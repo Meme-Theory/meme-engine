@@ -5,8 +5,8 @@
   "author": {
     "name": "Meme-Engine, Inc"
   },
-  "homepage": "https://github.com/meme-theory/ralph-loop-py",
-  "repository": "https://github.com/meme-theory/ralph-loop-py",
+  "homepage": "https://github.com/meme-theory/meme-engine",
+  "repository": "https://github.com/meme-theory/meme-engine",
   "license": "MIT",
   "keywords": ["ralph-loop", "iterative-development", "self-referential", "windows", "cross-platform", "automation"],
   "commands": "./commands",

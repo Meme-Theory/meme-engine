@@ -1,15 +1,21 @@
-# Ralph Loop Plugin (Python/Cross-Platform)
+# Meme Engine - Claude Code Plugin Marketplace
 
 [![Windows Compatible](https://img.shields.io/badge/Windows-Compatible-blue?logo=windows)](https://github.com/anthropics/claude-code/issues/17257)
 [![Python 3.6+](https://img.shields.io/badge/Python-3.6+-green?logo=python)](https://python.org)
 
+A **marketplace of cross-platform Claude Code plugins** by [Meme-Engine, Inc](https://meme-engine.com).
+
+## Included Plugins
+
+### Ralph Loop (Python/Cross-Platform)
+
 **Cross-platform implementation** of the Ralph Wiggum technique for iterative, self-referential AI development loops in Claude Code.
 
-> 🪟 **Windows Users**: This fork replaces bash scripts with Python for native Windows support. No WSL, Git Bash, or Cygwin required!
+> 🪟 **Windows Users**: This plugin replaces bash scripts with Python for native Windows support. No WSL, Git Bash, or Cygwin required!
 
-## Why This Fork?
+#### Why This Plugin?
 
-The [official ralph-loop plugin](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/ralph-loop) uses bash scripts that don't run natively on Windows ([Issue #17257](https://github.com/anthropics/claude-code/issues/17257)). This fork provides:
+The [official ralph-loop plugin](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/ralph-loop) uses bash scripts that don't run natively on Windows ([Issue #17257](https://github.com/anthropics/claude-code/issues/17257)). Our version provides:
 
 - ✅ **Python-based hooks** - Works on Windows, macOS, and Linux
 - ✅ **No external dependencies** - Just Python 3.6+ (usually pre-installed)
@@ -20,7 +26,7 @@ The [official ralph-loop plugin](https://github.com/anthropics/claude-plugins-of
 
 ```bash
 # Install via Claude Code plugins
-claude plugins add meme-theory/ralph-loop-py
+claude plugins add meme-theory/meme-engine
 ```
 
 Or manually clone to your plugins directory.
