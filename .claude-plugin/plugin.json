@@ -5,5 +5,7 @@
   "author": {
     "name": "Meme-Engine, Inc",
     "url": "https://meme-engine.com"
-  }
+  },
+  "commands": "./commands/",
+  "hooks": "./hooks/hooks.json"
 }
