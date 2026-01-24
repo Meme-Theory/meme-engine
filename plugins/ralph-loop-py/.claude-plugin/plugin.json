@@ -1,10 +1,12 @@
 {
   "name": "ralph-loop-py",
+  "description": "Cross-platform Ralph Loop plugin using Python",
   "version": "1.0.0",
-  "description": "Cross-platform Ralph Loop plugin using Python. Windows-compatible implementation of the Ralph Wiggum technique for self-referential AI development loops.",
   "author": {
-    "name": "Meme-Engine, Inc",
-    "url": "https://meme-engine.com"
+    "name": "Meme-Engine, Inc"
   },
+  "repository": "https://github.com/Meme-Theory/ralph-loop-py",
+  "license": "MIT",
+  "keywords": ["ralph-loop", "windows", "cross-platform"],
   "commands": "./commands/"
 }
