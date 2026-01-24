@@ -18,8 +18,11 @@ ARGUMENTS:
 
 OPTIONS:
   --max-iterations <n>           Maximum iterations before auto-stop (default: unlimited)
-  --completion-promise '<text>'  Promise phrase (USE QUOTES for multi-word)
+  --completion-promise <text>    Promise phrase (consumes all words until next option)
   -h, --help                     Show this help message
+
+NOTE: --completion-promise is greedy - it takes everything after it until the next
+      --option. Put it LAST if using multi-word promises.
 
 DESCRIPTION:
   Starts a Ralph Loop in your CURRENT session. The stop hook prevents
@@ -33,10 +36,10 @@ DESCRIPTION:
   - Learning how Ralph works
 
 EXAMPLES:
-  /ralph-loop Build a todo API --completion-promise 'DONE' --max-iterations 20
+  /ralph-loop Build a todo API --max-iterations 20 --completion-promise DONE
   /ralph-loop --max-iterations 10 Fix the auth bug
   /ralph-loop Refactor cache layer  (runs forever)
-  /ralph-loop --completion-promise 'TASK COMPLETE' Create a REST API
+  /ralph-loop Create a REST API --completion-promise TASK COMPLETE
 
 STOPPING:
   Only by reaching --max-iterations or detecting --completion-promise
@@ -100,16 +103,21 @@ def main():
                 print("Error: --completion-promise requires a text argument", file=sys.stderr)
                 print("", file=sys.stderr)
                 print("   Valid examples:", file=sys.stderr)
-                print("     --completion-promise 'DONE'", file=sys.stderr)
-                print("     --completion-promise 'TASK COMPLETE'", file=sys.stderr)
-                print("     --completion-promise 'All tests passing'", file=sys.stderr)
+                print("     --completion-promise DONE", file=sys.stderr)
+                print("     --completion-promise TASK COMPLETE", file=sys.stderr)
+                print("     --completion-promise All tests passing", file=sys.stderr)
                 print("", file=sys.stderr)
                 print("   You provided: --completion-promise (with no text)", file=sys.stderr)
                 print("", file=sys.stderr)
-                print("   Note: Multi-word promises must be quoted!", file=sys.stderr)
+                print("   Tip: Put --completion-promise LAST, after --max-iterations", file=sys.stderr)
                 sys.exit(1)
-            completion_promise = args[i + 1]
-            i += 2
+            # Consume all words until next --option or end of args
+            promise_parts = []
+            i += 1
+            while i < len(args) and not args[i].startswith('--'):
+                promise_parts.append(args[i])
+                i += 1
+            completion_promise = ' '.join(promise_parts)
 
         else:
             # Non-option argument - collect as prompt part
