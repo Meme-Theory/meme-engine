@@ -10,10 +10,7 @@
   "plugins": [
     {
       "name": "ralph-loop-py",
-      "source": {
-        "source": "url",
-        "url": "https://github.com/Meme-Theory/ralph-loop-py.git"
-      },
+      "source": "./plugins/ralph-loop-py",
       "description": "Cross-platform Ralph Loop plugin using Python. Windows-compatible implementation of the Ralph Wiggum technique for self-referential AI development loops.",
       "version": "1.0.1",
       "author": {
