@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh *)",
+      "Bash(git *)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: Add hooks and skills paths to plugin.json\n\nPlugin.json must explicitly reference hooks and skills directories.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit:*)"
+    ]
+  }
+}
