@@ -8,6 +8,16 @@
       "name": "ralph-loop-py",
       "source": "./plugins/ralph-loop-py",
       "strict": false
+    },
+    {
+      "name": "skeptic-validator",
+      "source": "./plugins/skeptic-validator",
+      "strict": false
+    },
+    {
+      "name": "graceful-handoff",
+      "source": "./plugins/graceful-handoff",
+      "strict": false
     }
   ]
 }
