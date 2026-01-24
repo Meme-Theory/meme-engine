@@ -1,0 +1,13 @@
+{
+  "name": "skeptic-validator",
+  "description": "Rigorous validation agent that demands concrete evidence of correctness. Deploys after code changes to verify implementations with logs, test results, and benchmarks.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Meme-Engine, Inc"
+  },
+  "homepage": "https://github.com/meme-theory/meme-engine",
+  "repository": "https://github.com/meme-theory/meme-engine",
+  "license": "MIT",
+  "keywords": ["validation", "verification", "testing", "evidence", "code-review", "quality-assurance"],
+  "commands": "./commands"
+}

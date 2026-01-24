@@ -1,0 +1,13 @@
+{
+  "name": "graceful-handoff",
+  "description": "Generate detailed conversation summaries for seamless model handoffs. Creates comprehensive context that allows a new session to continue work without losing progress.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Meme-Engine, Inc"
+  },
+  "homepage": "https://github.com/meme-theory/meme-engine",
+  "repository": "https://github.com/meme-theory/meme-engine",
+  "license": "MIT",
+  "keywords": ["handoff", "context", "summary", "continuity", "session", "model-switch"],
+  "commands": "./commands"
+}
