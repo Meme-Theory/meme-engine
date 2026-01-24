@@ -1,7 +1,8 @@
 ---
-allowed-tools: Bash(python:*)
-description: Start Ralph Loop in current session
-argument: PROMPT [--max-iterations N] [--completion-promise TEXT]
+description: "Start Ralph Loop in current session"
+argument-hint: "PROMPT [--max-iterations N] [--completion-promise TEXT]"
+allowed-tools: ["Bash(python:*)"]
+hide-from-slash-command-tool: "true"
 ---
 
 # Ralph Loop Command

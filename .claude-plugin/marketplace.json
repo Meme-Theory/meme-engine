@@ -3,16 +3,11 @@
   "owner": {
     "name": "Meme-Engine, Inc"
   },
-  "metadata": {
-    "description": "Cross-platform Ralph Loop plugin marketplace"
-  },
   "plugins": [
     {
       "name": "ralph-loop-py",
       "source": "./plugins/ralph-loop-py",
-      "description": "Cross-platform Ralph Loop plugin using Python",
-      "version": "1.0.0",
-      "keywords": ["ralph-loop", "windows", "cross-platform"]
+      "strict": false
     }
   ]
 }
