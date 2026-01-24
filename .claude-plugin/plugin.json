@@ -1,5 +1,6 @@
 {
   "name": "ralph-loop-py",
+  "version": "1.0.0",
   "description": "Cross-platform Ralph Loop plugin using Python. Windows-compatible implementation of the Ralph Wiggum technique for self-referential AI development loops.",
   "author": {
     "name": "Meme-Engine, Inc",
