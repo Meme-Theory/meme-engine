@@ -5,31 +5,79 @@
 
 A **marketplace of cross-platform Claude Code plugins** by [Meme-Engine, Inc](https://meme-engine.com).
 
-## Included Plugins
-
-### Ralph Loop (Python/Cross-Platform)
-
-**Cross-platform implementation** of the Ralph Wiggum technique for iterative, self-referential AI development loops in Claude Code.
-
-> 🪟 **Windows Users**: This plugin replaces bash scripts with Python for native Windows support. No WSL, Git Bash, or Cygwin required!
-
-#### Why This Plugin?
-
-The [official ralph-loop plugin](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/ralph-loop) uses bash scripts that don't run natively on Windows ([Issue #17257](https://github.com/anthropics/claude-code/issues/17257)). Our version provides:
-
-- ✅ **Python-based hooks** - Works on Windows, macOS, and Linux
-- ✅ **No external dependencies** - Just Python 3.6+ (usually pre-installed)
-- ✅ **Same functionality** - Identical behavior to the official plugin
-- ✅ **Drop-in replacement** - Same commands, same workflow
-
 ## Installation
 
 ```bash
-# Install via Claude Code plugins
-claude plugins add meme-theory/meme-engine
+/plugin marketplace add Meme-Theory/meme-engine
 ```
 
-Or manually clone to your plugins directory.
+Then install individual plugins via `/plugin` or use the commands directly.
+
+---
+
+## Included Plugins
+
+| Plugin | Command | Description |
+|--------|---------|-------------|
+| **Ralph Loop** | `/ralph-loop` | Cross-platform iterative AI development loops |
+| **Graceful Handoff** | `/grace` | Generate conversation summaries for model handoffs |
+| **Skeptic Validator** | `/validate` | Rigorous validation demanding concrete evidence |
+
+---
+
+## Ralph Loop (Python/Cross-Platform)
+
+**Cross-platform implementation** of the Ralph Wiggum technique for iterative, self-referential AI development loops in Claude Code.
+
+> Windows Users: This plugin replaces bash scripts with Python for native Windows support. No WSL, Git Bash, or Cygwin required!
+
+### Why This Plugin?
+
+The [official ralph-loop plugin](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/ralph-loop) uses bash scripts that don't run natively on Windows ([Issue #17257](https://github.com/anthropics/claude-code/issues/17257)). Our version provides:
+
+- Python-based hooks - Works on Windows, macOS, and Linux
+- No external dependencies - Just Python 3.6+ (usually pre-installed)
+- Same functionality - Identical behavior to the official plugin
+- Drop-in replacement - Same commands, same workflow
+
+---
+
+## Graceful Handoff
+
+Generate detailed conversation summaries for seamless model handoffs. When you need to switch sessions or models, `/grace` creates comprehensive context so a new session can continue without losing progress.
+
+**Usage:**
+```bash
+/grace
+```
+
+**What it does:**
+- Summarizes the current effort as a task list
+- Includes code and architecture notes for each task
+- Generates an action plan for post-handoff recovery
+
+Use this before ending a long session or when hitting context limits.
+
+---
+
+## Skeptic Validator
+
+A rigorous validation agent that demands concrete evidence of correctness. Deploy after code changes to verify implementations with actual logs, test results, and benchmarks.
+
+**Usage:**
+```bash
+/validate [FILE_OR_DESCRIPTION]
+```
+
+**What it validates:**
+- **Bug fixes** - Show failing test before, passing after
+- **New features** - Run tests and demonstrate working examples
+- **Performance claims** - Require benchmark numbers, before/after
+- **Security fixes** - Verify vulnerability is closed
+
+**Philosophy:** "Tests pass" is not enough - SHOW the output. "It works" is not enough - DEMONSTRATE it. Assumptions are not evidence.
+
+---
 
 ## What is Ralph Loop?
 
