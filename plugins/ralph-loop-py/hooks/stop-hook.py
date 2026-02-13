@@ -78,6 +78,16 @@ def main():
 
     frontmatter, prompt_text = parse_frontmatter(content)
 
+    # Session-scoping: only trap the session that created this loop
+    stored_session_id = frontmatter.get('session_id', '')
+    if stored_session_id:
+        # Derive current session ID from transcript path
+        transcript_path = hook_input.get('transcript_path', '')
+        current_session_id = Path(transcript_path).stem if transcript_path else ''
+        if current_session_id and current_session_id != stored_session_id:
+            # Different session — not ours, allow exit
+            sys.exit(0)
+
     # Extract values
     iteration_str = frontmatter.get('iteration', '')
     max_iterations_str = frontmatter.get('max_iterations', '0')
