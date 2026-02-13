@@ -151,6 +151,14 @@ def main():
     else:
         completion_promise_yaml = "null"
 
+    # Derive session ID from transcript path (unique per session)
+    import os
+    transcript_path = os.environ.get("CLAUDE_TRANSCRIPT_PATH", "")
+    session_id = ""
+    if transcript_path:
+        # Use the transcript filename (without extension) as session ID
+        session_id = Path(transcript_path).stem
+
     # Create state file
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     state_content = f"""---
@@ -159,6 +167,7 @@ iteration: 1
 max_iterations: {max_iterations}
 completion_promise: {completion_promise_yaml}
 started_at: "{now}"
+session_id: "{session_id}"
 ---
 
 {prompt}
