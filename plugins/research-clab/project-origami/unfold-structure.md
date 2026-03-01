@@ -26,7 +26,8 @@ Create this exact structure under the project root. Every directory listed here 
 │   │   ├── document-prep/
 │   │   ├── new-researcher/
 │   │   ├── indexing/
-│   │   └── team-blast/
+│   │   ├── team-blast/
+│   │   └── clab-synthesis/
 │   └── rules/
 ├── researchers/
 ├── sessions/
@@ -56,6 +57,7 @@ Each directory gets a scoped CLAUDE.md that tells agents what belongs there and 
 | `claude-md-agent-memory.md` | `.claude/agent-memory/CLAUDE.md` | None (generic) |
 | `claude-md-skills.md` | `.claude/skills/CLAUDE.md` | None (generic) |
 | `claude-md-researchers.md` | `researchers/CLAUDE.md` | None (generic) |
+| `agents-md-researchers.md` | `researchers/agents.md` | None (generic) |
 | `claude-md-sessions.md` | `sessions/CLAUDE.md` | None (generic) |
 | `claude-md-sessions-plan.md` | `sessions/session-plan/CLAUDE.md` | None (generic) |
 | `claude-md-sessions-framework.md` | `sessions/framework/CLAUDE.md` | None (generic) |
@@ -109,6 +111,7 @@ ${CLAUDE_PLUGIN_ROOT}/skills/document-prep/SKILL.md      → .claude/skills/docu
 ${CLAUDE_PLUGIN_ROOT}/skills/new-researcher/SKILL.md     → .claude/skills/new-researcher/SKILL.md
 ${CLAUDE_PLUGIN_ROOT}/skills/indexing/SKILL.md           → .claude/skills/indexing/SKILL.md
 ${CLAUDE_PLUGIN_ROOT}/skills/team-blast/SKILL.md         → .claude/skills/team-blast/SKILL.md
+${CLAUDE_PLUGIN_ROOT}/skills/clab-synthesis/SKILL.md     → .claude/skills/clab-synthesis/SKILL.md
 ${CLAUDE_PLUGIN_ROOT}/skills/new-research-project/SKILL.md → .claude/skills/new-research-project/SKILL.md
 ```
 
@@ -211,6 +214,7 @@ Generate `agents.md` at project root — a human-readable quick-reference:
 | `/new-researcher` | Create a new domain agent with web-fetched papers |
 | `/indexing` | Build structured index for researcher or general folder |
 | `/team-blast` | Direct-write broadcast to team agent inboxes |
+| `/clab-synthesis` | Generate synthesis or fusion documents from source docs |
 ```
 
 ---
@@ -298,7 +302,7 @@ Before reporting completion, verify:
 - [ ] All directories from Step 1 exist
 - [ ] Root CLAUDE.md has all required sections filled in
 - [ ] All 6 rule files exist in `.claude/rules/`
-- [ ] All 10 skills exist in `.claude/skills/`
+- [ ] All 11 skills exist in `.claude/skills/`
 - [ ] `settings.local.json` exists and is valid JSON
 - [ ] 3 infrastructure agents exist in `.claude/agents/`
 - [ ] 3 agent-memory stubs exist with MEMORY.md files

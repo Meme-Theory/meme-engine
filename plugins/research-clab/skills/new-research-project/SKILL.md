@@ -74,7 +74,7 @@ Pre-flight:
   Existing agents: WARNING — .claude/agents/ exists (will confirm overwrite)
   Mode: --dry-run
 
-Ready to collect project parameters. Press Enter to start.
+Ready to collect project parameters. Type 'go' to start.
 ```
 
 **STOP HERE.** Do not call AskUserQuestion. Do not proceed to Phase 1. Wait for the user to respond. Their response creates the turn boundary that makes AskUserQuestion work.
@@ -311,7 +311,7 @@ Run through this checklist. Every item must pass:
 - [ ] 3 infrastructure agents in `.claude/agents/`
 - [ ] 3 agent memory directories with MEMORY.md files
 - [ ] 6 behavioral rules in `.claude/rules/`
-- [ ] 10 skills in `.claude/skills/` (each with SKILL.md)
+- [ ] 11 skills in `.claude/skills/` (each with SKILL.md)
 - [ ] 11 session templates in `sessions/templates/`
 - [ ] 11 CLAUDE.md files (root + 10 subdirectories)
 - [ ] `.claude/settings.local.json` is valid JSON
@@ -343,7 +343,7 @@ Print completion summary using the insight block format. The content inside must
 
   Structure:
     .claude/agents/ ............ 3 infrastructure + {N} domain (queued)
-    .claude/skills/ ............ 10 skills installed
+    .claude/skills/ ............ 11 skills installed
     .claude/rules/ ............. 6 behavioral rules
     sessions/ .................. Session 0 prompt ready
     tools/ ..................... Knowledge schema initialized
