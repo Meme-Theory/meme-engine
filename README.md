@@ -1,262 +1,109 @@
-# Meme Engine - Claude Code Plugin Marketplace
+# Meme Engine
 
-[![Windows Compatible](https://img.shields.io/badge/Windows-Compatible-blue?logo=windows)](https://github.com/anthropics/claude-code/issues/17257)
-[![Python 3.6+](https://img.shields.io/badge/Python-3.6+-green?logo=python)](https://python.org)
+A Claude Code plugin marketplace by [Meme-Engine, Inc](https://meme-engine.com).
 
-A **marketplace of cross-platform Claude Code plugins** by [Meme-Engine, Inc](https://meme-engine.com).
+## Install
 
-## Installation
-
-```bash
-/plugin marketplace add Meme-Theory/meme-engine
+```
+/install-plugin Meme-Theory/meme-engine
 ```
 
-Then install individual plugins via `/plugin` or use the commands directly.
+## research-clab
+
+Scaffold a complete multi-agent research collaboration in any domain. One command generates the full project architecture: agents, skills, behavioral rules, knowledge tooling, session infrastructure, and a Session 0 plan.
+
+```
+/new-research-project
+```
+
+### What it builds
+
+```
+your-project/
+  .claude/
+    agents/          3 infrastructure + N domain specialists
+    skills/          11 skills (team launch, synthesis, indexing, ...)
+    rules/           6 behavioral rules (epistemic discipline, team conduct, ...)
+    agent-memory/    Per-agent persistent memory
+  researchers/       Domain reference corpora (14 papers per agent)
+  sessions/          Session plans, templates (Formats A-I), framework docs
+  tools/             Knowledge schema + index (librarian-maintained)
+  CLAUDE.md          Project constitution
+  agents.md          Agent & skill registry
+```
+
+### How it works
+
+1. `/new-research-project` collects your domain and research question
+2. Dispatches **coordinator** and **librarian** agents in parallel to scaffold infrastructure and knowledge system
+3. Presents 10 agent archetypes — you pick a team (Skeptic + Calculator mandatory, Workhorses/Dreamers/etc. optional)
+4. You assign persona overlays (real researchers whose intellectual DNA shapes each agent)
+5. `/new-researcher` stamps each agent definition and deploys **scout** to fetch papers
+6. Session 0 prompt is ready — run `/clab-team` to launch your first research session
+
+### Agent archetypes
+
+| Archetype | Cognitive style |
+|:----------|:----------------|
+| **Skeptic** | "Prove it." Demands methodology, controls, pre-registration. Owns confidence assessment. |
+| **Calculator** | "Stop debating. Run it." Produces artifacts, code, data. Resolves debates by computing. |
+| **Workhorse** | "I'll work through this properly." Deep domain expertise, shows every step. |
+| **Principalist** | "What MUST be true?" Structural constraints, thought experiments. |
+| **Dreamer** | "What if this is actually THAT?" Cross-domain pattern finder. |
+| **Boundary Guard** | "Here are the limits." Hard constraints, impossibility results. |
+| **Observer** | "What does the data say?" Data-driven analysis, error bars. |
+| **Bridge** | "The original source says..." Source fidelity, preserves external work. |
+
+### Skills installed in generated projects
+
+| Skill | What it does |
+|:------|:-------------|
+| `/clab-team` | Launch a coordinated multi-agent session from a prompt file |
+| `/clab-synthesis` | Generate synthesis/fusion documents (solo or team mode) |
+| `/clab-plan` | Generate session plans and prompts from a topic |
+| `/clab-review` | Multi-agent collaborative document review |
+| `/new-researcher` | Create a new domain agent with web-fetched papers |
+| `/weave` | Query and maintain the knowledge index |
+| `/indexing` | Build structured index for a researcher folder |
+| `/shortterm` | Collapse and optimize agent memory files |
+| `/document-prep` | Format-aware document toolkit |
+| `/team-blast` | Direct-write broadcast to team agent inboxes |
+| `/redact` | Remove agent-memory references to a session or identifier |
+
+### Session formats
+
+Nine predefined formats with prescribed team sizes and workflows:
+
+| Format | Type | Team |
+|:-------|:-----|:-----|
+| A | First Contact Review | 2-3 agents |
+| B | Adversarial Debate | 2-3 agents |
+| C | Collaborative Deep Dive | 2-3 agents |
+| D | Workshop | 2-3 agents per round |
+| E | Investigation Arc | 2-3 agents |
+| F | Decisive Computation | 2-3 agents |
+| G | Mass Parallel Assessment | 3 agents |
+| H | Decision Gate | 2-3 agents |
+| I | Formalization | 2-3 agents |
+
+### Knowledge system
+
+Every generated project includes a schema-driven knowledge graph:
+
+- `tools/knowledge-schema.yaml` — Entity types (universal + domain-specific)
+- `tools/knowledge-index.json` — Structured index (librarian is sole writer)
+- `/weave` skill for querying and maintaining the index
+
+The librarian agent indexes session outputs, tracks constraints, gates, proven results, data provenance, and cross-references — all without Python.
 
 ---
 
-## Included Plugins
+## Also included
 
-| Plugin | Command | Description |
-|--------|---------|-------------|
-| **Ralph Loop** | `/ralph-loop` | Cross-platform iterative AI development loops |
-| **Graceful Handoff** | `/grace` | Generate conversation summaries for model handoffs |
-| **Skeptic Validator** | `/validate` | Rigorous validation demanding concrete evidence |
+**graceful-handoff** — `/grace` generates a detailed conversation summary so a new session can pick up where you left off.
 
----
-
-## Ralph Loop (Python/Cross-Platform)
-
-**Cross-platform implementation** of the Ralph Wiggum technique for iterative, self-referential AI development loops in Claude Code.
-
-> Windows Users: This plugin replaces bash scripts with Python for native Windows support. No WSL, Git Bash, or Cygwin required!
-
-### Why This Plugin?
-
-The [official ralph-loop plugin](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/ralph-loop) uses bash scripts that don't run natively on Windows ([Issue #17257](https://github.com/anthropics/claude-code/issues/17257)). Our version provides:
-
-- Python-based hooks - Works on Windows, macOS, and Linux
-- No external dependencies - Just Python 3.6+ (usually pre-installed)
-- Same functionality - Identical behavior to the official plugin
-- Drop-in replacement - Same commands, same workflow
-
----
-
-## Graceful Handoff
-
-Generate detailed conversation summaries for seamless model handoffs. When you need to switch sessions or models, `/grace` creates comprehensive context so a new session can continue without losing progress.
-
-**Usage:**
-```bash
-/grace
-```
-
-**What it does:**
-- Summarizes the current effort as a task list
-- Includes code and architecture notes for each task
-- Generates an action plan for post-handoff recovery
-
-Use this before ending a long session or when hitting context limits.
-
----
-
-## Skeptic Validator
-
-A rigorous validation agent that demands concrete evidence of correctness. Deploy after code changes to verify implementations with actual logs, test results, and benchmarks.
-
-**Usage:**
-```bash
-/validate [FILE_OR_DESCRIPTION]
-```
-
-**What it validates:**
-- **Bug fixes** - Show failing test before, passing after
-- **New features** - Run tests and demonstrate working examples
-- **Performance claims** - Require benchmark numbers, before/after
-- **Security fixes** - Verify vulnerability is closed
-
-**Philosophy:** "Tests pass" is not enough - SHOW the output. "It works" is not enough - DEMONSTRATE it. Assumptions are not evidence.
-
----
-
-## What is Ralph Loop?
-
-Ralph Loop is a development methodology based on continuous AI agent loops. As Geoffrey Huntley describes it: **"Ralph is a Bash loop"** - a simple `while true` that repeatedly feeds an AI agent a prompt file, allowing it to iteratively improve its work until completion.
-
-This technique is inspired by the Ralph Wiggum coding technique (named after the character from The Simpsons), embodying the philosophy of persistent iteration despite setbacks.
-
-### Core Concept
-
-This plugin implements Ralph using a **Stop hook** that intercepts Claude's exit attempts:
-
-```bash
-# You run ONCE:
-/ralph-loop "Your task description" --completion-promise "DONE"
-
-# Then Claude Code automatically:
-# 1. Works on the task
-# 2. Tries to exit
-# 3. Stop hook blocks exit
-# 4. Stop hook feeds the SAME prompt back
-# 5. Repeat until completion
-```
-
-The loop happens **inside your current session** - you don't need external bash loops. The Stop hook in `hooks/stop-hook.py` creates the self-referential feedback loop by blocking normal session exit.
-
-This creates a **self-referential feedback loop** where:
-- The prompt never changes between iterations
-- Claude's previous work persists in files
-- Each iteration sees modified files and git history
-- Claude autonomously improves by reading its own past work in files
-
-## Quick Start
-
-```bash
-/ralph-loop "Build a REST API for todos. Requirements: CRUD operations, input validation, tests. Output <promise>COMPLETE</promise> when done." --completion-promise "COMPLETE" --max-iterations 50
-```
-
-Claude will:
-- Implement the API iteratively
-- Run tests and see failures
-- Fix bugs based on test output
-- Iterate until all requirements met
-- Output the completion promise when done
-
-## Commands
-
-### /ralph-loop
-
-Start a Ralph loop in your current session.
-
-**Usage:**
-```bash
-/ralph-loop "<prompt>" --max-iterations <n> --completion-promise "<text>"
-```
-
-**Options:**
-- `--max-iterations <n>` - Stop after N iterations (default: unlimited)
-- `--completion-promise <text>` - Phrase that signals completion
-
-### /cancel-ralph
-
-Cancel the active Ralph loop.
-
-**Usage:**
-```bash
-/cancel-ralph
-```
-
-## Prompt Writing Best Practices
-
-### 1. Clear Completion Criteria
-
-❌ Bad: "Build a todo API and make it good."
-
-✅ Good:
-```markdown
-Build a REST API for todos.
-
-When complete:
-- All CRUD endpoints working
-- Input validation in place
-- Tests passing (coverage > 80%)
-- README with API docs
-- Output: <promise>COMPLETE</promise>
-```
-
-### 2. Incremental Goals
-
-❌ Bad: "Create a complete e-commerce platform."
-
-✅ Good:
-```markdown
-Phase 1: User authentication (JWT, tests)
-Phase 2: Product catalog (list/search, tests)
-Phase 3: Shopping cart (add/remove, tests)
-
-Output <promise>COMPLETE</promise> when all phases done.
-```
-
-### 3. Self-Correction
-
-❌ Bad: "Write code for feature X."
-
-✅ Good:
-```markdown
-Implement feature X following TDD:
-1. Write failing tests
-2. Implement feature
-3. Run tests
-4. If any fail, debug and fix
-5. Refactor if needed
-6. Repeat until all green
-7. Output: <promise>COMPLETE</promise>
-```
-
-### 4. Escape Hatches
-
-Always use `--max-iterations` as a safety net to prevent infinite loops on impossible tasks:
-
-```bash
-# Recommended: Always set a reasonable iteration limit
-/ralph-loop "Try to implement feature X" --max-iterations 20
-
-# In your prompt, include what to do if stuck:
-# "After 15 iterations, if not complete:
-#  - Document what's blocking progress
-#  - List what was attempted
-#  - Suggest alternative approaches"
-```
-
-**Note**: The `--completion-promise` uses exact string matching, so you cannot use it for multiple completion conditions (like "SUCCESS" vs "BLOCKED"). Always rely on `--max-iterations` as your primary safety mechanism.
-
-## Philosophy
-
-Ralph embodies several key principles:
-
-### 1. Iteration > Perfection
-Don't aim for perfect on first try. Let the loop refine the work.
-
-### 2. Failures Are Data
-"Deterministically bad" means failures are predictable and informative. Use them to tune prompts.
-
-### 3. Operator Skill Matters
-Success depends on writing good prompts, not just having a good model.
-
-### 4. Persistence Wins
-Keep trying until success. The loop handles retry logic automatically.
-
-## When to Use Ralph
-
-**Good for:**
-- Well-defined tasks with clear success criteria
-- Tasks requiring iteration and refinement (e.g., getting tests to pass)
-- Greenfield projects where you can walk away
-- Tasks with automatic verification (tests, linters)
-
-**Not good for:**
-- Tasks requiring human judgment or design decisions
-- One-shot operations
-- Tasks with unclear success criteria
-- Production debugging (use targeted debugging instead)
-
-## Real-World Results
-
-- Successfully generated 6 repositories overnight in Y Combinator hackathon testing
-- One $50k contract completed for $297 in API costs
-- Created entire programming language ("cursed") over 3 months using this approach
-
-## Learn More
-
-- Original technique: https://ghuntley.com/ralph/
-- Ralph Orchestrator: https://github.com/mikeyobrien/ralph-orchestrator
-- Windows Issue: https://github.com/anthropics/claude-code/issues/17257
-
-## Credits
-
-- Original plugin by [Anthropic](https://github.com/anthropics/claude-plugins-official)
-- Python port for Windows compatibility by [Meme-Engine, Inc](https://meme-engine.com)
+**skeptic-validator** — `/validate` demands concrete evidence (test results, logs, benchmarks) that code changes are correct before accepting them.
 
 ## License
 
-MIT - Same as the original plugin.
+MIT
