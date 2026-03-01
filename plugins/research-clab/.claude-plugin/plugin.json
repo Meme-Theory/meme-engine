@@ -1,0 +1,12 @@
+{
+  "name": "research-clab",
+  "description": "Scaffold a complete multi-agent research collaboration -- agents, skills, knowledge tooling, and Session 0 plan -- in any domain",
+  "version": "1.0.0",
+  "author": {
+    "name": "Meme-Engine, Inc"
+  },
+  "homepage": "https://github.com/meme-theory/meme-engine",
+  "repository": "https://github.com/meme-theory/meme-engine",
+  "license": "MIT",
+  "keywords": ["research", "multi-agent", "collaboration", "scaffold", "knowledge", "sessions"]
+}
