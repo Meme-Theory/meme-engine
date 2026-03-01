@@ -85,7 +85,7 @@ Copy rule files from `${CLAUDE_PLUGIN_ROOT}/templates/claude-md/rules/` into `.c
 
 | Source | Install To | Purpose |
 |:-------|:-----------|:--------|
-| `team-lead-behavior.md` | `.claude/rules/team-lead-behavior.md` | Don't over-manage, never self-shutdown |
+| `team-lead-behavior.md` | `.claude/rules/team-lead-behavior.md` | Don't over-manage, shut down agents when done, never self-terminate |
 | `teammate-behavior.md` | `.claude/rules/teammate-behavior.md` | Inbox first, message discipline |
 | `epistemic-discipline.md` | `.claude/rules/epistemic-discipline.md` | Evidence hierarchy, what counts as a result |
 | `output-standards.md` | `.claude/rules/output-standards.md` | Formatting, precision requirements |
@@ -112,7 +112,6 @@ ${CLAUDE_PLUGIN_ROOT}/skills/new-researcher/SKILL.md     → .claude/skills/new-
 ${CLAUDE_PLUGIN_ROOT}/skills/indexing/SKILL.md           → .claude/skills/indexing/SKILL.md
 ${CLAUDE_PLUGIN_ROOT}/skills/team-blast/SKILL.md         → .claude/skills/team-blast/SKILL.md
 ${CLAUDE_PLUGIN_ROOT}/skills/clab-synthesis/SKILL.md     → .claude/skills/clab-synthesis/SKILL.md
-${CLAUDE_PLUGIN_ROOT}/skills/new-research-project/SKILL.md → .claude/skills/new-research-project/SKILL.md
 ```
 
 ---
@@ -161,13 +160,15 @@ If a Python environment was identified, add `Bash("{python-path}":*)`.
 
 ## Step 6: Install Infrastructure Agents
 
-Copy the 3 infrastructure agents from `${CLAUDE_PLUGIN_ROOT}/agents/` into `.claude/agents/`:
+Copy the 3 infrastructure agents from `${CLAUDE_PLUGIN_ROOT}/templates/infrastructure-agents/` into `.claude/agents/`:
 
 ```
-${CLAUDE_PLUGIN_ROOT}/agents/coordinator.md → .claude/agents/coordinator.md
-${CLAUDE_PLUGIN_ROOT}/agents/librarian.md   → .claude/agents/librarian.md
-${CLAUDE_PLUGIN_ROOT}/agents/scout.md       → .claude/agents/scout.md
+${CLAUDE_PLUGIN_ROOT}/templates/infrastructure-agents/coordinator.md → .claude/agents/coordinator.md
+${CLAUDE_PLUGIN_ROOT}/templates/infrastructure-agents/librarian.md   → .claude/agents/librarian.md
+${CLAUDE_PLUGIN_ROOT}/templates/infrastructure-agents/scout.md       → .claude/agents/scout.md
 ```
+
+**Variable substitution**: After copying, replace `{{PROJECT_NAME}}` with the actual project name in `librarian.md` (2 occurrences: YAML description and agent intro paragraph) and `scout.md` (3 occurrences: Connection section header, generation phase template, cross-domain interaction pattern). `coordinator.md` has no template variables — copy verbatim.
 
 Create agent-memory stubs for each:
 

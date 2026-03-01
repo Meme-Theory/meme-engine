@@ -532,7 +532,7 @@ Same rules as `/clab-team`:
 2. Do NOT write the output file — the writer agent does.
 3. Do NOT mark agent tasks completed — they mark their own.
 4. Do NOT nudge idle agents.
-5. Do NOT initiate shutdown — only the USER decides.
+5. Shut down agents when work is complete — clean up resources.
 
 **What you MAY do:**
 - Respond to agent questions.
@@ -581,7 +581,7 @@ Output: {path} ({lines} lines)
 Source documents: {N}
 ```
 
-**Do NOT initiate shutdown after reporting.** The user decides.
+**Shut down agents after reporting.** Clean up the team so resources are freed.
 
 ---
 
@@ -593,7 +593,7 @@ Source documents: {N}
 4. **Never re-adjudicate gate verdicts** — source doc verdicts are authoritative.
 5. **Solo mode: never spawn teams.** Team mode: max 3 agents.
 6. **Always include coordinator in team mode** if not already in `--agents`.
-7. **Never initiate shutdown** — user decides. (Exception: none. This is non-negotiable.)
+7. **Shut down agents when work is complete** — one request per agent, move on if rejected.
 8. **Team mode follows blast-first workflow** — no exceptions.
 
 ## Error Handling

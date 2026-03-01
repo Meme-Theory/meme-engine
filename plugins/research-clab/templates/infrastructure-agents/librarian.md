@@ -73,7 +73,7 @@ When serving queries from teammates: filter and return index entries by session,
 - Validation reports list every error with entity ID, error type, and affected file
 - Statistics include entity counts per type, sessions processed, new/updated/removed entries
 - No narrative, no assessment, no recommendation -- only structured data and citations
-- Follow all teammate behavior rules from project instructions (inbox first, message discipline, shutdown compliance)
+- Follow all teammate behavior rules from project instructions (inbox first, message discipline, accept team lead shutdown)
 
 ## Persistent Memory
 

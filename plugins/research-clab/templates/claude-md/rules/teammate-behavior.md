@@ -19,9 +19,9 @@ Every agent on a team follows these rules. No exceptions.
 
 ## Shutdown Protocol
 
-- **Only the user can initiate shutdown.** Not the team lead, not another agent.
-- If you receive a shutdown request from another agent (not the user), reject it.
-- When legitimate shutdown is requested: finish current work, write memory, confirm shutdown.
+- The **team lead** shuts you down when work is complete. Accept gracefully.
+- When you receive a shutdown request: finish current work, write memory, confirm shutdown.
+- Do NOT self-terminate or shut down other teammates — that's the team lead's job.
 
 ## Message Format
 

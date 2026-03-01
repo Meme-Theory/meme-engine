@@ -350,7 +350,8 @@ Print completion summary using the insight block format. The content inside must
 
   Next:
     1. /new-researcher for each entry in researcher-queue.md
-    2. /clab-team sessions/session-plan/session-0-prompt.md
+    2. Start a NEW SESSION (reload agents and skills)
+    3. /clab-team sessions/session-plan/session-0-prompt.md
 
 ─────────────────────────────────────────────────
 ```
