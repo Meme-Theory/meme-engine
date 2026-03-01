@@ -114,19 +114,50 @@ If an agent name in the prompt doesn't match any definition in `.claude/agents/`
 - Warn the user: "No agent definition found for '{name}'. Use `general-purpose` as fallback?"
 - If user agrees, use `general-purpose` with the prompt's role description injected into the spawn prompt.
 
-### 1c. Mode-Specific Extraction
+### 1c. Output File Naming — YOU Generate the Paths
+
+Agents do NOT choose their own filenames. YOU generate every output path using this convention:
+
+```
+{session-folder}/session-{NN}-{descriptor}.md
+```
+
+- `NN` = zero-padded session number (from session ID)
+- `descriptor` = lowercase-hyphenated topic (from the prompt's task description)
+
+**Compute mode examples:**
+```
+sessions/session-05/session-05-spectral-analysis.md
+sessions/session-05/session-05-gate-verdicts.md
+sessions/session-05/session-05-synthesis.md
+```
+
+**Workshop mode** — add round ID:
+```
+sessions/session-00/session-00-r1a-empirical-quantitative.md
+sessions/session-00/session-00-r1b-geometric-creative.md
+```
+
+**Panel mode:**
+```
+sessions/session-07/session-07-synthesis.md
+```
+
+When the prompt specifies explicit output paths, use those. Otherwise, generate paths from the session ID + task descriptor. Pass the FULL PATH to each agent in their prompt — never leave it to the agent to decide.
+
+### 1d. Mode-Specific Extraction
 
 **Compute mode**: Extract computation list (IDs, titles, priorities, agents, inputs, outputs, scripts, dependencies) and constraint gates.
 
-**Workshop mode**: Extract round definitions (round ID, participants, discussion topics, input files, output file path). Note the sequential ordering — each round feeds the next.
+**Workshop mode**: Extract round definitions (round ID, participants, discussion topics, input files, output file). Note the sequential ordering — each round feeds the next.
 
 **Panel mode**: Extract the interpretive thesis/question, required reading, the designated writer, and the expected output document.
 
-### 1d. Required Reading
+### 1e. Required Reading
 
 Separate into ALL-agents shared list and per-agent lists.
 
-### 1e. Team Name
+### 1f. Team Name
 
 Use `--team-name` if provided. Otherwise: `session-{id}` (lowercase, hyphens). For workshop mode with multiple rounds, the team name gets a `-r{N}` suffix per round.
 
@@ -277,9 +308,8 @@ Claim each (TaskUpdate owner={your-name}), mark in_progress when starting.
 {full specs from prompt — method, inputs, outputs, script name, formulas}
 
 ### Rules
+- Write ONLY to the designated output paths. Do not create drafts, scratch files, or rename outputs.
 - Python: use the project's configured Python environment
-- Output: designated output directory
-- Prefix: {prefix}
 - NUMBERS first. Gate classification second. Interpretation third.
 - Check inbox between computation blocks.
 - When done: TaskUpdate completed + summary to team-lead.
@@ -303,6 +333,7 @@ Claim each (TaskUpdate owner={your-name}), mark in_progress when starting.
 - Write gate verdicts: {output-dir}/{prefix}gate_verdicts.txt
 
 ### Rules
+- Write ONLY to the paths above. Do not create drafts, scratch files, or rename outputs.
 - YOU are the only agent who writes synthesis and verdict files.
 - Classify BEFORE interpreting.
 - Check inbox constantly.
@@ -328,6 +359,7 @@ Follow this structure:
 {output format from prompt}
 
 ### Rules
+- Write ONLY to the path above. Do not create drafts, scratch files, or rename the output.
 - Ground arguments in YOUR research papers (cite specific sources).
 - Keep focused: 100-200 lines.
 - Message your partner directly to discuss — use NAMES.
@@ -378,6 +410,7 @@ Collect interpretations from all specialists. Synthesize into:
 {document structure from prompt}
 
 ### Rules
+- Write ONLY to the path above. Do not create drafts, scratch files, or rename the output.
 - YOU are the only agent who writes the synthesis.
 - Wait for specialist inputs before writing — do not front-run.
 - Capture convergent AND divergent views.
