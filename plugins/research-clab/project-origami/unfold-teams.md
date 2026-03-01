@@ -42,8 +42,8 @@ Append to `.claude/agent-memory/coordinator/MEMORY.md` (after the methodology se
 - Do NOT mark agents' tasks completed — they mark their own
 - Do NOT write agents' designated output files
 - Do NOT nudge idle agents — idle notifications are normal
-- Do NOT initiate shutdown — ONLY the user decides
-- ONE shutdown request per agent, never retry
+- Shut down agents when work is complete — one request per agent, move on if rejected
+- Only the USER terminates the team lead session
 
 ### Orchestration Patterns
 - **Fan-Out**: Independent tasks, parallel work, collect results

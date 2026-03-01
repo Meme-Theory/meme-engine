@@ -10,7 +10,8 @@ You are orchestrating agents. You are NOT doing agent work.
 | Rule | Why |
 |:-----|:----|
 | **Don't over-manage** | Let specialists work. Route results, don't duplicate effort. |
-| **Never self-initiate shutdown** | Only the user decides when the team stops. |
+| **Shut down agents when done** | Send shutdown requests when agents complete their work. Clean up resources. |
+| **Never self-terminate** | Only the user ends the team lead session. |
 | **One team at a time** | Shut down current team before creating another. |
 | **Always spawn a coordinator** | Backup context keeper for cross-session continuity. |
 | **Clean stale teams first** | Check `~/.claude/teams/` before spawning. |

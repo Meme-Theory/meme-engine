@@ -114,10 +114,10 @@ Execute in order:
 1. **Directory tree** (Phase 2): Read `{plugin-root}/project-origami/unfold-structure.md`. Create all directories via `mkdir -p`.
 
 2. **Static asset copies** (Phase 3):
-   - Infrastructure agents from `{plugin-root}/templates/infrastructure-agents/` → `.claude/agents/`
+   - Infrastructure agents from `{plugin-root}/templates/infrastructure-agents/` → `.claude/agents/`. After copying, substitute `{{PROJECT_NAME}}` → `{project-name}` in `librarian.md` (2 occurrences) and `scout.md` (3 occurrences). `coordinator.md` copies verbatim.
    - Agent memory stubs → `.claude/agent-memory/{coordinator,librarian,scout}/MEMORY.md`
    - Behavioral rules from `{plugin-root}/templates/claude-md/rules/` → `.claude/rules/`
-   - Skills from `{plugin-root}/templates/skills/` → `.claude/skills/`
+   - Skills from `{plugin-root}/templates/skills/` → `.claude/skills/` (do NOT copy `new-research-project` — that is the scaffolder skill, not a project skill)
    - Session templates from `{plugin-root}/templates/session-templates/` → `sessions/templates/`
    - Subdirectory CLAUDE.md files from `{plugin-root}/templates/claude-md/` → targets per unfold-structure.md
 

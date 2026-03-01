@@ -21,7 +21,7 @@ Copy each rule file from `${CLAUDE_PLUGIN_ROOT}/templates/claude-md/rules/` into
 
 | Source | Target | What It Enforces |
 |:-------|:-------|:-----------------|
-| `team-lead-behavior.md` | `.claude/rules/team-lead-behavior.md` | Don't over-manage, never self-shutdown, one team at a time, always spawn coordinator, clean stale teams, blast-first |
+| `team-lead-behavior.md` | `.claude/rules/team-lead-behavior.md` | Don't over-manage, shut down agents when done, never self-terminate, one team at a time, always spawn coordinator, clean stale teams, blast-first |
 | `teammate-behavior.md` | `.claude/rules/teammate-behavior.md` | Inbox first, limit self-induced work, respond to interrupts, message by name, wait for roster, one topic per message |
 | `epistemic-discipline.md` | `.claude/rules/epistemic-discipline.md` | Evidence hierarchy, pre-registration, constraint framing, confidence ownership, what counts as a result |
 | `output-standards.md` | `.claude/rules/output-standards.md` | One writer per file, specific action items, mandatory handoffs, formatting precision |

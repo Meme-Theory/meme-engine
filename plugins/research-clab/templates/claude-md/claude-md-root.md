@@ -72,7 +72,7 @@ Team behavior, epistemic discipline, and output standards are defined in `.claud
 | Rule File | Scope | What It Covers |
 |:----------|:------|:---------------|
 | `team-lead-behavior.md` | Always | Orchestration rules, blast-first spawn, what leads don't do |
-| `teammate-behavior.md` | Always | Inbox discipline, message routing, shutdown protocol |
+| `teammate-behavior.md` | Always | Inbox discipline, message routing, team lead shutdown compliance |
 | `epistemic-discipline.md` | Always | Pre-registration, constraint methodology, source authority, confidence rules |
 | `output-standards.md` | Always | Action item format, handoff document structure, output rules |
 | `gate-verdicts.md` | Always | Pre-registration protocol, verdict format, permanence |

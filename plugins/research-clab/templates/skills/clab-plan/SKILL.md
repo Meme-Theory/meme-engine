@@ -444,7 +444,7 @@ Every result classified against its pre-registered gate BEFORE any interpretatio
 
 ## COMPLETION SIGNAL
 
-Session ends ONLY when user approves shutdown explicitly. Idle agents are not finished agents.
+When all agents have reported, shut them down and clean up the team. Idle agents are not finished agents — wait for their reports first.
 
 ---
 
