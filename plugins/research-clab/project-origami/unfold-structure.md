@@ -140,6 +140,18 @@ These are verbatim copies — no substitutions needed. The selection guide is NO
 
 ## Step 5: Install Settings
 
+### 5a: Install `settings.json` (shared, committed)
+
+Read the template from `${CLAUDE_PLUGIN_ROOT}/templates/claude-md/claude-md-settings-json.md` and write the JSON block to `.claude/settings.json`. This file includes:
+
+- `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` — **required** for agent team functionality
+- Shared permissions (research domain whitelists, deny rules for credentials)
+- PostToolUse hooks for session file tracking
+
+If the user specified additional web domains for research, add `WebFetch(domain:...)` entries to the allow list.
+
+### 5b: Install `settings.local.json` (personal, gitignored)
+
 Generate `.claude/settings.local.json` with:
 
 ```json
@@ -151,8 +163,6 @@ Generate `.claude/settings.local.json` with:
   }
 }
 ```
-
-If the user specified web domains for research (e.g., arxiv.org, pubmed.ncbi.nlm.nih.gov), add `WebFetch(domain:...)` entries to the allow list.
 
 If a Python environment was identified, add `Bash("{python-path}":*)`.
 
@@ -304,6 +314,7 @@ Before reporting completion, verify:
 - [ ] Root CLAUDE.md has all required sections filled in
 - [ ] All 6 rule files exist in `.claude/rules/`
 - [ ] All 11 skills exist in `.claude/skills/`
+- [ ] `settings.json` exists, is valid JSON, and contains `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`
 - [ ] `settings.local.json` exists and is valid JSON
 - [ ] 3 infrastructure agents exist in `.claude/agents/`
 - [ ] 3 agent-memory stubs exist with MEMORY.md files
