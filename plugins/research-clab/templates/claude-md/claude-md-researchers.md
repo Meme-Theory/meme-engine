@@ -43,8 +43,8 @@ NN_YYYY_Author_ShortTitle.md
 - `ShortTitle` — Descriptive title (underscores for spaces)
 
 **Examples**:
-- `01_1921_Kaluza_Unified_Field_Theory.md`
-- `07_2006_Connes_Noncommutative_Geometry_SM.md`
+- `01_YYYY_Author_Short_Title.md`
+- `07_YYYY_Author_Short_Title.md`
 
 ## Adding New Domains
 

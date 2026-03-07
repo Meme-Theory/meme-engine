@@ -1,22 +1,23 @@
 ---
 name: clab-plan
 description: Generate session plans and prompts from a topic — context assembly, planner agent, user checkpoint, prompter agent
-argument-hint: <topic> [--session <N>] [--sub-sessions <N>] [--planner <agent-type>] [--prompter <agent-type>] [--context <file>...] [--dry-run]
+argument-hint: <topic> [--session <N>] [--format compute|workshop|panel] [--sub-sessions <N>] [--planner <agent-type>] [--prompter <agent-type>] [--context <file>...] [--dry-run]
 ---
 
 # Clab-Plan — Session Plan & Prompt Generator
 
-Automate the session planning pipeline: topic → context → plan → prompts. The skill assembles project context deterministically, spawns a solo planner agent to produce the plan document, checkpoints with the user, then spawns a solo prompter agent to generate self-contained prompt files. No teams — sequential solo agents only.
+Automate the session planning pipeline: topic -> context -> plan -> prompts. The skill assembles project context deterministically, spawns a solo planner agent to produce the plan document, checkpoints with the user, then spawns a solo prompter agent to generate self-contained prompt files. No teams — sequential solo agents only.
 
 ## Usage
 
 ```
 /clab-plan "Initial domain survey"
 /clab-plan "Initial domain survey" --planner coordinator
-/clab-plan "Constraint boundary analysis" --session 12 --sub-sessions 3
-/clab-plan "Cross-domain integration test" --planner workhorse-1 --prompter calculator
+/clab-plan "Constraint boundary analysis" --format compute --session 12
+/clab-plan "Cross-domain integration test" --format panel --session 5 --sub-sessions 3
+/clab-plan "Parallel computation sprint" --format compute --planner workhorse
 /clab-plan "test topic" --dry-run
-/clab-plan "Literature gap analysis" --context sessions/session-05/session-5-synthesis.md --context researchers/index.md
+/clab-plan "Literature gap analysis" --context sessions/session-05/session-5-synthesis.md
 ```
 
 ---
@@ -31,11 +32,22 @@ Parse `$ARGUMENTS` for:
 |:----|:---------|:--------|:------------|
 | `<topic>` | YES | — | The session topic (first positional arg, may be quoted) |
 | `--session <N>` | no | auto-detect | Session number (integer) |
-| `--sub-sessions <N>` | no | planner decides | Number of prompt files to generate |
+| `--format <fmt>` | no | `compute` | Session format — see below |
+| `--sub-sessions <N>` | no | planner decides | Number of prompt files to generate (team formats only) |
 | `--planner <type>` | no | `coordinator` | Agent type for plan generation |
 | `--prompter <type>` | no | `coordinator` | Agent type for prompt generation |
 | `--context <file>` | no | none | Extra context files (repeatable — each `--context` takes one path) |
 | `--dry-run` | no | false | Show context manifest and output paths, then stop |
+
+#### Format Options
+
+| Format | Description | Plan Structure | Prompt Output |
+|:-------|:-----------|:---------------|:-------------|
+| `compute` | Wave-based parallel independent agents. Each computation is an independent Agent call. No teams. Shared working paper. Decision points between waves. | Waves + per-computation specs + decision points | ONE plan file + ONE working paper template |
+| `workshop` | Sequential paired discussions in rounds. ONE team at a time. Markdown handoff between rounds. | Round definitions + participant pairs + topics | Per-round prompt files |
+| `panel` | Interpretive panel with designated writer. 2-3 specialists + writer synthesize. | Thesis + specialist assignments + output structure | Single prompt file |
+
+If `--format` is omitted, default is `compute`.
 
 ### 0b. Validate Topic
 
@@ -60,7 +72,7 @@ If `--context` files are provided, verify each exists using the Read tool (read 
 If `--session` was NOT provided:
 
 1. Glob for `sessions/session-plan/session-*-plan.md`
-2. Extract session numbers from filenames (e.g., `session-12-plan.md` → 12)
+2. Extract session numbers from filenames (e.g., `session-12-plan.md` -> 12)
 3. Set the next session number = max(found) + 1
 
 If no existing plans found, default to session 1.
@@ -153,7 +165,7 @@ knowledge-index: active_channels                45      no
 knowledge-index: gates                          180     no
 proven_results                                  150     no
 {planner} agent memory                          95      no
-─────────────────────────────────────────────────────────────────
+---
 Total context: 1210 lines (cap: 6000)
 ```
 
@@ -168,6 +180,7 @@ Display the manifest, output paths, and proposed agent types, then STOP. Do not 
 
 Topic: "{topic}"
 Session: {N}
+Format: {compute|workshop|panel}
 Plan file: {PLAN_FILE}
 Prompt prefix: {PROMPT_PREFIX}
 Sub-sessions: {count or "planner decides"}
@@ -210,7 +223,99 @@ The following is assembled project context — methodology status, recent result
 {full context package from Phase 2}
 ---END CONTEXT---
 
-## Plan Structure (MANDATORY — follow this format exactly)
+## Plan Structure
+
+The plan format depends on `--format`. Use EXACTLY ONE of the following structures.
+```
+
+#### FORMAT: `compute` (MANDATORY structure for compute plans)
+
+```markdown
+# Session {N} Plan: {Topic Title}
+
+**Date**: {date}
+**Author**: Team-lead (generated by /clab-plan, planner: {planner-type})
+**Format**: Parallel single-agent computations across {W} waves
+**Source**: {which sessions/syntheses informed this plan}
+**Motivation**: {1-2 sentences: why this session, why now}
+**Results file**: `sessions/session-{N}/session-{N}-results-workingpaper.md`
+
+---
+
+## I. Session Objective
+
+{1-2 paragraphs: what this session resolves, what the pre-registered master gate is}
+
+**Pre-registered master gate**:
+- **{GATE-ID}**: {description}
+- **PASS**: {condition}
+- **FAIL**: {condition}
+- **Null hypothesis**: {what the default expectation is}
+
+## II. Wave Structure
+
+### Dependency Graph
+
+{ASCII diagram showing waves and which can run in parallel. Example:}
+```
+Wave 1 (parallel, no dependencies):
+  W1-A  W1-B  W1-C  W1-D
+
+Wave 2 (parallel, can co-run with W1):
+  W2-A  W2-B  W2-C
+
+Wave 3 (depends on Wave 1 results):
+  W3-A  W3-B  W3-C
+```
+
+## III. Wave {M}: {Wave Title}
+
+{Repeat this section for each wave. Within a wave, all tasks are independent.}
+
+### W{M}-{L}: {Computation Title}
+
+**Agent**: `{agent-type}`
+**Model**: {sonnet or opus}
+**Cost**: {ZERO / LOW / MEDIUM / HIGH}
+
+**Prompt**:
+
+{The COMPLETE self-contained prompt for this agent. Include:}
+- Context paragraph (what prior sessions established)
+- Computation steps (numbered, specific)
+- Input data files (full paths)
+- Pre-registered gate (ID, PASS/FAIL criteria)
+- Output files (script, data, plot paths)
+- Working paper section to write to
+
+---
+
+## IV. Constraint Gates Summary
+
+| ID | Type | Condition | Fires If | Consequence |
+|:---|:-----|:----------|:---------|:------------|
+
+{CRITICAL: Gate IDs must NOT collide with existing IDs in the knowledge index.}
+
+## V. Decision Points
+
+{Between-wave decision logic. For each decision point:}
+
+**After Wave {M}**:
+- If {condition A} -> {action A}
+- If {condition B} -> {action B}
+- If {condition C} -> {action C}
+
+## VI. Execution Notes
+
+- Python: {project's configured Python environment}
+- Output directory: {project's configured output directory}
+- Script prefix: `s{N}_`
+- Each agent writes results ONLY to their designated section in the working paper
+- No TeamCreate — all agents are independent Agent tool calls
+```
+
+#### FORMAT: `workshop` or `panel` (MANDATORY structure for these formats)
 
 ```markdown
 # Session {N} Plan: {Topic Title}
@@ -225,60 +330,34 @@ The following is assembled project context — methodology status, recent result
 
 ## I. Relation to Prior Sessions
 
-{What recent sessions delivered that this session builds on. Table format:}
-
 | Prior Output | Data File | This Session's Use |
 |:-------------|:----------|:-------------------|
 
 ## II. Conditional Architecture
 
-{If this session depends on prior verdicts, show the branching table:}
-
 | Prior Outcome | This Session Scope |
 |:-------------|:-------------------|
 
-{If no dependencies, state "Standalone session — no conditional gates."}
-
 ## III. Computation Plan
-
-{For each computation (one per sub-section):}
 
 ### {N}-{sub}: {Computation Title} [{COST ESTIMATE}, {SIGNIFICANCE}]
 
 **Priority**: {number and source}
 **Dependency**: {what must complete first, or "None"}
-
-**What**: {1-2 paragraphs describing the computation or investigation}
-
-**Method**:
-1. {step 1}
-2. {step 2}
-...
-
-**Gate condition**: {what PASS looks like}
-
-**Constraint Condition**: {what FAIL means, and its consequence}
-
-**Inputs**: {list of input files}
-
-**Script/Artifact**: {description, estimated lines or scope}
-
-**Computational cost**: {time or effort estimate}
-
-**Agent**: {which agent type should run this}
-
-**Output**: {expected output files}
-
----
+**What**: {1-2 paragraphs}
+**Method**: {numbered steps}
+**Gate condition**: {PASS criteria}
+**Constraint Condition**: {FAIL consequence}
+**Inputs**: {file list}
+**Script**: {description}
+**Computational cost**: {time estimate}
+**Agent**: {agent type}
+**Output**: {file list}
 
 ## IV. Constraint Gates Summary
 
 | ID | Type | Condition | Fires If | Consequence |
 |:---|:-----|:----------|:---------|:------------|
-
-{CRITICAL: Gate IDs must NOT collide with existing IDs in the knowledge index.
-Use the session prefix (e.g., S-{N}a, F-{N}a) and check the gates table in the
-context package. If an ID is already used, increment the suffix.}
 
 ## V. Agent Assignments
 
@@ -289,15 +368,10 @@ context package. If an ID is already used, increment the suffix.}
 
 ## VI. Sub-Session Structure
 
-{Declare how the session splits into sub-sessions (prompts).
-Each sub-session should be independently runnable by /clab-team.}
-
 | Sub-Session | Computations | Agents | Dependencies |
 |:-----------|:-------------|:-------|:-------------|
 
-{Number of sub-sessions: {N_sub} — either from --sub-sessions flag or your judgment.
-Consider: max 3 agents per sub-session, max 4 computations per sub-session,
-independent sub-sessions can run in parallel.}
+{Max 3 agents per sub-session, max 4 computations per sub-session.}
 
 ## VII. Required Reading
 
@@ -314,13 +388,16 @@ independent sub-sessions can run in parallel.}
 1. **Ground in data**: Every computation must reference specific input files that EXIST (check the context package for file paths).
 2. **Non-colliding gate IDs**: Check the gates table in context. Use fresh IDs only.
 3. **Realistic cost estimates**: Reference existing computation times from recent sessions if available.
-4. **Agent count**: Max 3 per sub-session (coordinator always included).
-5. **Script prefix**: `s{N}{sub}_` (e.g., `s12a_`, `s12b_`).
+4. **Format-specific agent rules**:
+   - `compute`: No agent count limit per wave. Each task is independent. No coordinator needed (team-lead handles synthesis). Write COMPLETE self-contained prompts for each agent inside the plan.
+   - `workshop`/`panel`: Max 3 agents per sub-session. Coordinator always included.
+5. **Script prefix**: `s{N}_` for compute format, `s{N}{sub}_` for workshop/panel.
 6. **Output directory**: Use the project's configured output directory (check CLAUDE.md or default to `sessions/session-{N}/`).
 7. **Python**: Use the project's configured Python environment if applicable.
 8. **Do NOT execute computations** — only plan them.
 9. **Do NOT modify MEMORY.md, agent memory, or the knowledge index.**
 10. **Write ONLY the plan file** — nothing else.
+11. **Compute format**: Include decision points between waves. Each agent prompt must be fully self-contained (context, method, inputs, outputs, gate criteria) — agents cannot communicate with each other.
 ```
 
 ### Wait for Planner
@@ -344,6 +421,7 @@ Report to the user:
 
 File: {PLAN_FILE}
 Lines: {count}
+Format: {compute|workshop|panel}
 Planner: {planner-type}
 Sub-sessions: {N_sub} ({list labels})
 Computations: {count}
@@ -369,7 +447,54 @@ Spawn a **solo background agent** (NOT a team):
 - `run_in_background`: true
 - `name`: `prompter`
 
-### Prompter Agent Prompt
+### Compute Format — Working Paper Generator
+
+For `--format compute`, the prompter generates a **working paper template** (not per-sub-session prompts). The plan file itself IS the prompt — it contains the full self-contained prompts for each agent in each wave.
+
+```
+You are generating a **results working paper template** from an approved session plan.
+
+## Your Task
+
+Read the plan at `{PLAN_FILE}` and generate ONE file:
+  `sessions/session-{N}/session-{N}-results-workingpaper.md`
+
+## Structure
+
+The working paper has:
+1. A header with session metadata and instructions for contributing agents
+2. One section per computation (matching the wave/task IDs from the plan)
+3. Each section contains: Status, Gate ID + criteria, and a "Results" placeholder
+4. A synthesis section at the end (for team-lead to fill after all waves)
+5. A constraint map updates table
+6. A files produced table
+
+## Section Template (repeat for each W{M}-{L} in the plan)
+
+```markdown
+### W{M}-{L}: {Computation Title} ({agent-type})
+
+**Status**: NOT STARTED
+**Gate**: {GATE-ID}. {PASS/FAIL criteria from plan.}
+
+**Results**:
+
+*(Agent writes here)*
+
+---
+```
+
+## Rules
+1. Extract ALL computation IDs, titles, agents, and gate criteria from the plan
+2. Group sections by wave (Wave 1, Wave 2, etc.)
+3. Include the agent instructions block at the top (what to include in results: verdict, key numbers, cross-checks, data files, assessment)
+4. Write ONLY the working paper file — nothing else
+5. Do NOT modify the plan file
+```
+
+### Workshop & Panel Formats — Prompt File Generator
+
+For `--format workshop` or `--format panel`, the prompter generates per-sub-session prompt files.
 
 ```
 You are generating **session prompt files** from an approved plan for this research project.
@@ -444,7 +569,7 @@ Every result classified against its pre-registered gate BEFORE any interpretatio
 
 ## COMPLETION SIGNAL
 
-When all agents have reported, shut them down and clean up the team. Idle agents are not finished agents — wait for their reports first.
+Session ends ONLY when user approves shutdown explicitly. Idle agents are not finished agents.
 
 ---
 
@@ -540,11 +665,36 @@ If any files are missing, report which ones failed.
 
 ## Phase 6: Report
 
+### Compute Format
 ```
 === CLAB-PLAN COMPLETE ===
 
 Topic: "{topic}"
 Session: {N}
+Format: compute (parallel independent)
+
+Generated Files:
+  {PLAN_FILE}                                          {lines} lines
+  sessions/session-{N}/session-{N}-results-workingpaper.md   {lines} lines
+
+Planner: {planner-type}
+Prompter: {prompter-type}
+Waves: {W}
+Total computations: {count}
+Gates: {count}
+Context sources: {count} files ({total_lines} lines)
+
+Next step:
+  /clab-team sessions/session-plan/session-{N}-plan.md --mode compute
+```
+
+### Workshop & Panel Formats
+```
+=== CLAB-PLAN COMPLETE ===
+
+Topic: "{topic}"
+Session: {N}
+Format: {workshop|panel}
 
 Generated Files:
   {PLAN_FILE}                              {lines} lines
@@ -557,7 +707,7 @@ Prompter: {prompter-type}
 Context sources: {count} files ({total_lines} lines)
 
 Next step:
-  /clab-team sessions/session-plan/session-{N}a-prompt.md
+  /clab-team sessions/session-plan/session-{N}a-prompt.md --mode {workshop|panel}
 ```
 
 ---
@@ -566,11 +716,11 @@ Next step:
 
 1. **Never overwrite existing files** without user confirmation (Phase 1c collision check).
 2. **Never spawn teams** — solo agents only. No TeamCreate, no SendMessage, no blast.
-3. **Never execute computations** — documents only.
+3. **Never execute computations** — documents only. No running scripts.
 4. **Never modify MEMORY.md**, agent memory files, or the knowledge index. Read only.
 5. **Context reads capped at ~6000 lines total**. Truncate oldest-added source first.
 6. **Gate IDs in generated plans must not collide** with existing IDs in the knowledge index.
-7. **Always include a coordinator** in agent assignments.
+7. **Always include a coordinator** in agent assignments (except compute format where team-lead handles synthesis).
 
 ## Error Handling
 

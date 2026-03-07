@@ -193,7 +193,7 @@ If python env discovered → add `Bash("{python-path}":*)`.
 
 3. **DO**: Clean stale state — delete contents of `~/.claude/teams/` and `~/.claude/tasks/` if they exist.
 
-**VERIFY**: Coordinator MEMORY.md contains "Spawn Sequence (MANDATORY)" and "MAX 3 agents per team". No stale team/task directories.
+**VERIFY**: Coordinator MEMORY.md contains "Spawn Sequence (MANDATORY)" and "MAX 4 agents per team in workshop/panel modes". No stale team/task directories.
 
 ---
 
