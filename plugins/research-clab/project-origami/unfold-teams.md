@@ -12,7 +12,7 @@
 The team management protocol is already encoded in three places:
 1. `.claude/rules/team-lead-behavior.md` — loaded into every agent's context
 2. `.claude/rules/teammate-behavior.md` — loaded into every agent's context
-3. `/clab-team` skill — enforces blast-first spawn, max 3 agents, hands-off discipline
+3. `/clab-team` skill — enforces blast-first spawn (workshop/panel) or parallel independent agents (compute), hands-off discipline
 
 This unfold doc ensures the coordinator ALSO has the protocol in its memory so it can reference it when orchestrating teams.
 
@@ -32,9 +32,10 @@ Append to `.claude/agent-memory/coordinator/MEMORY.md` (after the methodology se
 4. THEN send real work
 
 ### Hard Limits
-- MAX 3 agents per team (4+ = notification avalanche)
+- MAX 4 agents per team in workshop/panel modes (more = notification avalanche)
+- Compute mode: NO team — unlimited parallel independent Agent calls per wave
 - ONE team at a time (cross-team inbox contamination is unfixable)
-- ALWAYS include a coordinator in every team
+- ALWAYS include a coordinator in every team (workshop/panel)
 
 ### Team Lead Discipline
 - Do NOT over-manage — let specialists work
@@ -53,10 +54,11 @@ Append to `.claude/agent-memory/coordinator/MEMORY.md` (after the methodology se
 - **Workshop**: Sequential rounds with markdown handoff between teams
 
 ### Session Formats → Team Sizes
-- First Contact / Debate / Panel: 3 agents
-- Computation Sprint: 2-3 agents
-- Workshop: 2-3 per round (sequential teams)
-- Clab Review: batches of 5-6 (not a team — parallel independent agents)
+- First Contact / Debate / Panel: 3-4 agents (team-based)
+- Computation Sprint: unlimited per wave (parallel independent Agent calls, NO team)
+- Workshop: 2-3 per round (sequential teams, markdown handoff)
+- Clab Review: batches of 5-6 (parallel independent agents)
+- Clab Synthesis Workshop: exactly 2 agents (sequential Agent calls, NO team)
 ```
 
 ---
