@@ -217,7 +217,7 @@ Every agent reads the constraint map, but each archetype interacts with it diffe
 | **Observer** | Updates observational benchmarks. Checks whether theoretical constraints are consistent with measurements. |
 | **Bridge** | Verifies constraints against primary sources. Catches when a constraint overstates what a source actually proves. |
 | **Coordinator** | Writes entries. Cites by ID. Links to file path. Never summarizes counts or trends in prose. |
-| **Librarian** | Extracts constraint entries into knowledge index entities. Does not evaluate content. |
+| **Indexer** | Extracts constraint entries into knowledge index entities. Does not evaluate content. |
 
 ### 4c. Who Challenges
 

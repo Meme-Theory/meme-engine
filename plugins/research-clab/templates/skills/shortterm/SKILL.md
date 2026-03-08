@@ -25,8 +25,8 @@ The user invoked: `/shortterm $ARGUMENTS`
 
 ## Context
 
-- Available agents: !`python -c "import os; [print(f.removesuffix('.md')) for f in sorted(os.listdir('.claude/agents')) if f.endswith('.md')]" 2>/dev/null`
-- Agent memory dirs: !`python -c "import os,sys; base='.claude/agent-memory'; [print(f'{d}: {len(mds)} files, {sum(sum(1 for _ in open(os.path.join(base,d,f),encoding=\"utf-8\",errors=\"ignore\")) for f in mds)} lines') for d in sorted(os.listdir(base)) if os.path.isdir(os.path.join(base,d)) for mds in [[f for f in os.listdir(os.path.join(base,d)) if f.endswith('.md')]]]; sys.exit(0)" 2>/dev/null`
+- Available agents: List `.claude/agents/*.md` filenames (strip `.md` suffix for agent names)
+- Agent memory dirs: List `.claude/agent-memory/` subdirectories and count `.md` files + total lines in each
 
 ## Agent Discovery
 

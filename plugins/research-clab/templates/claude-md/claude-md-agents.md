@@ -33,7 +33,7 @@ memory: project                # Always "project" for research agents
 | Tier | Cost | Use For | Typical Agents |
 |:-----|:-----|:--------|:---------------|
 | `opus` | Highest | Deep derivation, adversarial debate, nuanced analysis | Specialist theorists, Skeptic |
-| `sonnet` | Medium | Structured indexing, synthesis, orchestration | Coordinator, Librarian |
+| `sonnet` | Medium | Structured indexing, synthesis, orchestration | Coordinator, Indexer |
 | `haiku` | Lowest | Fast bulk tasks, paper fetching, simple retrieval | Scout, web-researcher |
 
 ## Agent Archetypes
@@ -51,7 +51,7 @@ Every research agent maps to one cognitive archetype:
 | **Observer** | "Here's what the data says." | Empirical measurer |
 | **Boundary Guard** | "Here are the limits." | Maps exclusion regions |
 | **Coordinator** | Orchestrates. Does NOT research. | Infrastructure |
-| **Librarian** | Indexes. Does NOT evaluate. | Infrastructure |
+| **Indexer** | Indexes. Does NOT evaluate. | Infrastructure |
 | **Scout** | Fetches. Does NOT analyze. | Infrastructure |
 
 ## Required Agents
@@ -67,7 +67,7 @@ These three must exist in every project:
 - **One agent per file** — no multi-agent definitions
 - **Filename = identity** — `foo-bar.md` means the agent's name is `foo-bar`
 - **No project-wide rules in agent files** — those belong in the root CLAUDE.md
-- **Infrastructure agents don't do research** — coordinator orchestrates, librarian indexes, scout fetches. Hard boundary.
+- **Infrastructure agents don't do research** — coordinator orchestrates, indexer indexes, scout fetches. Hard boundary.
 - **Every agent needs a memory stub** — create `.claude/agent-memory/{name}/MEMORY.md` when creating the agent
 
 ## Anti-Patterns

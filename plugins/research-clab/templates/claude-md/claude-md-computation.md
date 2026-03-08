@@ -83,4 +83,4 @@ Use the project's virtual environment Python, not system Python. The exact path 
 | Workhorse agents | Read/write — they implement specific computations |
 | Observer agents | Read — they analyze outputs |
 | Skeptic agents | Read — they evaluate gate verdicts |
-| Infrastructure agents | **Do not touch** — coordinator, librarian, scout stay out |
+| Infrastructure agents | **Do not touch** — coordinator, indexer, scout stay out |

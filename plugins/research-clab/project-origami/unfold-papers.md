@@ -61,17 +61,17 @@ This creates:
 
 ## Step 3: Index Each Researcher Folder
 
-After ALL `/new-researcher` invocations complete, invoke `/indexing` on each researcher folder:
+After ALL `/new-researcher` invocations complete, invoke `/librarian` on each researcher folder:
 
 ```
-/indexing {FolderName-1}
-/indexing {FolderName-2}
+/librarian {FolderName-1}
+/librarian {FolderName-2}
 ...
 ```
 
 This spawns the newly created domain agent to read its own papers and build a structured index.
 
-**Sequential**: `/indexing` creates a team, so only one at a time.
+**Sequential**: `/librarian` creates a team, so only one at a time.
 
 ---
 
@@ -111,4 +111,4 @@ Update `agents.md` at project root -- replace the "Queued" placeholders from the
 - **Do NOT create agent definitions yourself** -- `/new-researcher` handles this
 - **Do NOT modify the researcher queue** -- the coordinator wrote it, you execute it
 - **Do NOT skip entries** -- process every row, report failures
-- **Do NOT create agents for infrastructure roles** -- coordinator, librarian, and scout are already installed
+- **Do NOT create agents for infrastructure roles** -- coordinator, indexer, and scout are already installed

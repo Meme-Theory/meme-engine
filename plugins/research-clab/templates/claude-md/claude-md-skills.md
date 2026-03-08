@@ -24,8 +24,8 @@ skills/
 │   └── SKILL.md        # /document-prep — Format-aware document toolkit
 ├── new-researcher/
 │   └── SKILL.md        # /new-researcher — Create new agent with web-fetched papers
-├── indexing/
-│   └── SKILL.md        # /indexing — Build structured index for any folder
+├── librarian/
+│   └── SKILL.md        # /librarian — Build structured index for any folder
 ├── team-blast/
 │   └── SKILL.md        # /team-blast — Direct-write broadcast to team inboxes
 └── {{DOMAIN_SKILL}}/
@@ -61,7 +61,7 @@ The body contains the complete instruction set Claude follows when the user invo
 | `/redact` | Purge stale memory references | Optional |
 | `/document-prep` | Format-aware document toolkit (templates, notation, checking) | Recommended |
 | `/new-researcher` | Create new agent with web-fetched papers | Recommended |
-| `/indexing` | Build structured index for researcher or general folder | Recommended |
+| `/librarian` | Build structured index for researcher or general folder | Recommended |
 | `/team-blast` | Direct-write broadcast to team agent inboxes | Optional |
 
 ## Rules

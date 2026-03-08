@@ -4,27 +4,27 @@ argument-hint: <folder-name> [qualifier1] [qualifier2] ...
 allowed-tools: [Read, Write, Edit, Glob, Grep, Bash, Agent, TeamCreate, TaskCreate, TaskUpdate, TaskList, TaskGet, SendMessage]
 ---
 
-# Indexing Skill (Team Orchestration)
+# Librarian Skill (Team Orchestration)
 
 Two-agent team: a **specialist** (domain expert who reads and analyzes the files) and a **coordinator** (template enforcer who assembles the index). You are the **team lead** orchestrating them.
 
 ## Arguments
 
-The user invoked: `/indexing $ARGUMENTS`
+The user invoked: `/librarian $ARGUMENTS`
 
 Parse `$ARGUMENTS` as:
 - **`--help`**: show this usage summary and stop:
   ```
-  /indexing                          — list all indexable folders
-  /indexing <folder>                 — index entire folder
-  /indexing <folder> <qualifier> ... — index only matching files
+  /librarian                          — list all indexable folders
+  /librarian <folder>                 — index entire folder
+  /librarian <folder> <qualifier> ... — index only matching files
   ```
 - **Blank**: list all indexable folders and their status, then stop
 - **`<folder>`**: index the entire folder with auto-detected groupings
 - **`<folder> <qualifier1> [qualifier2] ...`**: index ONLY files matching the given qualifiers
   - Qualifiers match by case-insensitive substring against filenames
-  - E.g., `/indexing meeting-minutes session-16 giants` processes only files whose names contain "session-16" or "giants"
-  - E.g., `/indexing Noether 13-18` processes only files whose names contain "13-18" (or papers 13 through 18 -- interpret numerically if a range)
+  - E.g., `/librarian meeting-minutes session-16 giants` processes only files whose names contain "session-16" or "giants"
+  - E.g., `/librarian Noether 13-18` processes only files whose names contain "13-18" (or papers 13 through 18 -- interpret numerically if a range)
   - If `index.md` already exists, MERGE results into it (update/add only the affected sections, leave other entries intact)
 
 ## Context
@@ -102,7 +102,7 @@ Match the folder name to an agent in `.claude/agents/` by case-insensitive subst
 
 ### 2a. Create the Team
 
-Use **TeamCreate** to create a team named `indexing-<folder-short-name>` (e.g., `indexing-noether`, `indexing-minutes`).
+Use **TeamCreate** to create a team named `librarian-<folder-short-name>` (e.g., `librarian-noether`, `librarian-minutes`).
 
 ### 2b. Create Tasks
 
@@ -389,26 +389,26 @@ Copy `researchers/agents.md` into the target folder as `AGENTS.md` if not alread
 
 **Mode A:**
 ```
-=== INDEXING COMPLETE (Researcher) ===
+=== LIBRARIAN COMPLETE (Researcher) ===
 Folder:    researchers/<name>/
 Papers:    <N> indexed
 Groups:    <N> processed (<group names>)
 Index:     researchers/<name>/index.md (<line count> lines)
 AGENTS.md: <placed / already present>
 Agent:     <specialist agent type>
-Team:      indexing-<name> (specialist: <type>, coordinator: coordinator)
+Team:      librarian-<name> (specialist: <type>, coordinator: coordinator)
 ```
 
 **Mode B:**
 ```
-=== INDEXING COMPLETE (General) ===
+=== LIBRARIAN COMPLETE (General) ===
 Folder:    <name>/
 Files:     <N> indexed
 Groups:    <N> processed (<group names>)
 Phases:    <N> identified
 Index:     <name>/index.md (<line count> lines)
 AGENTS.md: <placed / already present>
-Team:      indexing-<name> (reader: coordinator, assembler: coordinator)
+Team:      librarian-<name> (reader: coordinator, assembler: coordinator)
 ```
 
 ---

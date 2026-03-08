@@ -8,7 +8,7 @@ allowed-tools: [Read, Write, Edit, Glob, Grep, Bash, Agent, WebFetch, WebSearch]
 
 You are the **Researcher Factory**. Your job is to create a domain agent and populate its research corpus: fetch papers via web-researcher, stamp the agent definition (optionally from an archetype template), and set up the memory scaffold.
 
-You do NOT index the papers -- the caller handles that separately via `/indexing`.
+You do NOT index the papers -- the caller handles that separately via `/librarian`.
 
 ## Arguments
 
@@ -61,11 +61,11 @@ When `--archetype` is provided, the archetype name may influence the slug suffix
 ## Context
 
 Discover project structure dynamically at runtime:
-- Project root CLAUDE.md: !`head -30 CLAUDE.md 2>/dev/null` (read for domain context)
-- Existing researcher folders: !`ls researchers/ 2>/dev/null`
-- Existing agents: !`ls .claude/agents/*.md 2>/dev/null | xargs -I{} basename {} .md`
+- Project root CLAUDE.md: Read `CLAUDE.md` for domain context
+- Existing researcher folders: List `researchers/` subdirectories
+- Existing agents: List `.claude/agents/*.md` filenames (strip `.md` suffix for agent names)
 - AGENTS.md template: `researchers/agents.md`
-- Color palette already used: !`grep -h "^color:" .claude/agents/*.md 2>/dev/null | sort -u`
+- Color palette already used: Read `color:` frontmatter field from each `.claude/agents/*.md` file
 
 ## Step 0: Collision Check
 
@@ -172,8 +172,8 @@ Run 2-3 searches. Prefer primary sources (interviews, autobiographies, obituarie
 **If `--archetype` is provided:**
 
 Search for the archetype template in this order:
-1. `${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/{archetype}.md`
-2. `.claude/agent-templates/{archetype}.md`
+1. `.claude/templates/agent-templates/{archetype}.md`
+2. `${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/{archetype}.md`
 
 Read the template file. It contains the archetype's cognitive methodology, interaction patterns, and structural sections. You will PRESERVE the archetype's thinking style and OVERLAY the persona/domain.
 
@@ -293,7 +293,7 @@ Paper List:
   02. {title} ({year}) -- {reason}
   ...
 
-NOTE: Indexing not yet run. Invoke `/indexing {FolderName}` to build the paper index.
+NOTE: Indexing not yet run. Invoke `/librarian {FolderName}` to build the paper index.
 ```
 
 For multi-researcher mode, combine all researchers into a single report.
@@ -308,5 +308,5 @@ For multi-researcher mode, combine all researchers into a single report.
 6. **Color assignment**: Pick a color NOT already used by existing agents. Available: crimson, teal, amber, emerald, coral, indigo, bronze, silver, magenta, cyan, lime, rose, slate, etc.
 7. **Windows cp1252 compatibility**: All generated content must use ASCII-safe characters. No unicode arrows, checkmarks, em dashes. Use `->`, `[OK]`, `--` instead.
 8. **Parallel where possible.** Multiple web-researchers run in parallel. Agent definitions can be written while papers are being fetched.
-9. **Do NOT invoke `/indexing`.** The caller is responsible for indexing after this skill completes. This skill creates the agent and its corpus; indexing is a separate step.
+9. **Do NOT invoke `/librarian`.** The caller is responsible for indexing after this skill completes. This skill creates the agent and its corpus; indexing is a separate step.
 10. **When using `--archetype`, preserve the archetype's methodology.** The archetype defines HOW the agent thinks. The persona/discipline defines WHAT it knows. Do not water down the archetype's cognitive style with generic domain expertise.
