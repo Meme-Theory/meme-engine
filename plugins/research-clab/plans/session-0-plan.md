@@ -17,8 +17,9 @@ This is the step-by-step script the main agent follows when `/new-research-proje
 **DO**: Run a single mkdir command:
 ```
 mkdir -p .claude/agents .claude/agent-memory .claude/rules
-mkdir -p .claude/skills/{weave,shortterm,clab-review,clab-team,clab-plan,redact,document-prep,new-researcher,indexing,team-blast}
-mkdir -p researchers sessions/session-plan sessions/templates sessions/framework sessions/misc sessions/session-00
+mkdir -p .claude/skills/{weave,shortterm,clab-review,clab-team,clab-plan,redact,document-prep,new-researcher,librarian,team-blast}
+mkdir -p researchers sessions/session-plan sessions/framework sessions/misc sessions/session-00
+mkdir -p .claude/templates/agent-templates .claude/templates/session-templates
 mkdir -p tools/viz artifacts/source plans
 ```
 
@@ -30,12 +31,12 @@ mkdir -p tools/viz artifacts/source plans
 
 **DO**: Copy these 3 files verbatim from `${PLUGIN}/agents/` to `.claude/agents/`:
 - `coordinator.md`
-- `librarian.md`
+- `indexer.md`
 - `scout.md`
 
 **DO**: Create 3 empty memory stubs:
 - `.claude/agent-memory/coordinator/MEMORY.md` → `# Coordinator Memory\n`
-- `.claude/agent-memory/librarian/MEMORY.md` → `# Librarian Memory\n`
+- `.claude/agent-memory/indexer/MEMORY.md` → `# Indexer Memory\n`
 - `.claude/agent-memory/scout/MEMORY.md` → `# Scout Memory\n`
 
 **VERIFY**: 3 agent files in `.claude/agents/`, 3 MEMORY.md files in agent-memory subdirs.
@@ -71,7 +72,7 @@ clab-plan/SKILL.md
 redact/SKILL.md
 document-prep/SKILL.md
 new-researcher/SKILL.md
-indexing/SKILL.md
+librarian/SKILL.md
 team-blast/SKILL.md
 ```
 
@@ -81,7 +82,7 @@ team-blast/SKILL.md
 
 ## Step 4b: Copy Session Templates
 
-**DO**: Copy 11 session format files verbatim from `${PLUGIN}/templates/session-templates/` to `sessions/templates/`:
+**DO**: Copy 11 session format files verbatim from `${PLUGIN}/templates/session-templates/` to `.claude/templates/session-templates/`:
 
 - `A-first-contact-review.md`
 - `B-adversarial-debate.md`
@@ -97,7 +98,26 @@ team-blast/SKILL.md
 
 The selection guide is NOT copied here — it goes to `sessions/session-plan/format-selection-guide.md` in Step 9.
 
-**VERIFY**: 11 files in `sessions/templates/`.
+**VERIFY**: 11 files in `.claude/templates/session-templates/`.
+
+---
+
+## Step 4c: Copy Agent Templates
+
+**DO**: Copy 10 agent archetype files verbatim from `${PLUGIN}/templates/agent-templates/` to `.claude/templates/agent-templates/`:
+
+- `skeptic.md`
+- `calculator.md`
+- `workhorse.md`
+- `principalist.md`
+- `dreamer.md`
+- `boundary-guard.md`
+- `observer.md`
+- `bridge.md`
+- `formatter.md`
+- `generalist.md`
+
+**VERIFY**: 10 files in `.claude/templates/agent-templates/`.
 
 ---
 
@@ -161,7 +181,7 @@ If python env discovered → add `Bash("{python-path}":*)`.
 
 **READ**: `${PLUGIN}/project-origami/unfold-structure.md` Step 7 for the exact format.
 
-**VERIFY**: File exists. Lists coordinator, librarian, scout. Lists all 10 skills. Domain Specialists section says "(None yet)".
+**VERIFY**: File exists. Lists coordinator, indexer, scout. Lists all 10 skills. Domain Specialists section says "(None yet)".
 
 ---
 
@@ -212,13 +232,13 @@ If python env discovered → add `Bash("{python-path}":*)`.
 
 3. **DO**: Write `tools/knowledge-index.json` — empty index with metadata block (schema_version, project, domain, dates, entity_types list, counters at 0) and one empty array per entity type.
 
-4. **DO**: Write `.claude/agent-memory/librarian/MEMORY.md` with knowledge system config, entity type list, constraint categories, source authority hierarchy, maintenance protocol, and rules. Content structure is specified in unfold-knowledge.md Step 4. This OVERWRITES the stub from Step 2.
+4. **DO**: Write `.claude/agent-memory/indexer/MEMORY.md` with knowledge system config, entity type list, constraint categories, source authority hierarchy, maintenance protocol, and rules. Content structure is specified in unfold-knowledge.md Step 4. This OVERWRITES the stub from Step 2.
 
 5. **DO**: Verify `.claude/skills/weave/SKILL.md` exists (already copied in Step 4). Verify `tools/knowledge-schema.yaml` and `tools/knowledge-index.json` both exist.
 
 6. **DO**: Check if Python is available. If yes and project expects heavy computation, optionally copy accelerator tools. Otherwise skip.
 
-**VERIFY**: `knowledge-schema.yaml` has all 9 universal types + at least 1 domain type. `knowledge-index.json` is valid JSON with matching entity_types in metadata. Librarian MEMORY.md mentions "sole writer of knowledge-index.json".
+**VERIFY**: `knowledge-schema.yaml` has all 9 universal types + at least 1 domain type. `knowledge-index.json` is valid JSON with matching entity_types in metadata. Indexer MEMORY.md mentions "sole writer of knowledge-index.json".
 
 ---
 
@@ -286,7 +306,8 @@ ${RESEARCH_QUESTION}
 - [ ] 3 agent memory stubs with MEMORY.md files
 - [ ] 6 behavioral rules in `.claude/rules/`
 - [ ] 10 skills in `.claude/skills/` (each with SKILL.md)
-- [ ] 11 session templates in `sessions/templates/`
+- [ ] 11 session templates in `.claude/templates/session-templates/`
+- [ ] 10 agent templates in `.claude/templates/agent-templates/`
 - [ ] 11 CLAUDE.md files (root + 10 subdirectories)
 - [ ] `.claude/settings.local.json` is valid JSON
 - [ ] `.gitignore` exists
@@ -297,7 +318,7 @@ ${RESEARCH_QUESTION}
 - [ ] `tools/knowledge-schema.yaml` exists with 9+ entity types
 - [ ] `tools/knowledge-index.json` is valid JSON with empty arrays
 - [ ] Coordinator MEMORY.md has methodology + team protocol sections
-- [ ] Librarian MEMORY.md has knowledge maintenance protocol
+- [ ] Indexer MEMORY.md has knowledge maintenance protocol
 - [ ] `sessions/session-plan/researcher-queue.md` has at least 2 entries
 - [ ] `sessions/session-plan/session-0-prompt.md` has the research question
 - [ ] `sessions/session-00/` directory exists
@@ -335,7 +356,7 @@ Next Steps:
 ```
 /new-researcher "{Persona Spec}" --archetype {archetype} --papers {N} --color {color}
 ```
-Then `/indexing {FolderName}` for each created folder. Update `agents.md` and `researchers/index.md`.
+Then `/librarian {FolderName}` for each created folder. Update `agents.md` and `researchers/index.md`.
 
 **READ**: `${PLUGIN}/project-origami/unfold-papers.md` for the full processing protocol (sequential invocation, failure handling, cross-index update, registry update).
 

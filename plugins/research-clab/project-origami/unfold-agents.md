@@ -51,7 +51,7 @@ UTILITY ROLES (optional):
  10. FORMATTER      Domain-specific document preparation. Add when you need to publish.
 
 INFRASTRUCTURE (already installed -- do NOT select these):
-  - Coordinator, Librarian, Scout
+  - Coordinator, Indexer, Scout
 ```
 
 ---
@@ -210,7 +210,7 @@ The main orchestrator will update this with actual agent names after running `/n
 - **Do NOT invoke `/new-researcher` yourself** -- you write the queue, the main orchestrator processes it
 - **Do NOT force archetype selections** -- user decides (you suggest)
 - **Do NOT queue more than 5 domain agents at launch** -- start small, add via `/new-researcher` later
-- **Do NOT modify infrastructure agents** -- coordinator, librarian, scout are already installed
+- **Do NOT modify infrastructure agents** -- coordinator, indexer, scout are already installed
 - **Do NOT skip the Skeptic** -- if user tries to skip it, explain why it's non-negotiable and ask again
 
 Your job is the agent DESIGN and the researcher queue. The main orchestrator feeds the queue to `/new-researcher`, which does the building.

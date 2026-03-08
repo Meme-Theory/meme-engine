@@ -62,7 +62,7 @@ The knowledge index is the project's institutional memory.
 
 - **Single source of truth**: `tools/knowledge-index.json`
 - **Query interface**: `/weave` slash command
-- **Rebuild**: `/weave --update` (only the `librarian` agent writes the index)
+- **Rebuild**: `/weave --update` (only the `indexer` agent writes the index)
 - **SQLite accelerator**: `tools/knowledge.db` — rebuilt via `/weave --db-sync`
 
 ## Behavioral Rules
@@ -87,7 +87,7 @@ Three agents are required in every project. They do NOT do research.
 | Agent | Role | Hard Boundary |
 |:------|:-----|:-------------|
 | `coordinator` | Orchestrates, writes minutes, maintains constraint map | Does NOT do domain analysis |
-| `librarian` | Indexes, queries, serves knowledge graph | Does NOT evaluate content |
+| `indexer` | Indexes, queries, serves knowledge graph | Does NOT evaluate content |
 | `scout` | Fetches papers, populates researcher folders | Does NOT analyze or interpret |
 
 ## Personal Overrides

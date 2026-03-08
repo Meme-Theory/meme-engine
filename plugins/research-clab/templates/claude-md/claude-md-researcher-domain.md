@@ -54,6 +54,6 @@ Papers here outrank general LLM knowledge but are subordinate to project-specifi
 - Raw PDF files → `artifacts/source/{{DOMAIN}}/`
 - Agent analysis or opinions → agent memory or session files
 
-## Librarian
+## Indexer
 
-- The Librarian agent has directives to index the [Domain] folders into a Claude accesibly information heirarchy - focusing agent context on pertinent data.
+- The Indexer agent has directives to index the [Domain] folders into a Claude accesibly information heirarchy - focusing agent context on pertinent data.

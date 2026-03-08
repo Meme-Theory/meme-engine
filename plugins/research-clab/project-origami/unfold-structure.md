@@ -25,14 +25,16 @@ Create this exact structure under the project root. Every directory listed here 
 │   │   ├── redact/
 │   │   ├── document-prep/
 │   │   ├── new-researcher/
-│   │   ├── indexing/
+│   │   ├── librarian/
 │   │   ├── team-blast/
 │   │   └── clab-synthesis/
+│   ├── templates/
+│   │   ├── agent-templates/
+│   │   └── session-templates/
 │   └── rules/
 ├── researchers/
 ├── sessions/
 │   ├── session-plan/
-│   ├── templates/
 │   ├── framework/
 │   └── misc/
 ├── tools/
@@ -109,7 +111,7 @@ ${CLAUDE_PLUGIN_ROOT}/skills/clab-plan/SKILL.md        → .claude/skills/clab-p
 ${CLAUDE_PLUGIN_ROOT}/skills/redact/SKILL.md             → .claude/skills/redact/SKILL.md
 ${CLAUDE_PLUGIN_ROOT}/skills/document-prep/SKILL.md      → .claude/skills/document-prep/SKILL.md
 ${CLAUDE_PLUGIN_ROOT}/skills/new-researcher/SKILL.md     → .claude/skills/new-researcher/SKILL.md
-${CLAUDE_PLUGIN_ROOT}/skills/indexing/SKILL.md           → .claude/skills/indexing/SKILL.md
+${CLAUDE_PLUGIN_ROOT}/skills/librarian/SKILL.md          → .claude/skills/librarian/SKILL.md
 ${CLAUDE_PLUGIN_ROOT}/skills/team-blast/SKILL.md         → .claude/skills/team-blast/SKILL.md
 ${CLAUDE_PLUGIN_ROOT}/skills/clab-synthesis/SKILL.md     → .claude/skills/clab-synthesis/SKILL.md
 ```
@@ -118,23 +120,44 @@ ${CLAUDE_PLUGIN_ROOT}/skills/clab-synthesis/SKILL.md     → .claude/skills/clab
 
 ## Step 4b: Copy Session Templates
 
-Copy the session format reference docs from `${CLAUDE_PLUGIN_ROOT}/templates/session-templates/` into `sessions/templates/`. These are the format definitions (A through I) that agents consult when planning and running sessions.
+Copy the session format reference docs from `${CLAUDE_PLUGIN_ROOT}/templates/session-templates/` into `.claude/templates/session-templates/`. These are the format definitions (A through I) that agents consult when planning and running sessions.
 
 ```
-${CLAUDE_PLUGIN_ROOT}/templates/session-templates/A-first-contact-review.md       → sessions/templates/A-first-contact-review.md
-${CLAUDE_PLUGIN_ROOT}/templates/session-templates/B-adversarial-debate.md          → sessions/templates/B-adversarial-debate.md
-${CLAUDE_PLUGIN_ROOT}/templates/session-templates/C-collaborative-deep-dive.md     → sessions/templates/C-collaborative-deep-dive.md
-${CLAUDE_PLUGIN_ROOT}/templates/session-templates/D-workshop.md                    → sessions/templates/D-workshop.md
-${CLAUDE_PLUGIN_ROOT}/templates/session-templates/E-investigation-arc.md           → sessions/templates/E-investigation-arc.md
-${CLAUDE_PLUGIN_ROOT}/templates/session-templates/F-decisive-computation.md        → sessions/templates/F-decisive-computation.md
-${CLAUDE_PLUGIN_ROOT}/templates/session-templates/G-mass-parallel-assessment.md    → sessions/templates/G-mass-parallel-assessment.md
-${CLAUDE_PLUGIN_ROOT}/templates/session-templates/H-decision-gate.md               → sessions/templates/H-decision-gate.md
-${CLAUDE_PLUGIN_ROOT}/templates/session-templates/I-formalization.md               → sessions/templates/I-formalization.md
-${CLAUDE_PLUGIN_ROOT}/templates/session-templates/00-infrastructure.md             → sessions/templates/00-infrastructure.md
-${CLAUDE_PLUGIN_ROOT}/templates/session-templates/supporting-documents.md          → sessions/templates/supporting-documents.md
+${CLAUDE_PLUGIN_ROOT}/templates/session-templates/A-first-contact-review.md       → .claude/templates/session-templates/A-first-contact-review.md
+${CLAUDE_PLUGIN_ROOT}/templates/session-templates/B-adversarial-debate.md          → .claude/templates/session-templates/B-adversarial-debate.md
+${CLAUDE_PLUGIN_ROOT}/templates/session-templates/C-collaborative-deep-dive.md     → .claude/templates/session-templates/C-collaborative-deep-dive.md
+${CLAUDE_PLUGIN_ROOT}/templates/session-templates/D-workshop.md                    → .claude/templates/session-templates/D-workshop.md
+${CLAUDE_PLUGIN_ROOT}/templates/session-templates/E-investigation-arc.md           → .claude/templates/session-templates/E-investigation-arc.md
+${CLAUDE_PLUGIN_ROOT}/templates/session-templates/F-decisive-computation.md        → .claude/templates/session-templates/F-decisive-computation.md
+${CLAUDE_PLUGIN_ROOT}/templates/session-templates/G-mass-parallel-assessment.md    → .claude/templates/session-templates/G-mass-parallel-assessment.md
+${CLAUDE_PLUGIN_ROOT}/templates/session-templates/H-decision-gate.md              → .claude/templates/session-templates/H-decision-gate.md
+${CLAUDE_PLUGIN_ROOT}/templates/session-templates/I-formalization.md               → .claude/templates/session-templates/I-formalization.md
+${CLAUDE_PLUGIN_ROOT}/templates/session-templates/00-infrastructure.md             → .claude/templates/session-templates/00-infrastructure.md
+${CLAUDE_PLUGIN_ROOT}/templates/session-templates/supporting-documents.md          → .claude/templates/session-templates/supporting-documents.md
 ```
 
 These are verbatim copies — no substitutions needed. The selection guide is NOT copied here (it goes to `sessions/session-plan/format-selection-guide.md` in unfold-methodology Step 1).
+
+---
+
+## Step 4c: Copy Agent Templates
+
+Copy the agent archetype templates from `${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/` into `.claude/templates/agent-templates/`. These are the cognitive archetype definitions that `/new-researcher` reads when stamping new domain agents.
+
+```
+${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/skeptic.md          → .claude/templates/agent-templates/skeptic.md
+${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/calculator.md       → .claude/templates/agent-templates/calculator.md
+${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/workhorse.md        → .claude/templates/agent-templates/workhorse.md
+${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/principalist.md     → .claude/templates/agent-templates/principalist.md
+${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/dreamer.md          → .claude/templates/agent-templates/dreamer.md
+${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/boundary-guard.md   → .claude/templates/agent-templates/boundary-guard.md
+${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/observer.md         → .claude/templates/agent-templates/observer.md
+${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/bridge.md           → .claude/templates/agent-templates/bridge.md
+${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/formatter.md        → .claude/templates/agent-templates/formatter.md
+${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/generalist.md       → .claude/templates/agent-templates/generalist.md
+```
+
+These are verbatim copies — no substitutions needed. `/new-researcher` resolves templates from `.claude/templates/agent-templates/` at runtime, so the project is self-contained after scaffolding.
 
 ---
 
@@ -174,17 +197,17 @@ Copy the 3 infrastructure agents from `${CLAUDE_PLUGIN_ROOT}/templates/infrastru
 
 ```
 ${CLAUDE_PLUGIN_ROOT}/templates/infrastructure-agents/coordinator.md → .claude/agents/coordinator.md
-${CLAUDE_PLUGIN_ROOT}/templates/infrastructure-agents/librarian.md   → .claude/agents/librarian.md
+${CLAUDE_PLUGIN_ROOT}/templates/infrastructure-agents/indexer.md   → .claude/agents/indexer.md
 ${CLAUDE_PLUGIN_ROOT}/templates/infrastructure-agents/scout.md       → .claude/agents/scout.md
 ```
 
-**Variable substitution**: After copying, replace `{{PROJECT_NAME}}` with the actual project name in `librarian.md` (2 occurrences: YAML description and agent intro paragraph) and `scout.md` (3 occurrences: Connection section header, generation phase template, cross-domain interaction pattern). `coordinator.md` has no template variables — copy verbatim.
+**Variable substitution**: After copying, replace `{{PROJECT_NAME}}` with the actual project name in `indexer.md` (2 occurrences: YAML description and agent intro paragraph) and `scout.md` (3 occurrences: Connection section header, generation phase template, cross-domain interaction pattern). `coordinator.md` has no template variables — copy verbatim.
 
 Create agent-memory stubs for each:
 
 ```
 .claude/agent-memory/coordinator/MEMORY.md  (empty — "# Coordinator Memory\n")
-.claude/agent-memory/librarian/MEMORY.md    (empty — "# Librarian Memory\n")
+.claude/agent-memory/indexer/MEMORY.md    (empty — "# Indexer Memory\n")
 .claude/agent-memory/scout/MEMORY.md        (empty — "# Scout Memory\n")
 ```
 
@@ -204,7 +227,7 @@ Generate `agents.md` at project root — a human-readable quick-reference:
 | Agent | Type | Role |
 |:------|:-----|:-----|
 | coordinator | sonnet | Orchestrates teams, writes minutes, maintains constraints |
-| librarian | sonnet | Indexes knowledge, serves queries |
+| indexer | sonnet | Indexes knowledge, serves queries |
 | scout | haiku | Fetches papers, archives sources |
 
 ### Domain Specialists
@@ -223,7 +246,7 @@ Generate `agents.md` at project root — a human-readable quick-reference:
 | `/redact` | Remove agent-memory references to a session or identifier |
 | `/document-prep` | Format-aware document toolkit |
 | `/new-researcher` | Create a new domain agent with web-fetched papers |
-| `/indexing` | Build structured index for researcher or general folder |
+| `/librarian` | Build structured index for researcher or general folder |
 | `/team-blast` | Direct-write broadcast to team agent inboxes |
 | `/clab-synthesis` | Generate synthesis or fusion documents from source docs |
 ```
@@ -318,7 +341,8 @@ Before reporting completion, verify:
 - [ ] `settings.local.json` exists and is valid JSON
 - [ ] 3 infrastructure agents exist in `.claude/agents/`
 - [ ] 3 agent-memory stubs exist with MEMORY.md files
-- [ ] 11 session templates exist in `sessions/templates/`
+- [ ] 11 session templates exist in `.claude/templates/session-templates/`
+- [ ] 10 agent templates exist in `.claude/templates/agent-templates/`
 - [ ] `agents.md` exists at root
 - [ ] `.gitignore` exists at root
 - [ ] Session-0 prompt exists in `sessions/session-plan/`
@@ -330,7 +354,7 @@ Before reporting completion, verify:
 
 - **Do NOT create domain-specific agents** — that's the user's choice via `/new-researcher` (see `unfold-agents.md`)
 - **Do NOT fetch papers** — that's Scout's job (see `unfold-papers.md`)
-- **Do NOT set up knowledge tools** — that's Librarian's job (see `unfold-knowledge.md`)
+- **Do NOT set up knowledge tools** — that's Indexer's job (see `unfold-knowledge.md`)
 - **Do NOT create a simulation directory** — only if user explicitly needs computation infrastructure
 - **Do NOT run any Python scripts** — just install the files
 

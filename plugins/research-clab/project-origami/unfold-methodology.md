@@ -19,7 +19,7 @@ This is the decision tree users consult when planning a session. It maps researc
 
 ### Format Reference
 
-Session format templates (A through I, plus infrastructure and supporting docs) are copied into `sessions/templates/` by unfold-structure Step 4b. Agents consult these locally when planning sessions — no need to reference the plugin at runtime.
+Session format templates (A through I, plus infrastructure and supporting docs) are copied into `.claude/templates/session-templates/` by unfold-structure Step 4b. Agents consult these locally when planning sessions — no need to reference the plugin at runtime.
 
 ---
 
@@ -121,7 +121,7 @@ Write to `.claude/agent-memory/coordinator/MEMORY.md`:
 - **Format I**: Formalization — consolidate N sessions into status doc
 
 See `sessions/session-plan/format-selection-guide.md` for decision tree.
-See `sessions/templates/` for full format definitions.
+See `.claude/templates/session-templates/` for full format definitions.
 
 ## Methodology
 - Pre-register ALL gates before investigation

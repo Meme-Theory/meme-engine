@@ -70,4 +70,4 @@ sessions/             ──(directs)──▶   {{SIMULATION_DIR}}/     ──(
 | Workhorse agents | Read/write — implement specific features |
 | Observer agents | Read — analyze simulation outputs |
 | Skeptic agents | Read — evaluate simulation validity |
-| Infrastructure agents | **Do not touch** — no coordinator, librarian, or scout access |
+| Infrastructure agents | **Do not touch** — no coordinator, indexer, or scout access |

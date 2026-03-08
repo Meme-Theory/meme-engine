@@ -25,7 +25,7 @@ Agents have a known behavior: they look up teammates by **agentType** (e.g., "ha
 ## Context
 
 Discover active teams at runtime:
-- Team directories: !`ls ~/.claude/teams/ 2>/dev/null`
+- Team directories: List `~/.claude/teams/` to discover active teams
 
 ## Modes
 

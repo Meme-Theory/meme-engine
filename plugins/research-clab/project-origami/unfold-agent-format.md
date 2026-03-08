@@ -47,7 +47,7 @@ persona: ""
 | Tier | Use For | Archetypes |
 |:-----|:--------|:-----------|
 | `opus` | Deep analysis, adversarial debate, first-principles reasoning | skeptic, principalist, calculator, dreamer, boundary-guard, workhorse, observer, bridge, generalist |
-| `sonnet` | Structured orchestration, indexing, formatting | coordinator, librarian, formatter |
+| `sonnet` | Structured orchestration, indexing, formatting | coordinator, indexer, formatter |
 | `haiku` | Fast bulk tasks, web fetching | scout |
 
 ---
@@ -147,7 +147,7 @@ The most productive configurations:
 - Observer + Boundary Guard → "Here's the data" vs. "Here's the limit"
 
 ### Infrastructure Isolation
-Infrastructure agents (coordinator, librarian, scout) CANNOT do research. Hard boundary.
+Infrastructure agents (coordinator, indexer, scout) CANNOT do research. Hard boundary.
 
 ---
 

@@ -72,7 +72,7 @@ When MEMORY.md gets too long, factor content into topic files:
 |:----|:-------|
 | Each agent | Read/write its OWN memory directory only |
 | Coordinator | Read any agent's memory; write constraint-map.md |
-| Librarian | Read any agent's memory (for indexing); write nothing |
+| Indexer | Read any agent's memory (for indexing); write nothing |
 | Team lead | Read any agent's memory (for orchestration) |
 
 ## Memory Collapse

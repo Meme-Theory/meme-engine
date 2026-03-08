@@ -1,6 +1,6 @@
 # Unfold: Knowledge Index System
 
-**Target agent**: Librarian
+**Target agent**: Indexer
 **Task**: Generate the knowledge schema for the domain, create the empty index, seed your own memory with the maintenance protocol.
 **Inputs**: Domain and research question (from coordinator or user). Constraint categories (from coordinator).
 **Reads from**: `${CLAUDE_PLUGIN_ROOT}/KNOWLEDGE-DATABASE.md` (canonical specification), project `tools/` directory
@@ -10,12 +10,12 @@
 
 ## Context
 
-The knowledge index is the project's institutional memory — a structured, queryable graph of everything the project has established. You (the librarian) are the sole writer of this index. You maintain it by reading session artifacts and updating `knowledge-index.json` directly, guided by the knowledge schema.
+The knowledge index is the project's institutional memory — a structured, queryable graph of everything the project has established. You (the indexer) are the sole writer of this index. You maintain it by reading session artifacts and updating `knowledge-index.json` directly, guided by the knowledge schema.
 
 Architecture:
 ```
 sessions/*.md              ─┐
-data/output/*               ─┼─▶  YOU (librarian)  ─▶  knowledge-index.json
+data/output/*               ─┼─▶  YOU (indexer)  ─▶  knowledge-index.json
 constraint-map.md           ─┘   (read schema,           (canonical)
                                    extract entries)
                               knowledge-schema.yaml ──── (defines what to extract)
@@ -54,8 +54,8 @@ Write `tools/knowledge-schema.yaml`. The schema defines what knowledge types thi
 | `closed_approaches` | Falsified hypotheses | coordinator |
 | `active_channels` | Surviving hypotheses under investigation | coordinator |
 | `confidence_trajectory` | Bayesian confidence evolution | skeptic |
-| `data_provenance` | Computation lineage (script → output → gate) | librarian |
-| `references` | Reference corpus inventory | librarian |
+| `data_provenance` | Computation lineage (script → output → gate) | indexer |
+| `references` | Reference corpus inventory | indexer |
 
 ### Domain-Specific Entity Type (add at least one)
 
@@ -143,12 +143,12 @@ Create the visualization output directory: `tools/viz/`
 
 ---
 
-## Step 4: Seed Librarian Memory
+## Step 4: Seed Indexer Memory
 
-Write to `.claude/agent-memory/librarian/MEMORY.md`:
+Write to `.claude/agent-memory/indexer/MEMORY.md`:
 
 ```markdown
-# Librarian Memory
+# Indexer Memory
 
 ## Knowledge System
 - Schema: `tools/knowledge-schema.yaml` (defines entity types and fields)
@@ -224,7 +224,7 @@ Send a message to the coordinator confirming:
 Knowledge index scaffold complete:
 - Schema: tools/knowledge-schema.yaml ({N} entity types, {M} constraint categories)
 - Index: tools/knowledge-index.json (empty, ready for first session)
-- Memory: .claude/agent-memory/librarian/MEMORY.md (seeded with maintenance protocol)
+- Memory: .claude/agent-memory/indexer/MEMORY.md (seeded with maintenance protocol)
 - /weave skill: verified
 - Python accelerator: {installed | not needed | not available}
 

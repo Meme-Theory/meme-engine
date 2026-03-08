@@ -145,13 +145,13 @@ Use the Agent tool:
 
 The coordinator will read the project-origami docs, create directories, copy all static assets (using `templates/infrastructure-agents/` as the source for infrastructure agents — NOT `agents/`), generate project-specific files, install methodology and team protocol, and run the infrastructure gate verification.
 
-### Agent 2: Librarian — Knowledge System Init (Phase 7)
+### Agent 2: Indexer — Knowledge System Init (Phase 7)
 
 Use the Agent tool:
 - `subagent_type`: `"general-purpose"`
-- `name`: `"librarian-knowledge-init"`
+- `name`: `"indexer-knowledge-init"`
 - `prompt`: Must include ALL of the following:
-  - Identity directive: `"You are the librarian agent for the research-clab plugin. Read your full agent definition at {plugin-root}/agents/librarian.md — find the '## /new-research-project — Scaffolding Directives' section and execute the 'Knowledge System Initialization Task' exactly as specified."`
+  - Identity directive: `"You are the indexer agent for the research-clab plugin. Read your full agent definition at {plugin-root}/agents/indexer.md — find the '## /new-research-project — Scaffolding Directives' section and execute the 'Knowledge System Initialization Task' exactly as specified."`
   - Key inputs:
     - `project-name`: `{project-name}`
     - `domain`: `{domain}`
@@ -160,7 +160,7 @@ Use the Agent tool:
   - `target-dir`: current working directory (absolute path)
   - Explicit reminder: `"Do NOT call AskUserQuestion. All user interaction is handled by the main skill."`
 
-The librarian will read unfold-knowledge.md, determine domain-specific entity types, write the schema and index, seed its own memory, and verify the knowledge triad.
+The indexer will read unfold-knowledge.md, determine domain-specific entity types, write the schema and index, seed its own memory, and verify the knowledge triad.
 
 ### After Both Complete
 
@@ -201,7 +201,7 @@ UTILITY (optional):
  10. FORMATTER       Domain-specific document preparation.
 
 INFRASTRUCTURE (already installed):
-  - Coordinator, Librarian, Scout
+  - Coordinator, Indexer, Scout
 ```
 
 ### 8b. Recommend and Collect Selections
@@ -312,7 +312,8 @@ Run through this checklist. Every item must pass:
 - [ ] 3 agent memory directories with MEMORY.md files
 - [ ] 6 behavioral rules in `.claude/rules/`
 - [ ] 11 skills in `.claude/skills/` (each with SKILL.md)
-- [ ] 11 session templates in `sessions/templates/`
+- [ ] 11 session templates in `.claude/templates/session-templates/`
+- [ ] 10 agent templates in `.claude/templates/agent-templates/`
 - [ ] 11 CLAUDE.md files (root + 10 subdirectories)
 - [ ] `.claude/settings.local.json` is valid JSON
 - [ ] `.gitignore` exists
@@ -323,7 +324,7 @@ Run through this checklist. Every item must pass:
 - [ ] `tools/knowledge-schema.yaml` has 9+ universal entity types + domain type
 - [ ] `tools/knowledge-index.json` is valid JSON with empty arrays
 - [ ] Coordinator MEMORY.md has methodology section AND team protocol section
-- [ ] Librarian MEMORY.md has knowledge maintenance protocol
+- [ ] Indexer MEMORY.md has knowledge maintenance protocol
 - [ ] `sessions/session-plan/researcher-queue.md` has at least 2 entries
 - [ ] `sessions/session-plan/session-0-prompt.md` has the research question
 - [ ] `sessions/session-00/` directory exists
@@ -378,7 +379,7 @@ For each row in `researcher-queue.md`, sequentially invoke:
 - If one fails, report the failure and continue to the next entry.
 
 After ALL `/new-researcher` invocations complete:
-1. Invoke `/indexing {FolderName}` for each created researcher folder (sequential — each creates a team).
+1. Invoke `/librarian {FolderName}` for each created researcher folder (sequential — each creates a team).
 2. Create or update `researchers/index.md` with a cross-domain table.
 3. **Use Edit (not Write)** on `agents.md` — replace "Queued" status entries with actual agent names and roles.
 

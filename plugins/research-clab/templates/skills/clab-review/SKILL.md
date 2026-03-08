@@ -47,7 +47,7 @@ Build the agent roster dynamically from `.claude/agents/`:
 2. Read each file's YAML frontmatter to get `name` and `description`
 3. Exclude infrastructure agents that don't produce domain reviews:
    - `coordinator` — orchestration role, not a reviewer
-   - `knowledge-weaver` / `librarian` — indexing role
+   - `knowledge-weaver` / `indexer` — indexing role
    - `web-researcher` / `scout` — fetching role
    - Any agent whose description contains "infrastructure" or "orchestration"
 4. The remaining agents are the **domain reviewers**
