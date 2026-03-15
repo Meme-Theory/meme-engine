@@ -40,10 +40,12 @@ Create this exact structure under the project root. Every directory listed here 
 ├── tools/
 │   └── viz/
 └── artifacts/
-    └── source/
+    ├── source/
+    └── document-templates/    # Installed by unfold-document-prep.md
 ```
 
 **Do NOT create** a simulation directory yet — that's domain-dependent and happens later if the user needs computation infrastructure.
+**Do NOT create** `document-templates/` subdirectories here — that's handled by `unfold-document-prep.md` based on the user's format selection.
 
 ---
 
@@ -158,6 +160,16 @@ ${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/generalist.md       → .claude/
 ```
 
 These are verbatim copies — no substitutions needed. `/new-researcher` resolves templates from `.claude/templates/agent-templates/` at runtime, so the project is self-contained after scaffolding.
+
+---
+
+## Step 4d: Install Document Templates
+
+**READ**: `${CLAUDE_PLUGIN_ROOT}/project-origami/unfold-document-prep.md` and execute it.
+
+This step installs format-specific document templates into `artifacts/document-templates/` based on the user's `{output-format}` selection (Question 4). For LaTeX projects, this installs 13 `.tex` templates (paper, poster, slides, thesis, report, etc.) and a sample `.bib` file. For Typst and Markdown, it installs placeholder READMEs.
+
+The `/document-prep --new <type>` command discovers these templates at runtime.
 
 ---
 
@@ -347,6 +359,8 @@ Before reporting completion, verify:
 - [ ] `.gitignore` exists at root
 - [ ] Session-0 prompt exists in `sessions/session-plan/`
 - [ ] `sessions/session-00/` directory exists
+- [ ] `artifacts/document-templates/` exists with format-specific subdirectory
+- [ ] For LaTeX: 13 `.tex` + 1 `.bib` templates present
 
 ---
 

@@ -1,26 +1,41 @@
 ---
 name: document-prep
-description: Document preparation toolkit — templates, notation registry, format checking, submission workflows. Backed by the formatter agent's research corpus.
-disable-model-invocation: true
-argument-hint: --template <format> | --notation | --style <venue> | --check <file> | --submission | --bib | --index
+description: "Document preparation toolkit — create documents from templates, draft sections, peer review, citation management, format checking, compilation. Adapts to LaTeX, Typst, or Markdown."
+argument-hint: --new <type> [title] | --draft <section> [file] | --review <file> | --cite <doi|query> | --compile [file] | --template <format> | --notation | --style <venue> | --check <file> | --submission | --bib | --index | --templates
+metadata:
+    building-workflows-from: K-Dense-AI/claude-scientific-skills (MIT License)
+    templates-from: delibae/claude-prism (apps/desktop/public/examples)
 ---
 
 # Document Prep — Format-Aware Document Toolkit
 
-Quick access to document preparation expertise for the project. Discovers and uses the formatter agent's research corpus to provide format-specific guidance, notation registries, document checking, and submission workflows.
+Create, draft, review, and compile scientific documents. Discovers the project's formatting resources from the formatter agent's research corpus AND from shipped templates at `artifacts/document-templates/`.
 
-Unlike other skills, this one **adapts to whatever document formats the project uses** — LaTeX, Typst, markdown, HTML, or any other format. It discovers the project's formatting conventions from the formatter agent's research papers rather than hardcoding them.
+> Building workflows derived from [K-Dense-AI/claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills) (MIT). Templates from [claude-prism](https://github.com/delibae/claude-prism).
 
 ## Usage
 
+### Building (create and write documents)
+
 ```
-/document-prep --template jhep          # Generate a template/preamble for a target format
-/document-prep --notation               # Show the project notation registry
-/document-prep --style prd              # Style summary for a target venue
-/document-prep --check paper.tex        # Review a document for formatting issues
-/document-prep --submission             # Submission checklist for the project's target venue
-/document-prep --bib                    # Bibliography setup guide
-/document-prep --index                  # Show the formatter's research document index
+/document-prep --new <type> [title]       # Create a new document from template
+/document-prep --draft <section> [file]   # Write or expand a section (IMRAD-aware)
+/document-prep --review <file>            # Structured peer review of a manuscript
+/document-prep --cite <doi|arxiv|query>   # Look up and format citations as BibTeX
+/document-prep --compile [file]           # Compile document to PDF
+/document-prep --templates                # List available document templates
+```
+
+### Reference (lookup and checking)
+
+```
+/document-prep --template <format>  # Generate a template/preamble for a target format
+/document-prep --notation           # Show the project notation registry
+/document-prep --style <venue>      # Style summary for a target venue
+/document-prep --check <file>       # Review a document for formatting issues
+/document-prep --submission         # Submission checklist
+/document-prep --bib                # Bibliography setup guide
+/document-prep --index              # Show the formatter's research document index
 ```
 
 ## Parse Arguments
@@ -31,13 +46,19 @@ If no arguments provided or `--help`, show the usage block above and stop.
 
 ---
 
-## Discovery: Find the Formatter
+## Discovery: Find Resources
 
 Before executing any subcommand, discover the project's formatting resources:
 
-### Step 1: Find the formatter agent
+### Step 1: Find document templates
 
-Search `.claude/agents/` for an agent whose description contains "format", "typeset", "document preparation", or "notation". This is the project's formatter agent (may be named `formatter.md`, `latex-typesetting-specialist.md`, `typst-formatter.md`, etc.).
+Search for `artifacts/document-templates/` in the project root. This contains format-specific templates installed during project scaffolding (see `unfold-document-prep.md`).
+
+Supported subdirectories: `latex/`, `typst/`, `markdown/`.
+
+### Step 2: Find the formatter agent
+
+Search `.claude/agents/` for an agent whose description contains "format", "typeset", "document preparation", or "notation". This is the project's formatter agent.
 
 If no formatter agent exists, report:
 ```
@@ -45,199 +66,294 @@ No formatter agent found in .claude/agents/.
 Create one with: /new-researcher --archetype formatter <domain>
 (e.g., /new-researcher --archetype formatter "LaTeX academic publishing")
 ```
-For `--check` and `--notation`, proceed without the agent (use general knowledge). For other subcommands, stop here.
+For `--new`, `--draft`, `--review`, `--cite`, `--compile`, `--check`, and `--notation`: proceed without the agent (use templates + general knowledge). For `--template`, `--style`, `--bib`, `--index`: check formatter corpus, use general knowledge if absent.
 
-### Step 2: Find the research corpus
+### Step 3: Find the research corpus
 
-Search `researchers/` for a directory matching the formatter's domain. Common patterns:
-- `researchers/LaTeX/`
-- `researchers/Technical-Writing/`
-- `researchers/Typst/`
-- `researchers/Document-Formatting/`
-
-Match by scanning `researchers/*/index.md` for directories whose content relates to document preparation, formatting, or typesetting.
-
-If found, this is `{FORMATTER_CORPUS}`. If not found, the formatter agent has no research papers yet — suggest running `/new-researcher` to populate it.
-
-### Step 3: Read the corpus index
-
-If `{FORMATTER_CORPUS}` exists, read `{FORMATTER_CORPUS}/index.md` to understand what reference documents are available. Cache the document list for use by subcommands.
+If the formatter agent exists, search `researchers/` for its research corpus. Read the corpus index if found.
 
 ---
 
-## Subcommand Implementations
+## Building Subcommands
+
+### `--new <type> [title]`
+
+Create a new document from a shipped template.
+
+**Available template types** (LaTeX):
+
+| Type | Template File | Document Class | Use For |
+|:-----|:-------------|:---------------|:--------|
+| `paper` | `paper-standard.tex` | `article` | Generic research paper |
+| `paper-ieee` | `paper-ieee.tex` | `IEEEtran` | IEEE conference/journal |
+| `paper-acm` | `paper-acm.tex` | ACM format | ACM conference/journal |
+| `poster` | `poster-academic.tex` | `article` (A0) | Academic conference poster |
+| `slides` | `presentation-beamer.tex` | `beamer` | Conference talk, seminar, defense |
+| `thesis` | `thesis-standard.tex` | `report` | PhD/Master's thesis |
+| `report` | `report-scientific.tex` | `report` | Lab/scientific report |
+| `report-tech` | `report-technical.tex` | `report` | Technical report |
+| `letter` | `letter-formal.tex` | letter | Formal/cover letter |
+| `cv` | `cv-modern.tex` | custom | Academic CV |
+| `book` | `book-standard.tex` | `book` | Book/monograph |
+| `newsletter` | `newsletter.tex` | custom | Newsletter |
+| `blank` | `blank.tex` | `article` | Empty starting point |
+
+**Steps:**
+
+1. Match `<type>` against the template table. If no match, show the table and stop.
+2. Read the template file from `artifacts/document-templates/latex/<type>.tex`. If templates directory doesn't exist, report: "No document templates installed. Run project scaffolding with a document format selection, or manually copy templates to `artifacts/document-templates/latex/`."
+3. Ask the user for a target directory (default: current directory) and filename.
+4. Customize the template:
+   - Replace placeholder title with `[title]`, or leave `{Title}` if none given.
+   - Replace placeholder author/institution with `{Author Name}` / `{Institution}`.
+   - Keep all structural sections intact.
+5. If a `references.bib` template exists, copy it alongside the `.tex` file.
+6. Write the customized files to the target directory.
+7. Report what was created and suggest next steps.
+
+**Type-specific guidance (include as LaTeX comments):**
+
+- **paper / paper-ieee / paper-acm**: IMRAD structure. Abstract 150-300 words.
+- **poster**: A0 portrait. Max 800 words total. 5-6 sections. Title 72-120pt, body 28-36pt. Three columns.
+- **slides**: ~1 slide per minute. 60-70% visual, 30-40% text. Body 24-28pt.
+- **thesis**: Front matter (declaration, abstract, acknowledgements, TOC). Main chapters. Appendices.
+- **report**: Highlight boxes for key findings. Summary statistics tables.
+
+### `--draft <section> [file]`
+
+Write or expand a section of an existing document.
+
+**Steps:**
+
+1. If `[file]` provided, read it. Otherwise, search for document files (`.tex`, `.typ`, `.md`) in current directory and ask which one.
+2. Identify document type from content/extension.
+3. Locate the target `<section>`. Match flexibly:
+   - `abstract`, `introduction`, `intro`
+   - `methods`, `methodology`, `materials`, `approach`, `proposed`, `framework`
+   - `results`, `experiments`, `evaluation`
+   - `discussion`, `analysis`
+   - `conclusion`, `summary`, `future`
+   - `related`, `background`, `literature`, `prior`
+   - For slides: frame titles. For thesis: chapter names.
+4. Apply the **two-stage writing process**:
+
+   **Stage 1 — Outline**: Generate a structured outline:
+   - 3-7 key points with supporting sub-points
+   - Mark citations needed as `\cite{needed:topic}` (LaTeX) or `[?topic]` (Markdown)
+   - Mark figures/tables needed as comments
+   - Present to user for approval
+
+   **Stage 2 — Prose**: Convert approved outline to flowing scientific prose:
+   - Write in full paragraphs (NEVER bullet points in the document body)
+   - Follow IMRAD conventions for the section type
+   - Use precise, field-appropriate terminology
+   - Include equation/code environments where needed
+
+5. Edit the section content into the file using the Edit tool.
+
+**Section-specific guidance:**
+
+| Section | Key Requirements |
+|:--------|:----------------|
+| Abstract | Self-contained. Problem, method, result, implication. 150-300 words. |
+| Introduction | Context, gap, contribution, outline. Final paragraph: numbered contributions. |
+| Methods | Reproducible detail. Define all variables. State assumptions. |
+| Results | Present without interpretation. One message per figure/table. |
+| Discussion | Interpret. Compare to prior work. Limitations. Implications. |
+| Conclusion | 1-2 paragraphs. Contribution summary (not results). Future directions. |
+
+### `--review <file>`
+
+Structured peer review of a manuscript.
+
+**Steps:**
+
+1. Read the file (`.tex`, `.typ`, `.md`, or `.pdf`).
+2. Perform a systematic 7-stage review:
+
+   **Stage 1 — First Impression**: Novelty, significance, scope.
+
+   **Stage 2 — Section-by-Section**: Title/Abstract accuracy, Introduction clarity, Methods rigor, Results validity, Discussion interpretation, References coverage.
+
+   **Stage 3 — Technical Rigor**: Mathematical correctness, statistical methods, experimental design, computational reproducibility.
+
+   **Stage 4 — Figures and Tables**: Quality, readability, accessibility, axis labels, error bars, captions, data integrity.
+
+   **Stage 5 — Writing Quality**: Clarity, conciseness, grammar, logical flow.
+
+3. Output a structured review report:
+
+```markdown
+## Summary Statement
+[2-3 sentences on contribution and assessment]
+
+## Major Issues (must address before publication)
+1. [Issue with location and suggestion]
+
+## Minor Issues (should address)
+1. [Issue with line/section reference]
+
+## Line-by-Line Comments
+- L42: [specific comment]
+
+## Questions for Authors
+1. [Clarification needed]
+
+## Recommendation
+[ ] Accept as-is
+[ ] Minor revision
+[ ] Major revision
+[ ] Reject
+```
+
+### `--cite <identifier>`
+
+Look up a citation and format as BibTeX.
+
+**Steps:**
+
+1. Determine identifier type:
+   - DOI (contains `10.`): fetch from `https://doi.org/<doi>` with Accept: `application/x-bibtex`
+   - arXiv ID (e.g., `2103.14030`): fetch from arXiv and construct BibTeX
+   - Free text: use WebSearch to find the paper, extract DOI, then fetch
+
+2. Clean and format the BibTeX entry:
+   - Citation key: `FirstAuthor2024keyword`
+   - Protect capitalization with `{}`
+   - Use `--` for page ranges
+   - Include DOI field
+   - Remove unnecessary fields
+
+3. Output the formatted entry.
+
+4. If a `.bib` file exists in current directory, offer to append.
+
+**Batch mode**: comma-separated or one-per-line identifiers.
+
+### `--compile [file]`
+
+Compile a document to PDF.
+
+**Steps:**
+
+1. If `[file]` not given, find the main document file in current directory.
+2. Detect format:
+   - `.tex`: check for `pdflatex`, `xelatex`, `lualatex`, or `latexmk`
+   - `.typ`: check for `typst`
+   - `.md`: check for `pandoc`
+3. Compile with the appropriate engine:
+
+   **LaTeX:**
+   ```bash
+   pdflatex -interaction=nonstopmode <file> && \
+   bibtex <basename> 2>/dev/null; \
+   pdflatex -interaction=nonstopmode <file> && \
+   pdflatex -interaction=nonstopmode <file>
+   ```
+
+   **Typst:**
+   ```bash
+   typst compile <file>
+   ```
+
+   **Markdown:**
+   ```bash
+   pandoc <file> -o <basename>.pdf
+   ```
+
+4. Parse log/output for errors and warnings. Report with line numbers.
+5. If compiler not found, suggest installation.
+
+### `--templates`
+
+List all available document templates.
+
+Read `artifacts/document-templates/` and show what's installed:
+- Template name (the `--new` type argument)
+- Format (LaTeX/Typst/Markdown)
+- Document class
+- Whether a `.bib` template is included
+
+---
+
+## Reference Subcommands
 
 ### `--template <format>`
 
-Generate a complete, ready-to-use document template/preamble for the specified format or venue.
+Generate a complete document template/preamble for a target format or venue.
 
 **Steps:**
-1. Search the formatter's research corpus for style guides matching `<format>` (case-insensitive substring match against document titles and filenames).
-2. If a matching style guide exists, read it to extract: document class/format, required packages/imports, standard structure, metadata format.
-3. Read any notation/macro reference documents in the corpus.
-4. Assemble a complete template in a code block with comments explaining each section.
+1. Search formatter's research corpus for style guides matching `<format>`.
+2. If found, read and extract: document class, required packages, standard structure.
+3. Read notation/macro reference documents if available.
+4. Assemble a complete template in a code block with comments.
 
-**What the template must include:**
-1. The correct document class/format declaration for the venue
-2. All required packages, imports, or dependencies
-3. The project's notation macros (if a notation registry exists in the formatter's memory)
-4. Standard environments/blocks (theorem, definition, proof, etc. — if applicable)
-5. Comments explaining each block
-
-If no matching style guide is found:
-- List the available formats from the corpus index
-- Suggest which one might be closest
-- Offer to generate a generic template
+If no corpus match, check `artifacts/document-templates/` for a shipped template matching the format. If neither exists, list available options.
 
 ### `--notation`
 
-Show the project's notation registry — a quick-reference card of all project-specific symbols, abbreviations, and conventions.
-
-**Steps:**
-1. Check the formatter agent's memory (`.claude/agent-memory/{formatter-name}/notation-registry.md` or similar)
-2. Check the research corpus for notation/symbol convention documents
-3. If notation data exists, format as a markdown table:
-
-| Symbol | Markup | Meaning | First Appears |
-|:-------|:-------|:--------|:-------------|
-
-Organized by category (domain-specific groupings).
-
-If no notation registry exists:
-```
-No notation registry found.
-The formatter agent builds this over time as the project develops notation conventions.
-To bootstrap: describe your key symbols and run /document-prep --notation again.
-```
+Show the project's notation registry from the formatter agent's memory or research corpus.
 
 ### `--style <venue>`
 
-Show a concise style summary for the named venue/format.
-
-**Steps:**
-1. Search the formatter's research corpus for a matching style guide.
-2. Read it and extract a structured summary:
-
-1. **Document class/format** and options
-2. **Page limits** (if any)
-3. **Bibliography** format and style
-4. **Figure requirements** (format, resolution, color)
-5. **Abstract** word limit and format
-6. **Key formatting rules** (section numbering, equation numbering, appendices)
-7. **Submission portal** URL (if documented)
-8. **Typical review timeline** (if documented)
-
-If no matching style guide is found, list available venues from the corpus index.
+Concise style summary for a named venue: document class, page limits, bibliography format, figure requirements, abstract limits, submission portal, review timeline.
 
 ### `--check <file>`
 
-Review a document file for formatting issues. Works with any format the formatter agent understands.
-
-**Steps:**
-1. Read the file using the Read tool.
-2. Determine the format from the file extension and content (.tex, .typ, .md, .html, etc.).
-3. If a formatter research corpus exists, load relevant style guides for the target format.
-4. Check for:
-   - **Structural issues**: missing required sections, broken cross-references, unmatched delimiters
-   - **Notation consistency**: scan for variant spellings of project terms (if notation registry exists)
-   - **Format compliance**: check document class/format against expected venue (if determinable)
-   - **Common mistakes**: format-specific antipatterns (e.g., for LaTeX: double subscripts, missing `\,` in integrals; for markdown: broken link syntax, inconsistent heading levels)
-   - **Reference integrity**: unresolved cross-references, missing bibliography entries
-5. Output a categorized issue list with line numbers and suggested fixes.
+Review a document for formatting issues: structural problems, notation consistency, format compliance, common mistakes, reference integrity. Output categorized issues with line numbers.
 
 ### `--submission`
 
-Generate a submission checklist for the project's target venue.
-
-**Steps:**
-1. Search the formatter's research corpus for submission workflow documents.
-2. If found, read and extract checklist items.
-3. Generate a markdown checklist organized by phase:
-
-```markdown
-## Submission Checklist
-
-### Pre-submission
-- [ ] Document compiles/renders cleanly with no warnings
-- [ ] All cross-references resolve
-- [ ] All figures present and correctly referenced
-- [ ] Bibliography complete (no undefined citations, no unused entries)
-- [ ] Notation consistent throughout (check notation registry)
-
-### Metadata
-- [ ] Title matches document exactly
-- [ ] All authors with correct affiliations
-- [ ] Abstract within word limit
-- [ ] Keywords/categories selected
-- [ ] Acknowledgments complete
-
-### File Package
-- [ ] All source files included
-- [ ] Figures in correct format and resolution
-- [ ] Supplementary materials prepared (if any)
-- [ ] Total package size within limits
-
-### Post-submission
-- [ ] Verify rendering in submission system
-- [ ] Check all cross-references in rendered output
-- [ ] Confirm all figures appear correctly
-- [ ] Note submission ID/reference number
-```
-
-Augment with venue-specific items from the research corpus if available.
+Generate a submission checklist (pre-submission, metadata, file package, post-submission). Augment with venue-specific items from the formatter's corpus.
 
 ### `--bib`
 
-Bibliography setup guide for the project's target format(s).
-
-**Steps:**
-1. Search the formatter's research corpus for bibliography/reference management documents.
-2. If found, generate:
-
-1. **Format compatibility matrix**: which bibliography engines/styles work with which venues
-2. **Reference source workflow**: how to export entries from domain-specific databases
-3. **Single-source strategy**: one master bibliography file, venue-specific compilation
-4. **Common citation commands**: format-specific citation syntax
-
-If no bibliography guide exists in the corpus, provide a generic best-practices guide based on the detected document format.
+Bibliography setup guide: format compatibility matrix, reference source workflows, single-source strategy, citation commands.
 
 ### `--index`
 
-Show the full document index of the formatter's research corpus.
+Show the formatter's research corpus index.
 
-**Steps:**
-1. Read `{FORMATTER_CORPUS}/index.md`
-2. Display it to the user
-3. If no corpus exists, report that and suggest creating one
+---
+
+## Format-Specific Constraints
+
+### Posters
+
+- **Content**: Max 300-800 words total body text
+- **Sections**: 5-6 for A0, 4-5 for A1
+- **Fonts**: Title 72-120pt, headers 40-48pt, body 28-36pt, refs 24pt
+- **Layout**: 3 columns for A0 portrait
+- **Color**: Cohesive theme, colorblind accessible
+- **Test**: Readable from 1.5 meters
+
+### Slides
+
+- **Density**: ~1 slide per minute
+- **Content**: 60-70% visual, 30-40% text
+- **Fonts**: Body 24-28pt, titles 36-44pt
+- **Anti-patterns**: No text walls, no full sentences, max 6 bullets/slide
+- **Talk types**: Conference 10-15 slides, seminar 30-40, defense 35-45, lightning 5-7
+
+### Grant Proposals
+
+- **NSF**: Intellectual Merit + Broader Impacts. 15-page description.
+- **NIH**: Significance, Innovation, Approach. R01 = 12 pages.
+- **DOE**: Technical narrative. Mission relevance. Milestones.
+- **General**: Objectives in first paragraph. Preliminary data. Timeline figure.
 
 ---
 
 ## Spawning the Formatter Agent
 
-For complex tasks that exceed what this skill can do inline (writing full documents, multi-file template setup, extensive notation standardization), spawn the formatter agent instead:
-
-```
-Use the Agent tool with subagent_type = "{formatter-agent-name}" to handle:
-- Full document drafting or restructuring
-- Multi-section notation audits
-- Template architecture for large multi-file documents
-- Submission package assembly
-```
-
-This skill handles quick lookups and checks. The formatter agent handles heavy lifting.
+For heavy lifting (full document drafting, multi-section notation audits, submission package assembly), spawn the formatter agent instead of using this skill inline.
 
 ## Error Handling
 
-- If `--template` argument doesn't match any known format in the corpus: list available formats and stop
-- If `--style` argument doesn't match: list available venues and stop
-- If `--check` file doesn't exist: report file not found
-- If no subcommand given: show usage block
-- If formatter research corpus is missing: report which resources are missing and suggest `/new-researcher --archetype formatter <domain>` to populate
-- If formatter agent doesn't exist but corpus does: skill works in degraded mode (read-only from corpus, no agent memory)
-
-## Notes
-
-- This skill reads from the formatter's research corpus — it does NOT require spawning the formatter agent for most operations
-- The skill adapts to whatever format the project uses — it is NOT tied to any specific typesetting system
-- All format-specific knowledge comes from the research corpus, not from hardcoded rules
-- For projects that haven't created a formatter agent yet, `--check` and `--notation` still work using general-purpose formatting knowledge
+- If `--new <type>` doesn't match: show template table
+- If `--draft <section>` not found in file: list sections present
+- If file doesn't exist: report not found
+- If no document files found: suggest `--new <type>`
+- If compiler not found: provide installation instructions
+- If no arguments given: show usage block
+- If formatter corpus missing: proceed with shipped templates + general knowledge
