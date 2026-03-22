@@ -1,6 +1,6 @@
 # Meme Engine
 
-A Claude Code plugin marketplace by [Meme-Engine, Inc](https://meme-engine.com).
+A Claude Code plugin marketplace by [Meme-Engine Megacrop Enterprises](https://meme-engine.com).
 
 ## Install
 
