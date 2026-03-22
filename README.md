@@ -2,6 +2,8 @@
 
 A Claude Code plugin marketplace by [Meme-Engine Megacrop Enterprises](https://meme-engine.com).
 
+Plugin Implementation Example Viewable: https://github.com/Meme-Theory/rclab-exflation
+
 ## Install
 
 ```
