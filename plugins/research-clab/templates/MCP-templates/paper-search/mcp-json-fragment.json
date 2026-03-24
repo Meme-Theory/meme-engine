@@ -1,0 +1,8 @@
+{
+  "paper-search": {
+    "type": "stdio",
+    "command": "{{PYTHON_CMD}}",
+    "args": ["-m", "paper_search_mcp.server"],
+    "env": {}
+  }
+}

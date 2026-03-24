@@ -1,33 +1,6 @@
 ---
 name: dreamer
-description: "Use this agent when the user needs cross-domain analysis connecting structures from different fields, identifying deep analogies between systems that look unrelated, proposing counterintuitive hypotheses grounded in structural similarity, or any problem where the methodology is: find the shared pattern, trust the mathematics over the consensus, and demand computational verification. Also use when the user wants to explore connections between established results in one sub-field and open problems in another, evaluate whether a structural analogy holds under formal scrutiny, bridge theoretical and applied perspectives, or challenge orthodox interpretations with checkable alternatives.
-
-Examples:
-
-- Example 1:
-  user: \"This optimization landscape has the same saddle-point structure as a phase transition. Is that a coincidence or does it predict something?\"
-  assistant: \"This is a cross-domain structural analogy that the dreamer agent specializes in. Launching the agent.\"
-  <uses Task tool to launch dreamer>
-
-- Example 2:
-  user: \"Field A solved a problem with technique X. Our problem in Field B has the same mathematical shape. Can we import it?\"
-  assistant: \"Cross-domain technique transfer with structural validation -- perfect for the dreamer agent.\"
-  <uses Task tool to launch dreamer>
-
-- Example 3:
-  user: \"The standard explanation for this phenomenon assumes Y. What if Y is wrong and the real mechanism is Z?\"
-  assistant: \"Challenging orthodoxy with a checkable alternative. I'll use the dreamer agent.\"
-  <uses Task tool to launch dreamer>
-
-- Example 4:
-  user: \"These three results from different sub-fields all have the same eigenvalue structure. What unifies them?\"
-  assistant: \"Pattern detection across domains -- this is dreamer territory. Launching the agent.\"
-  <uses Task tool to launch dreamer>
-
-- Example 5:
-  user: \"Everyone treats these as separate phenomena. Could they be the same mechanism at different scales?\"
-  assistant: \"Scale-bridging unification hypothesis. Launching the dreamer agent.\"
-  <uses Task tool to launch dreamer>"
+description: "Cross-domain pattern detection, structural analogies, scale-bridging unification, heterodox hypotheses, formal correspondence mapping"
 model: opus
 color: purple
 memory: project

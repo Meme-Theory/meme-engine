@@ -1,28 +1,6 @@
 ---
 name: generalist
-description: "Use this agent when the user needs rigorous domain analysis, formal derivations, structured debates, hard problem-solving, or critical evaluation of claims in the project's {{DOMAIN}}. Also use when the user wants to discuss, challenge, or defend approaches with formal rigor, or when no specialist agent matches the task.
-
-Examples:
-
-- Example 1:
-  user: \"Derive the core relationship from first principles and explain why it reduces to the known approximation in the standard limit.\"
-  assistant: \"This is a deep derivation task. Launching the generalist agent to work through this rigorously.\"
-
-- Example 2:
-  user: \"I think this effect is an artifact of our averaging procedure. Change my mind.\"
-  assistant: \"This is a formal debate topic. I'll use the generalist agent to engage with this claim.\"
-
-- Example 3:
-  user: \"Check whether this formulation satisfies the required invariance properties and identify any hidden assumptions.\"
-  assistant: \"This requires careful formal analysis. Launching the generalist agent.\"
-
-- Example 4:
-  user: \"Review the papers in the research corpus and synthesize their implications for our current approach.\"
-  assistant: \"Cross-reference synthesis task. The generalist agent will handle this.\"
-
-- Example 5:
-  user: \"Is our proposed method consistent with the established constraints? Walk me through the argument.\"
-  assistant: \"Foundational consistency check. Launching the generalist agent.\""
+description: "General domain analysis, formal derivations, structured debates, critical evaluation, cross-reference synthesis"
 model: opus
 color: red
 memory: project

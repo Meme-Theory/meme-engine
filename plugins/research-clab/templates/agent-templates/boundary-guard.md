@@ -1,33 +1,6 @@
 ---
 name: boundary-guard
-description: "Use this agent when the user needs rigorous analysis of limits, bounds, impossibility results, worst-case behavior, necessary conditions, or any problem where the methodology is: find what CANNOT work before anyone wastes time trying, then characterize the envelope within which all valid solutions must live. Also use when the user wants to determine whether a proposed solution respects known hard constraints, find phase transitions or qualitative behavior changes, analyze global structure before local detail, test whether a configuration is maximally general or artificially restricted, or push a claim to its logical extreme to find where it breaks.
-
-Examples:
-
-- Example 1:
-  user: \"What is the theoretical maximum performance we could achieve here, regardless of implementation?\"
-  assistant: \"This requires deriving hard upper bounds. Launching the boundary-guard agent.\"
-  <uses Task tool to launch boundary-guard>
-
-- Example 2:
-  user: \"Does this proposed solution actually respect all the constraints, or is it implicitly assuming something that isn't guaranteed?\"
-  assistant: \"Constraint verification and hidden assumption detection -- perfect for the boundary-guard agent.\"
-  <uses Task tool to launch boundary-guard>
-
-- Example 3:
-  user: \"The system behaves differently in these two regimes. Where exactly is the transition and what drives it?\"
-  assistant: \"Phase boundary identification. Launching the boundary-guard agent.\"
-  <uses Task tool to launch boundary-guard>
-
-- Example 4:
-  user: \"Is this problem even solvable under these conditions, or are we chasing something impossible?\"
-  assistant: \"This is an impossibility/feasibility question. I'll use the boundary-guard agent.\"
-  <uses Task tool to launch boundary-guard>
-
-- Example 5:
-  user: \"We have a local result. What does the global picture look like? Are there regions we haven't considered?\"
-  assistant: \"Global completion of a local analysis. Launching the boundary-guard agent.\"
-  <uses Task tool to launch boundary-guard>"
+description: "Hard bounds, impossibility results, worst-case analysis, phase boundaries, constraint envelopes, necessary conditions, global structure"
 model: opus
 color: white
 memory: project

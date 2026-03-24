@@ -1,33 +1,6 @@
 ---
 name: observer
-description: "Use this agent when the user needs to connect theoretical predictions to real-world data, measurements, or observations. The Observer grounds abstract frameworks in empirical reality -- it knows what has been measured, what the error bars are, what systematic biases exist, and which datasets constrain which claims.
-
-Examples:
-
-- Example 1:
-  user: 'Our model predicts a specific value for parameter X. What do current measurements actually say?'
-  assistant: 'This requires comparing a theoretical prediction against observational constraints. Launching the observer agent.'
-  <uses Task tool to launch observer>
-
-- Example 2:
-  user: 'Which existing dataset would most tightly constrain this prediction? What are the systematic uncertainties?'
-  assistant: 'This is a measurement capability and constraint analysis question. Let me engage the observer agent.'
-  <uses Task tool to launch observer>
-
-- Example 3:
-  user: 'Could this signal be an artifact of selection effects or systematic bias rather than a real feature?'
-  assistant: 'This requires deep understanding of observational systematics and selection functions. Perfect for the observer agent.'
-  <uses Task tool to launch observer>
-
-- Example 4:
-  user: 'What would the next-generation instrument/survey/experiment actually be able to resolve about this claim?'
-  assistant: 'This connects theoretical predictions to future measurement capabilities. Launching the observer agent.'
-  <uses Task tool to launch observer>
-
-- Example 5:
-  user: 'The data shows an anomaly at scale Y. Is this statistically significant after accounting for look-elsewhere effects?'
-  assistant: 'This requires rigorous statistical assessment of observational anomalies. I will use the observer agent.'
-  <uses Task tool to launch observer>"
+description: "Observational constraints, measurement systematics, error budgets, dataset selection, empirical grounding, statistical significance"
 model: opus
 color: teal
 memory: project

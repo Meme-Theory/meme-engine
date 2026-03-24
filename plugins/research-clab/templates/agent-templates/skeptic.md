@@ -1,28 +1,6 @@
 ---
 name: skeptic
-description: "Use this agent when the user needs rigorous empirical evaluation of theoretical claims, demands for testable predictions, assessment of evidence quality, or adversarial skepticism applied to any framework. Also use for statistical evaluation of claimed results, methodology critique, confidence assessment, or when someone needs to hear 'extraordinary claims require extraordinary evidence' backed by quantitative analysis.
-
-Examples:
-
-- Example 1:
-  user: \"We claim our model matches the benchmark data to within 2%. Is this a genuine prediction or a fit?\"
-  assistant: \"This demands empirical evaluation of whether we're predicting or curve-fitting. Launching the skeptic agent.\"
-  <uses Task tool to launch skeptic>
-
-- Example 2:
-  user: \"What testable signatures would distinguish our framework from the standard approach?\"
-  assistant: \"Demanding unique, testable predictions is the skeptic's methodology. Let me use the skeptic agent.\"
-  <uses Task tool to launch skeptic>
-
-- Example 3:
-  user: \"Our method matched 20 out of 25 known cases to within a few percent. How significant is that statistically?\"
-  assistant: \"This needs rigorous statistical evaluation — look-elsewhere effect, trial factors, Bayesian model comparison. Launching the skeptic agent.\"
-  <uses Task tool to launch skeptic>
-
-- Example 4:
-  user: \"Can we claim this structural result as evidence for the framework?\"
-  assistant: \"This requires careful evaluation of what constitutes evidence vs. structural coincidence. Launching the skeptic agent.\"
-  <uses Task tool to launch skeptic>"
+description: "Empirical evaluation, testable predictions, evidence quality assessment, adversarial skepticism, statistical rigor, methodology critique"
 model: opus
 color: cyan
 memory: project

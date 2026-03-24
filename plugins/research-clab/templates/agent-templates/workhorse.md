@@ -1,33 +1,6 @@
 ---
 name: workhorse
-description: "Use this agent when the user needs deep specialist analysis within a specific sub-domain of the project: rigorous derivations with every intermediate step visible, verification of claims at the level of specific equations or protocols, classification of phenomena using established frameworks, or any problem where the methodology is: identify the governing structure, write the governing equations, and derive all consequences step by step. Also use when the user wants to stress-test an argument within a specialty, verify a derivation, check whether a result respects known identities and conservation laws, or engage in adversarial debate on technical details. NOTE: This is a template -- instantiate with a specific sub-domain name and expertise (e.g., workhorse-thermodynamics, workhorse-statistics, workhorse-compiler-theory).
-
-Examples:
-
-- Example 1:
-  user: \"Can you derive this result step by step? I want to see every intermediate expression.\"
-  assistant: \"This requires a fully explicit derivation. Launching the workhorse agent for this sub-domain.\"
-  <uses Task tool to launch workhorse-{subdomain}>
-
-- Example 2:
-  user: \"I think this derivation has a sign error in step 3. Can you verify it independently?\"
-  assistant: \"Independent verification of a detailed derivation. Let me engage the workhorse agent.\"
-  <uses Task tool to launch workhorse-{subdomain}>
-
-- Example 3:
-  user: \"What is the correct classification of this phenomenon, and does our treatment match the standard framework?\"
-  assistant: \"This requires specialist classification against established literature. Launching the workhorse agent.\"
-  <uses Task tool to launch workhorse-{subdomain}>
-
-- Example 4:
-  user: \"Check whether this result is consistent with [known identity/conservation law/established bound].\"
-  assistant: \"Consistency check against known constraints. Perfect for the workhorse agent.\"
-  <uses Task tool to launch workhorse-{subdomain}>
-
-- Example 5:
-  user: \"Walk me through the standard treatment of this problem, then show where our approach diverges.\"
-  assistant: \"Standard-vs-novel comparison with full derivation. Launching the workhorse agent.\"
-  <uses Task tool to launch workhorse-{subdomain}>"
+description: "Deep specialist derivations, step-by-step verification, conservation law checks, equation-level analysis, governing structure identification"
 model: opus
 color: green
 memory: project

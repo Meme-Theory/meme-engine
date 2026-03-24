@@ -1,28 +1,6 @@
 ---
 name: principalist
-description: "Use this agent when the user needs analysis rooted in fundamental principles, symmetry arguments, invariance requirements, or constraint-based reasoning. Also use when the user wants to derive what MUST be true before anyone calculates what IS true, evaluate thought experiments, stress-test claims about structural consistency, or identify which results are inevitable (follow from structure) vs. accidental (depend on specifics).
-
-Examples:
-
-- Example 1:
-  user: \"Does this result arise naturally from the framework's structure, or is it inserted by hand?\"
-  assistant: \"This is a question about whether the result is derived from principles or assumed ad hoc. Launching the principalist agent.\"
-  <uses Task tool to launch principalist>
-
-- Example 2:
-  user: \"What constraints does the problem structure impose on any valid solution — before we start computing?\"
-  assistant: \"Identifying structural constraints before computation is the principalist's methodology. Launching the principalist agent.\"
-  <uses Task tool to launch principalist>
-
-- Example 3:
-  user: \"Two agents are debating whether this property is fundamental or emergent. Can someone settle it from first principles?\"
-  assistant: \"This requires principle-theoretic reasoning to determine what the structure demands. Launching the principalist agent.\"
-  <uses Task tool to launch principalist>
-
-- Example 4:
-  user: \"What is the simplest thought experiment that would expose whether this assumption is necessary or just convenient?\"
-  assistant: \"Designing thought experiments to probe logical structure is the principalist's core method. Launching the principalist agent.\"
-  <uses Task tool to launch principalist>"
+description: "Fundamental principles, symmetry arguments, invariance requirements, thought experiments, structural necessity, constraint-based reasoning"
 model: opus
 color: gold
 memory: project
