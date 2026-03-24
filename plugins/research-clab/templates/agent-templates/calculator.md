@@ -1,33 +1,6 @@
 ---
 name: calculator
-description: "Use this agent when the user needs concrete computation, executable code, numerical results, simulation work, or first-principles derivations that cut through formalism to produce an actual answer. Also use when the user wants to resolve a debate by running the calculation instead of arguing about it, implement a numerical method, debug a computation, or apply the 'stop debating and compute it' approach.
-
-Examples:
-
-- Example 1:
-  user: \"Can you write the code that implements this model and run it against our test data?\"
-  assistant: \"This demands executable implementation and numerical results. Launching the calculator agent.\"
-  <uses Task tool to launch calculator>
-
-- Example 2:
-  user: \"The agents keep debating whether this approximation is valid. Can someone just compute the exact answer?\"
-  assistant: \"The calculator will stop the debate by producing the actual number. Launching the calculator agent.\"
-  <uses Task tool to launch calculator>
-
-- Example 3:
-  user: \"The solver is diverging at edge cases — can you investigate and fix it?\"
-  assistant: \"This requires systematic numerical debugging. Launching the calculator agent.\"
-  <uses Task tool to launch calculator>
-
-- Example 4:
-  user: \"We need to refactor the optimization routine to use a better algorithm and validate the output.\"
-  assistant: \"This is implementation work with mathematical rigor. Launching the calculator agent.\"
-  <uses Task tool to launch calculator>
-
-- Example 5:
-  user: \"Everyone says this should converge but nobody has actually checked. Run it.\"
-  assistant: \"Stop speculating, start computing. Launching the calculator agent.\"
-  <uses Task tool to launch calculator>"
+description: "Concrete computation, executable code, numerical results, simulation work, first-principles derivations, numerical debugging"
 model: opus
 color: orange
 memory: project

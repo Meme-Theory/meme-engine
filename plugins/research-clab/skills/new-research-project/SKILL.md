@@ -45,6 +45,7 @@ Verify these paths exist under `${CLAUDE_PLUGIN_ROOT}`:
 ```
 templates/agent-templates/
 templates/session-templates/
+templates/MCP-templates/
 templates/skills/
 templates/claude-md/
 templates/claude-md/rules/
@@ -168,6 +169,28 @@ Wait for BOTH agents to return. Check their reports:
 - If either reports errors, attempt to fix them before proceeding.
 - Verify key outputs exist: `.claude/agents/coordinator.md`, `tools/knowledge-schema.yaml`, `tools/knowledge-index.json`, `agents.md`.
 - If critical files are missing and unfixable, stop and report to the user.
+
+---
+
+## Phase 7b: MCP Server Installation (Interactive)
+
+**READ**: `${CLAUDE_PLUGIN_ROOT}/project-origami/unfold-mcp.md` — follow its 6 steps.
+
+This phase runs after infrastructure and knowledge setup are complete but before agent selection. It presents the user with optional MCP servers that enhance the project's research capabilities.
+
+**SERIAL QUESTIONS ONLY.** This phase uses AskUserQuestion — one question per call, wait for each answer.
+
+The unfold-mcp doc handles:
+1. Scanning `${CLAUDE_PLUGIN_ROOT}/templates/MCP-templates/` for available MCPs
+2. Presenting the menu to the user (AskUserQuestion)
+3. Detecting Python environment (if an MCP requires it)
+4. Alerting the user if Python is not available (with options to skip or provide a path)
+5. Installing the MCP package, writing `.mcp.json`, updating settings and CLAUDE.md
+6. Verification and reporting
+
+**If the user selects "None"**: skip to Phase 8. No MCP configuration is written.
+
+**If Python is not found**: the unfold explicitly alerts the user — it does NOT silently skip. The user decides whether to skip or provide a Python path.
 
 ---
 
@@ -328,6 +351,8 @@ Run through this checklist. Every item must pass:
 - [ ] `sessions/session-plan/researcher-queue.md` has at least 2 entries
 - [ ] `sessions/session-plan/session-0-prompt.md` has the research question
 - [ ] `sessions/session-00/` directory exists
+- [ ] If MCP servers were installed: `.mcp.json` exists at project root and is valid JSON
+- [ ] If MCP servers were installed: root CLAUDE.md contains MCP instructions section
 
 Print completion summary using the insight block format. The content inside must be GENERATED from the actual project — not boilerplate. Describe what makes THIS project's agent team distinctive, how the selected archetypes create productive tension for THIS research question, and what the first session will actually investigate.
 
@@ -404,7 +429,9 @@ If `--dry-run`: run Phases 0-1 and 8a-8d only. Display what WOULD be created (di
 | User skips Skeptic | Explain non-negotiable. Ask again. |
 | User selects >5 domain agents | Warn. "Start with 5 max, add more via /new-researcher." Let them trim. |
 | `/new-researcher` fails for a queue entry | Report failure, continue to next entry. |
-| Python not available | Skip accelerator. Core knowledge system works without it. |
+| Python not available (knowledge) | Skip accelerator. Core knowledge system works without it. |
+| Python not available (MCP) | Alert user explicitly. Offer skip or manual path. Never silently skip. |
+| MCP package install fails | Offer retry, skip, or manual install. Write config anyway if manual. |
 | No git repo | Run `git init` before Phase 2. |
 | Stale team/task state | Delete in Phase 6c. |
 | Root CLAUDE.md template has unfilled `{{...}}` variables | Substitute or strip — no mustache variables in final output. |

@@ -1,33 +1,6 @@
 ---
 name: bridge
-description: "Use this agent when the user needs rigorous analysis grounded in a specific external body of work that the project builds on. The Bridge has actually read the primary sources -- not summaries -- and verifies that the project uses external results correctly. Use it when fidelity to an external author's framework matters, when conventions need translation, when the user wants to extend external work into the project, or when there is a risk of misquotation, scope creep, or overstated claims about what the source material actually says.
-
-Examples:
-
-- Example 1:
-  user: 'How does Author X actually derive this result? Are we using it correctly in our framework?'
-  assistant: 'This requires direct verification against the primary source material. Launching the bridge agent.'
-  <uses Task tool to launch bridge>
-
-- Example 2:
-  user: 'I want to extend this external derivation into our project. Walk me through the original argument so we can see where our extension departs.'
-  assistant: 'This connects external source material to the project framework. Let me engage the bridge agent.'
-  <uses Task tool to launch bridge>
-
-- Example 3:
-  user: 'We claim our model reproduces Result Y from the literature. Does it actually, or are we overstating the match?'
-  assistant: 'This is a fidelity check against external work. Perfect for the bridge agent.'
-  <uses Task tool to launch bridge>
-
-- Example 4:
-  user: 'The notation in our framework differs from the original paper. Can we build a precise translation table?'
-  assistant: 'This requires deep familiarity with both the source conventions and the project conventions. I will use the bridge agent.'
-  <uses Task tool to launch bridge>
-
-- Example 5:
-  user: 'Does the original author make the same assumption we are making, or have we added something they would not endorse?'
-  assistant: 'This is a scope and interpretation fidelity question. Launching the bridge agent.'
-  <uses Task tool to launch bridge>"
+description: "Source fidelity verification, convention translation, primary literature analysis, scope validation, cross-framework mapping"
 model: opus
 color: purple
 memory: project

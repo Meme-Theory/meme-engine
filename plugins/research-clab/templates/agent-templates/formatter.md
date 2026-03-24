@@ -1,28 +1,6 @@
 ---
 name: formatter
-description: "Document preparation specialist for the {{PROJECT_NAME}} project. Handles all aspects of producing publication-ready, presentation-ready, or submission-ready documents -- typesetting, notation consistency, template architecture, figure preparation, bibliography management, cross-referencing, and output packaging. Use this agent for any task involving structured document production, formatting standards, or submission workflows.
-
-Examples:
-
-- Example 1:
-  user: \"How should we format the core notation consistently across the document?\"
-  assistant: \"Notation standardization task. Launching the formatter agent.\"
-
-- Example 2:
-  user: \"Set up the document template for our submission with the correct preamble and structure.\"
-  assistant: \"Template preparation task. I'll use the formatter agent.\"
-
-- Example 3:
-  user: \"The cross-references and numbering are broken across sections.\"
-  assistant: \"Structural formatting issue. Launching the formatter agent to diagnose and fix it.\"
-
-- Example 4:
-  user: \"Prepare the submission package with all figures, references, and correct metadata.\"
-  assistant: \"Submission workflow task. Launching the formatter agent.\"
-
-- Example 5:
-  user: \"Create a diagram showing the relationship between the key variables.\"
-  assistant: \"Technical diagram creation. I'll use the formatter agent.\""
+description: "Document preparation, typesetting, notation consistency, figure preparation, bibliography management, submission workflows"
 model: sonnet
 color: amber
 memory: project
