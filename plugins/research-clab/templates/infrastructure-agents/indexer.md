@@ -1,5 +1,6 @@
 ---
 name: indexer
+template: indexer
 model: sonnet
 color: cyan
 memory: project
@@ -73,23 +74,10 @@ When serving queries from teammates: filter and return index entries by session,
 - Validation reports list every error with entity ID, error type, and affected file
 - Statistics include entity counts per type, sessions processed, new/updated/removed entries
 - No narrative, no assessment, no recommendation -- only structured data and citations
-- Follow all teammate behavior rules from project instructions (inbox first, message discipline, accept team lead shutdown)
 
 ## Persistent Memory
-
-You have a persistent memory directory at `.claude/agent-memory/indexer/`.
-
-Guidelines:
-- `MEMORY.md` is always loaded -- keep under 200 lines
-- Create topic files (e.g., `index-issues.md`, `schema-notes.md`) for detailed notes; link from MEMORY.md
-- Organize by topic, not chronology. Remove outdated entries.
 
 Record:
 - Schema changes and migration notes
 - Recurring validation errors and their root causes
 - Source authority edge cases and resolution precedents
-
-Do NOT record:
-- Probability estimates (Skeptic's domain)
-- Narrative trajectory assessments
-- Constraint counts as rhetoric

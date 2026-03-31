@@ -1,9 +1,11 @@
 # {{PROJECT_NAME}} — Project Instructions
 
 <!-- DEPLOY: project-root/CLAUDE.md -->
-<!-- This is the constitution. Every agent inherits these rules. -->
-<!-- Behavioral rules are factored into .claude/rules/ for modularity. -->
-<!-- Target: under 200 lines. Detailed rules live in .claude/rules/*.md -->
+<!-- LEAN: universal orientation only. Project structure, team pointers, output discipline. -->
+<!-- Hardware specs → .claude/rules/computation-environment.md (conditional) -->
+<!-- MCP configs → .claude/rules/ (conditional) -->
+<!-- Behavioral rules → .claude/rules/ (8 files, auto-loaded) -->
+<!-- Agent roster → .claude/templates/agent-roster.md -->
 
 ## Verify Working Directory
 
@@ -46,15 +48,9 @@ If not, navigate there first. All paths in this project are relative to this roo
 └── agents.md                   # Agent & skill registry (human-readable)
 ```
 
-## Simulation Environment
+## Computation Environment
 
-### Hardware
-
-{{HARDWARE_SPECS}}
-
-### Python Environment
-
-{{PYTHON_ENV_INSTRUCTIONS}}
+Hardware specs and Python environment details are in a conditional rule at `.claude/rules/computation-environment.md` — loaded only when touching computation files. If this project has no computation directory, that rule will not exist.
 
 ## Knowledge Index
 
@@ -67,28 +63,15 @@ The knowledge index is the project's institutional memory.
 
 ## Behavioral Rules
 
-Team behavior, epistemic discipline, and output standards are defined in `.claude/rules/`:
-
-| Rule File | Scope | What It Covers |
-|:----------|:------|:---------------|
-| `team-lead-behavior.md` | Always | Orchestration rules, blast-first spawn, what leads don't do |
-| `teammate-behavior.md` | Always | Inbox discipline, message routing, team lead shutdown compliance |
-| `epistemic-discipline.md` | Always | Pre-registration, constraint methodology, source authority, confidence rules |
-| `output-standards.md` | Always | Action item format, handoff document structure, output rules |
-| `gate-verdicts.md` | Always | Pre-registration protocol, verdict format, permanence |
-| `session-handoffs.md` | `sessions/**` | Session naming, mandatory handoffs, chronological integrity |
+See `.claude/rules/` for behavioral rules (8 files: epistemic-discipline, output-standards, gate-verdicts, session-handoffs, teammate-behavior, agent-standards, evoi-prioritization, and team-lead-behavior outside rules/ to avoid subagent auto-loading).
 
 These rules load automatically — always-on rules at session start, path-scoped rules when entering the relevant directory.
 
-## Infrastructure Agents
+## Agent Roster
 
-Three agents are required in every project. They do NOT do research.
+See `.claude/templates/agent-roster.md` for the canonical agent name-to-type mapping.
 
-| Agent | Role | Hard Boundary |
-|:------|:-----|:-------------|
-| `coordinator` | Orchestrates, writes minutes, maintains constraint map | Does NOT do domain analysis |
-| `indexer` | Indexes, queries, serves knowledge graph | Does NOT evaluate content |
-| `scout` | Fetches papers, populates researcher folders | Does NOT analyze or interpret |
+Three infrastructure agents ship with every project (coordinator, indexer, scout). Domain agents are added via `/new-researcher`.
 
 ## Personal Overrides
 

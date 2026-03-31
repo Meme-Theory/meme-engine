@@ -55,11 +55,13 @@ If `<topic>` is empty or missing, show the Usage block above and stop.
 
 ### 0c. Validate Agent Types
 
-Check that `--planner` and `--prompter` agent types exist in `.claude/agents/`. List all `.claude/agents/*.md` files and match against the provided type names (case-insensitive, filename minus `.md`).
+Check that `--planner` and `--prompter` agent types exist in `.claude/agents/`. See `.claude/templates/agent-roster.md` for the canonical list. If invalid, list available types and stop.
 
-If invalid, list available types and stop.
+### 0d. Session Management Rule
 
-### 0d. Validate Context Files
+From team-lead-behavior.md: follow the "Session Management" and "Don't over-manage" rules. The full team-lead protocol (blast-first, shutdown) does not apply — clab-plan uses solo agents, not teams.
+
+### 0e. Validate Context Files
 
 If `--context` files are provided, verify each exists using the Read tool (read 1 line). If any missing, report which files were not found and stop.
 
@@ -194,13 +196,28 @@ Ready to spawn planner agent. Run without --dry-run to proceed.
 
 ---
 
+## Phase 2.5: Write Context File
+
+Write the assembled context package to `sessions/session-plan/session-{N}-context.md` instead of embedding it in the agent prompt. This reduces prompt token count, makes the context inspectable by the user, and allows reuse if the planner needs to be re-run.
+
+---
+
 ## Phase 3: Spawn Planner Agent
+
+Create a task for tracking, then spawn the planner:
+
+```
+TaskCreate: "Generate session plan" (subject: "Generate session {N} plan: {topic}")
+```
 
 Spawn a **solo background agent** (NOT a team) using the Agent tool:
 
 - `subagent_type`: from `--planner` flag (default: `coordinator`)
 - `run_in_background`: true
 - `name`: `planner`
+- `mode`: `"acceptEdits"` — planner only writes plan files
+- `effort`: `"thorough"` — planning needs depth
+- `maxTurns`: 30
 
 ### Planner Agent Prompt
 
@@ -217,11 +234,8 @@ Write a session plan to: `{PLAN_FILE}`
 
 ## Context Package
 
-The following is assembled project context — methodology status, recent results, open gates, and active channels. Use this to inform your plan.
-
----START CONTEXT---
-{full context package from Phase 2}
----END CONTEXT---
+Read the full project context from: `sessions/session-plan/session-{N}-context.md`
+This contains methodology status, recent results, open gates, and active channels.
 
 ## Plan Structure
 
@@ -441,11 +455,20 @@ If user provides feedback text (via "Other"), re-spawn the planner agent with th
 
 ## Phase 5: Spawn Prompter Agent
 
+Create a task for tracking (blocked by planner task):
+
+```
+TaskCreate: "Generate prompt files" (subject: "Generate session {N} prompts: {topic}", blocked_by: planner task ID)
+```
+
 Spawn a **solo background agent** (NOT a team):
 
 - `subagent_type`: from `--prompter` flag (default: `coordinator`)
 - `run_in_background`: true
 - `name`: `prompter`
+- `mode`: `"acceptEdits"` — prompter only writes prompt files
+- `effort`: 3
+- `maxTurns`: 20
 
 ### Compute Format — Working Paper Generator
 

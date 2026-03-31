@@ -21,12 +21,14 @@ Copy each rule file from `${CLAUDE_PLUGIN_ROOT}/templates/claude-md/rules/` into
 
 | Source | Target | What It Enforces |
 |:-------|:-------|:-----------------|
-| `team-lead-behavior.md` | `.claude/rules/team-lead-behavior.md` | Don't over-manage, shut down agents when done, never self-terminate, one team at a time, always spawn coordinator, clean stale teams, blast-first |
-| `teammate-behavior.md` | `.claude/rules/teammate-behavior.md` | Inbox first, limit self-induced work, respond to interrupts, message by name, wait for roster, one topic per message |
-| `epistemic-discipline.md` | `.claude/rules/epistemic-discipline.md` | Evidence hierarchy, pre-registration, constraint framing, confidence ownership, what counts as a result |
+| `team-lead-behavior.md` | `.claude/rules/team-lead-behavior.md` | Don't over-manage, task-based monitoring, blast-first protocol, compute mode protocol, never self-initiate shutdown |
+| `teammate-behavior.md` | `.claude/rules/teammate-behavior.md` | Inbox first, limit self-induced work, respond to interrupts, message by name, wait for roster, ready protocol, task ownership |
+| `epistemic-discipline.md` | `.claude/rules/epistemic-discipline.md` | Evidence hierarchy, pre-registration, constraint framing, mechanism assessment, what counts as a result, reporting format |
 | `output-standards.md` | `.claude/rules/output-standards.md` | One writer per file, specific action items, mandatory handoffs, formatting precision |
-| `gate-verdicts.md` | `.claude/rules/gate-verdicts.md` | Gate format, classification criteria (PASS/CLOSED/FAIL), compliance checking |
-| `session-handoffs.md` | `.claude/rules/session-handoffs.md` | Handoff document structure, what must be captured, recovery instructions |
+| `gate-verdicts.md` | `.claude/rules/gate-verdicts.md` | Gate format, pre-registration protocol, verdict permanence, compliance checking |
+| `session-handoffs.md` | `.claude/rules/session-handoffs.md` | Handoff document structure, chronological integrity, recommendation carry-forward |
+| `agent-standards.md` | `.claude/rules/agent-standards.md` | Formal rigor, dimensional consistency, persistent memory guidelines |
+| `evoi-prioritization.md` | `.claude/rules/evoi-prioritization.md` | EVOI computation priority, evidence weighting, effort-based probability tracking |
 
 These files are copied verbatim — no substitutions needed.
 
@@ -51,12 +53,14 @@ If this section is missing, add it.
 
 After copying, spot-check:
 
-1. **team-lead-behavior.md** contains the blast-first spawn sequence
-2. **teammate-behavior.md** contains the inbox-first rule
-3. **epistemic-discipline.md** contains the "only Skeptic states confidence" rule
+1. **team-lead-behavior.md** contains the blast-first protocol and compute mode protocol
+2. **teammate-behavior.md** contains the inbox-first rule, ready protocol, and task ownership
+3. **epistemic-discipline.md** contains the evidence hierarchy and mechanism assessment sections
 4. **output-standards.md** contains the "one writer per file" rule
-5. **gate-verdicts.md** contains the PASS/CLOSED/FAIL classification format
-6. **session-handoffs.md** contains the 7-section handoff template
+5. **gate-verdicts.md** contains the pre-registration protocol and verdict format
+6. **session-handoffs.md** contains the recommendation carry-forward section
+7. **agent-standards.md** contains formal rigor and persistent memory guidelines
+8. **evoi-prioritization.md** contains the EVOI formula and evidence weighting rules
 
 If any file is missing or empty, report the gap.
 

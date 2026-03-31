@@ -70,9 +70,7 @@ Read 1 line of each source document to verify it exists. If any missing, report 
 
 ### 0d. Validate Agent Types
 
-Discover valid agent types dynamically from `.claude/agents/`:
-
-Check that ALL specified agent types (from `--agent` or `--agents`) exist as `.claude/agents/{type}.md`. If invalid, list available types and stop.
+Check that all agent types exist in `.claude/agents/`. See `.claude/templates/agent-roster.md` for the canonical list. If invalid, list available types and stop.
 
 ### 0e. Defaults
 
@@ -205,6 +203,8 @@ Spawn a **single background agent** (NOT a team) using the Agent tool:
 - `subagent_type`: from `--agent`
 - `run_in_background`: true
 - `name`: `synthesis-writer`
+- `mode`: `"acceptEdits"` — synthesis agents write output files, should not be permission-blocked
+- Effort/depth by type: solo -> `effort: 3`, master -> `effort: 4`
 
 **Solo Agent Prompt** (varies by `--type`):
 
@@ -220,64 +220,11 @@ Read all source documents, then write a synthesis to: `{output_path}`
 ## Source Documents (read ALL of these FIRST)
 {numbered list of all source doc paths}
 
-## Also Read
-- Your agent memory: `.claude/agent-memory/{your-type}/MEMORY.md` (if it exists)
+## Document Structure
 
-## Document Structure (follow this format)
-
-```markdown
-# Session {session-id} Synthesis: {Title — derive from source content}
-
-**Date**: {today}
-**Session type**: SYNTHESIS
-**Agents**: {your agent type} (solo synthesis)
-**Source documents**: {list}
-
----
-
-## I. Session Outcome
-
-{2-3 sentence verdict. Lead with the most consequential result. State whether gates passed or failed.}
-
----
-
-## II. Gate Verdicts (Summary)
-
-{If source docs contain gate verdicts, tabulate them:}
-
-| Gate | Type | Verdict | Decisive Number |
-|:-----|:-----|:--------|:----------------|
-
-{If no gates in source docs, replace with "## II. Key Results" and summarize findings.}
-
----
-
-## III. Computation Results
-
-{For each computation or major finding in the source docs, one subsection:}
-
-### {Result Title}
-
-**Result**: {the number, then the classification}
-
-{2-3 paragraphs: what was computed, what it means, structural implications}
-
----
-
-## IV. Structural Implications
-
-{What these results mean for the framework. Update constraint map if applicable. Identify what opened, what closed, what shifted.}
-
----
-
-## V. Forward Projection
-
-{What should happen next. Specific computations. Which gates are now decisive. What the results enable or block.}
-```
+Follow the template in `.claude/templates/synthesis-solo.md`.
 
 ## Rules
-- Ground in the SOURCE DOCUMENTS. Do not invent results not in the sources.
-- Report numbers first. Classify second. Interpret third.
 - Gate verdicts from source docs are authoritative — do not re-adjudicate.
 - If sources conflict, flag the conflict explicitly.
 - Write ONLY the output file. Nothing else.
@@ -295,72 +242,9 @@ Read all source documents, then write a master synthesis to: `{output_path}`
 ## Source Documents (read ALL of these FIRST)
 {numbered list of all source doc paths}
 
-## Also Read
-- Your agent memory: `.claude/agent-memory/{your-type}/MEMORY.md` (if it exists)
-
 ## Document Structure
 
-```markdown
-# Session {session-id} Master Synthesis: {Title}
-
-**Date**: {today}
-**Sub-sessions rolled up**: {list of sub-sessions, e.g., 30Aa, 30Ab, 30Ba, 30Bb}
-**Agents**: {from each sub-session}
-**Document type**: Definitive standalone session record — all sub-session results integrated by importance, not chronology
-
----
-
-## Executive Summary
-
-{3-5 paragraphs. The reader should be able to understand the entire session arc from this section alone. State: what was attempted, what was found, what it means, what's next.}
-
----
-
-## I. Results Hierarchy
-
-{Organize ALL results from ALL sub-sessions by importance, not chronology:}
-
-### Tier 1: Framework-Decisive Results
-{Results that change the framework's status, probability, or direction}
-
-### Tier 2: Structural Results
-{Permanent mathematical results, theorems, proven identities}
-
-### Tier 3: Diagnostic Results
-{Useful numbers that inform future sessions but don't independently change status}
-
----
-
-## II. Gate Verdicts (Complete)
-
-| Gate | Sub-Session | Type | Verdict | Decisive Number |
-|:-----|:-----------|:-----|:--------|:----------------|
-
----
-
-## III. Constraint Map Update
-
-{What opened, what closed, what shifted. Reference specific gate IDs.}
-
----
-
-## IV. Cross-Sub-Session Discoveries
-
-{Insights visible ONLY when sub-session results are compared against each other. Emergent patterns, unexpected connections between sub-sessions that no individual sub-session synthesis captures alone.}
-
----
-
-## V. Forward Projection
-
-{Priority-ordered next steps. Specific computations. Which new gates are now defined.}
-```
-
-## Rules
-- This is a DEFINITIVE STANDALONE RECORD for one session number. A reader with no prior context should understand the full session arc from sub-session A through the last sub-session.
-- Organize by IMPORTANCE, not chronology. A reader should hit the most consequential result first.
-- Cross-sub-session discoveries (Section IV) are your highest-value contribution — patterns no individual sub-session synthesis captures.
-- Write ONLY the output file. Nothing else.
-```
+Follow the template in `.claude/templates/synthesis-master.md`. Key structural note: organize by IMPORTANCE not chronology. The Executive Summary should let a reader understand the full session arc standalone.
 
 ---
 
@@ -370,7 +254,7 @@ Workshop mode spawns exactly 2 agents **sequentially** — NO team infrastructur
 
 **Why no team infrastructure**: The 2-Agent Workshop Pattern eliminates every team management bug: no inbox routing, no notification avalanche, no shutdown resistance, no stale teams. Pure sequential Agent calls with append-only writes to a single document.
 
-**Short name mapping** — derive from agent type: use the first segment before the first hyphen (e.g., `boundary-guard` -> `boundary-guard`, `coordinator` -> `coordinator`). For agents with persona-based names, use the full slug.
+**Short name mapping**: Read `.claude/templates/agent-roster.md` for the canonical name-to-type mapping.
 
 #### Phase 3W-1: Write Document Header
 
@@ -388,6 +272,18 @@ The team lead (you) creates the workshop document with the header using the Writ
 ---
 ```
 
+#### Phase 3W-1.5: Create Task Tracking
+
+Even though workshop mode uses no team infrastructure, create tasks for progress visibility:
+
+```
+For each round r and turn (A, B):
+  TaskCreate: "R{r}-A: {agent-a-short} analysis" (blockedBy: previous turn's task ID)
+  TaskCreate: "R{r}-B: {agent-b-short} response" (blockedBy: R{r}-A task ID)
+```
+
+This gives the user a dashboard of workshop progress and ensures proper sequencing.
+
 #### Phase 3W-2: Round Loop
 
 For each round `r` from 1 to `--rounds`:
@@ -398,6 +294,11 @@ Spawn Agent A as a background agent using the Agent tool:
 - `subagent_type`: first agent from `--agents`
 - `run_in_background`: true
 - `name`: `workshop-{agent-a-short}-r{r}`
+- `mode`: `"acceptEdits"` — workshop agents only append to the shared document
+- `effort`: `"thorough"` for workshop depth
+- `maxTurns`: R1 Turn A -> 15, R2+ Turn A -> 12
+
+Mark the corresponding task as `in_progress` via TaskUpdate before spawning. Mark it `completed` after the agent finishes.
 
 **Round 1 Turn A Prompt:**
 
@@ -407,8 +308,6 @@ You are writing the OPENING ANALYSIS for a 2-agent iterative workshop.
 ## Source Documents (read ALL of these FIRST)
 {numbered list of all source doc paths}
 
-## Also Read
-- Your agent memory: `.claude/agent-memory/{your-type}/MEMORY.md` (if it exists)
 
 ## Your Task
 
@@ -445,8 +344,6 @@ You are writing ROUND {r} FOLLOW-UP for a 2-agent iterative workshop.
 ## Source Documents (for reference if needed)
 {numbered list of all source doc paths}
 
-## Also Read
-- Your agent memory: `.claude/agent-memory/{your-type}/MEMORY.md` (if it exists)
 
 ## Your Task
 
@@ -487,6 +384,9 @@ Spawn Agent B as a background agent:
 - `subagent_type`: second agent from `--agents`
 - `run_in_background`: true
 - `name`: `workshop-{agent-b-short}-r{r}`
+- `mode`: `"acceptEdits"`
+- `effort`: `"thorough"`
+- `maxTurns`: R1 Turn B -> 20, R2+ Turn B -> 15
 
 **Round 1 Turn B Prompt:**
 
@@ -501,8 +401,6 @@ You are writing the RESPONSE for a 2-agent iterative workshop.
 
 This file contains the header and your partner {agent-a-short}'s opening analysis with labeled sections (A1, A2, A3...).
 
-## Also Read
-- Your agent memory: `.claude/agent-memory/{your-type}/MEMORY.md` (if it exists)
 
 ## Your Task
 
@@ -547,8 +445,6 @@ You are writing ROUND {r} RESPONSE for a 2-agent iterative workshop.
 ## Source Documents (for reference if needed)
 {numbered list of all source doc paths}
 
-## Also Read
-- Your agent memory: `.claude/agent-memory/{your-type}/MEMORY.md` (if it exists)
 
 ## Your Task
 
@@ -652,24 +548,14 @@ Team mode uses the blast-first workflow from project rules. The procedure mirror
 
 #### Phase 3T-3: Spawn Agents (Blast-First)
 
-Spawn ALL agents with the hard-stop prompt (identical to clab-team):
+Execute the blast-first protocol from team-lead-behavior.md. Spawn all agents with the minimal hard-stop prompt:
 
 ```
 You are a teammate on team "{team-name}". Your name is "{short-name}".
-
-YOUR ONLY ACTION RIGHT NOW: Send a message to "team-lead" saying "ready" using SendMessage. Then STOP. Do absolutely nothing else.
-
-DO NOT:
-- Read any files
-- Check TaskList
-- Read your agent memory
-- Read team config
-- Start any work
-
-JUST send the ready message and go idle. You will receive a roster blast and your full assignment AFTER all agents have checked in.
+Send a ready message to "team-lead" using SendMessage, then wait for instructions.
 ```
 
-**Short name derivation**: Use the agent definition filename without `.md`. If the name contains hyphens, use the first segment as the short name unless it's ambiguous. For agents with persona-based names, use the full slug.
+**Short name mapping**: Read `.claude/templates/agent-roster.md` for the canonical name-to-type mapping.
 
 Spawn ALL in parallel. Wait for ALL to send "ready". Max 3 agents.
 
@@ -688,9 +574,6 @@ After roster blast, send each agent their full assignment via SendMessage.
 
 ### Required Reading (MANDATORY, FULL — do these FIRST)
 {numbered list of ALL source documents}
-
-Also read:
-- Your agent memory: `.claude/agent-memory/{your-type}/MEMORY.md`
 
 ### Your Role
 Analyze the source documents through YOUR specialist lens. Identify:
@@ -725,116 +608,15 @@ Collect specialist perspectives. Write the synthesis document.
 ### Output
 Write to: `{output_path}`
 
-{INCLUDE THE FULL DOCUMENT STRUCTURE TEMPLATE HERE — use the appropriate template based on --type:}
-
-{For `team` type: use Team Synthesis Template (below)}
-{For `fusion` type: use Fusion Synthesis Template (below)}
+For `team` type: read and follow `.claude/templates/synthesis-team.md`
+For `fusion` type: read and follow `.claude/templates/synthesis-fusion.md`
 
 ### Rules
 - YOU are the only agent who writes the output file.
 - Wait for specialist inputs before writing — do not front-run.
 - Capture convergent AND divergent views.
 - Attribute insights to their source specialist.
-- **AGENTS LIE ABOUT BEING DONE.** Do NOT start writing when specialists say "final" or "complete." Only the USER's explicit go-ahead authorizes synthesis writing. Specialists routinely produce their best cross-talk results after claiming completion.
 - When done: TaskUpdate completed + send summary to team-lead.
-```
-
-**Team Synthesis Template** (for `team` type):
-
-```markdown
-# {Title} Team Synthesis: {Subtitle}
-
-**Team**: {agent names and types}
-**Designated Writer**: {writer name}
-**Date**: {today}
-**Re**: {session-id} Results
-**Source Documents**: {list}
-
----
-
-## I. Executive Summary
-{2-3 paragraphs: what the team found, where they converge, where they diverge}
-
----
-
-## II. Convergent Themes
-{Themes that multiple specialists agree on. State convergence count.}
-
-### Theme 1: {Title} ({N}/{total} {Unanimous/Majority})
-- **{Agent1}**: {their perspective}
-- **{Agent2}**: {their perspective}
-**Synthesis**: {integrated assessment}
-
----
-
-## III. Divergent Assessments
-{Where specialists disagree. State each side's reasoning.}
-
----
-
-## IV. Cross-Pollination Discoveries
-{Ideas that emerged from discussion — present in the exchange but not in any individual source doc.}
-
----
-
-## V. Forward Projection
-{Priority-ordered next steps synthesized from all specialist inputs.}
-```
-
-**Fusion Synthesis Template** (for `fusion` type — synthesis of syntheses):
-
-```markdown
-# Session {session-id} Fusion Synthesis
-
-## Synthesis of Syntheses: Cross-Document Deliberation
-
-**Date**: {today}
-**Fusion Team**: {agent names and types}
-**Designated Writer**: {writer name}
-**Method**: {N} rounds of structured cross-synthesis deliberation
-**Source Syntheses**: {list — these are themselves synthesis documents, not raw data}
-**Fusion Purpose**: Extract patterns, connections, and discoveries visible ONLY when comparing source syntheses against each other
-
----
-
-## I. The Central Structural Insight
-{The ONE deepest finding that emerges from cross-synthesis. 2-3 paragraphs.}
-
----
-
-## II. Cross-Synthesis Discoveries
-{Findings visible ONLY when all source docs are compared. Label each:}
-
-### XS-1. {Discovery Title}
-{Description. Attribution: which specialists identified which aspects.}
-
----
-
-## III. Results Hierarchy
-
-### Tier 1: Framework-Decisive
-{Results that change status or direction}
-
-### Tier 2: Structural / Permanent
-{Mathematical results surviving any future closure}
-
-### Tier 3: Diagnostic / Informational
-{Useful context for future sessions}
-
----
-
-## IV. Constraint Map Update
-{What opened, closed, shifted. Full gate verdict table if applicable.}
-
----
-
-## V. Forward Projection
-{Priority-ordered next computations/sessions. Include specific gate definitions.}
-
----
-
-## VI. Attribution Index
-{Who contributed what. Specialist -> their key insight.}
 ```
 
 Use **TaskUpdate** to set `owner` on each task.
