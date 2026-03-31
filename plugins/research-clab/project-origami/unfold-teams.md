@@ -25,26 +25,45 @@ Append to `.claude/agent-memory/coordinator/MEMORY.md` (after the methodology se
 ```markdown
 ## Team Operations Protocol
 
-### Spawn Sequence (MANDATORY)
-1. Spawn agents with minimal prompts ("Wait for instructions")
-2. Wait for ALL agents to idle
-3. Roster blast (name-to-type mapping as first inbox message)
-4. THEN send real work
+### Blast-First Spawn Sequence (Workshop/Panel — MANDATORY)
+1. Spawn agents with minimal prompt: `"Send a ready message to team-lead using SendMessage, then wait for instructions."`
+2. Wait for ALL agents to send their "ready" message (verify with `/team-blast --ready-check`)
+3. Execute `/team-blast --list` (roster lands as each agent's FIRST inbox message)
+4. THEN send real work via SendMessage
 
 ### Hard Limits
 - MAX 4 agents per team in workshop/panel modes (more = notification avalanche)
-- Compute mode: NO team — unlimited parallel independent Agent calls per wave
+- Compute mode: NO team -- unlimited parallel independent Agent calls per wave
 - ONE team at a time (cross-team inbox contamination is unfixable)
 - ALWAYS include a coordinator in every team (workshop/panel)
 
+### Compute Mode Protocol (Parallel Independent Agents)
+Compute mode does NOT use TeamCreate or blast-first. Each computation is a standalone Agent call.
+1. TaskCreate for all computations across ALL waves (with wave dependencies via `blockedBy`)
+2. Spawn current wave's agents as independent Agent calls (no `team_name`) -- ALL in parallel
+3. Monitor via TaskList -- do NOT intervene unless agent explicitly errors
+4. When all wave tasks complete: read working paper sections, evaluate decision points
+5. Report wave results to user with decision-point recommendation
+6. On user go-ahead, spawn next wave (loop back to step 2)
+7. After all waves: read complete working paper, write gate verdicts, write synthesis
+
 ### Team Lead Discipline
-- Do NOT over-manage — let specialists work
+- Do NOT over-manage -- let specialists work
 - Do NOT run agents' scripts or duplicate their analysis
-- Do NOT mark agents' tasks completed — they mark their own
+- Do NOT mark agents' tasks completed -- they mark their own
 - Do NOT write agents' designated output files
-- Do NOT nudge idle agents — idle notifications are normal
-- Shut down agents when work is complete — one request per agent, move on if rejected
+- Do NOT nudge idle agents -- idle notifications are normal
+- Monitor via TaskList -- do NOT intervene unless agent explicitly errors
+- Shut down agents when work is complete -- one request per agent, move on if rejected
 - Only the USER terminates the team lead session
+
+### Task Metadata
+TaskCreate should include structured metadata for tracking:
+`metadata: { wave: N, gate_id: "...", agent_type: "..." }`
+
+### Permission Mode
+Compute agents that write scripts and working paper sections should be spawned with:
+`mode: "acceptEdits"` -- prevents permission prompts from blocking autonomous computation
 
 ### Orchestration Patterns
 - **Fan-Out**: Independent tasks, parallel work, collect results
@@ -52,6 +71,9 @@ Append to `.claude/agent-memory/coordinator/MEMORY.md` (after the methodology se
 - **Debate**: Agents take positions, critique each other (2-3 rounds max)
 - **Coffee Talk**: Paired assessment, joint document
 - **Workshop**: Sequential rounds with markdown handoff between teams
+
+### Ready Verification
+Use `/team-blast --ready-check` after spawning to verify all agents have sent their ready messages before proceeding with the roster blast.
 
 ### Session Formats → Team Sizes
 - First Contact / Debate / Panel: 3-4 agents (team-based)

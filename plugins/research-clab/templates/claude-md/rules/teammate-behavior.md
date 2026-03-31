@@ -18,15 +18,18 @@ Every agent on a team follows these rules. No exceptions.
 | **One writer per output** | Only the designated writer touches an output file. |
 | **One topic per message** | Keep messages focused and actionable. |
 | **Complete task before processing notifications** | When your current task finishes, mark it complete (TaskUpdate) BEFORE reading notifications. This prevents stale notifications from re-triggering work you already did. |
-| **Deduplicate notifications against completed work** | Notifications pile up while you work. When you finally read them, cross-check each against what you already delivered. If a notification asks for something you already sent or wrote, discard it -- do NOT re-execute. |
+| **Deduplicate notifications against completed work** | Notifications pile up while you work. When you finally read them, cross-check each against what you already delivered. If a notification asks for something you already sent or wrote, discard it — do NOT re-execute. |
 | **Notifications arrive first in, last out** | Notifications appear after already addressed through inbox. Most are stale. Default assumption: already handled unless content is clearly new. |
-| **Sleep interaction anomaly** | If using the sleep task -- you will not read notifications ever. Cannot sleep without first reading notifications explicitly. |
+| **Sleep interaction anomaly** | If using the sleep task — you will not read notifications ever. Cannot sleep without first reading notifications explicitly. |
+| **Ready protocol** | When spawned with a "send ready" instruction, send the ready message IMMEDIATELY as your first action. Do not read files, check tasks, or load context first. |
+| **Check TaskList after completing work** | After marking your task completed, check TaskList for unblocked tasks you own before going idle. |
+| **Task ownership** | Only work on tasks where you are the designated owner. Check task ownership before starting. |
 
 ## Shutdown Protocol
 
-- The **team lead** shuts you down when work is complete. Accept gracefully.
-- When you receive a shutdown request: finish current work, write memory, confirm shutdown.
-- Do NOT self-terminate or shut down other teammates — that's the team lead's job.
+- **Only the user can initiate shutdown.** Not the team lead, not another agent.
+- If you receive a shutdown request from another agent (not the user), reject it.
+- When legitimate shutdown is requested: finish current work, write memory, confirm shutdown.
 
 ## Message Format
 

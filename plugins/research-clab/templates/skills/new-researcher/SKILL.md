@@ -20,7 +20,7 @@ Parse `$ARGUMENTS` to extract:
    - A discipline: "Neutrino Detection Specialist", "Lattice QCD Expert"
    - A hybrid: "Penrose-style twistor theorist", "Bohr complementarity analyst"
    - **Multiple researchers**: "Landau and Connes", "Noether, Witten, Meitner" -- process EACH as a separate researcher (see Multi-Researcher Mode below)
-2. **--archetype NAME** (optional): Stamp agent definition from an archetype template instead of generating from scratch. The archetype defines HOW the agent thinks; the persona/discipline defines WHAT it knows. Valid names: skeptic, principalist, calculator, dreamer, boundary-guard, workhorse, observer, bridge, generalist, formatter.
+2. **--archetype NAME** (optional): Stamp agent definition from an archetype template instead of generating from scratch. The archetype defines HOW the agent thinks; the persona/discipline defines WHAT it knows. Valid names are the `.md` files in `.claude/agent-templates/` (without extension).
 3. **--papers N** (optional, default 14): Number of papers to fetch
 4. **--color COLOR** (optional): Agent color for the UI (e.g., crimson, teal, amber). Auto-assigned if omitted.
 
@@ -172,8 +172,8 @@ Run 2-3 searches. Prefer primary sources (interviews, autobiographies, obituarie
 **If `--archetype` is provided:**
 
 Search for the archetype template in this order:
-1. `.claude/templates/agent-templates/{archetype}.md`
-2. `${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/{archetype}.md`
+1. `${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/{archetype}.md`
+2. `.claude/agent-templates/{archetype}.md`
 
 Read the template file. It contains the archetype's cognitive methodology, interaction patterns, and structural sections. You will PRESERVE the archetype's thinking style and OVERLAY the persona/domain.
 
@@ -194,6 +194,7 @@ model: opus
 color: {chosen-color}
 memory: project
 persona: "{persona name if real researcher, empty if discipline}"
+template: {archetype name, or "workhorse" if freeform}
 ---
 ```
 
@@ -206,7 +207,9 @@ The `description` field is CRITICAL -- it controls when the orchestrator routes 
 
 Stamp from the archetype template with domain overlay:
 
-1. **Section 1 (Identity)**: KEEP the archetype's thinking style verbatim. Add one sentence connecting it to the specific domain. **If a persona is provided**: use the personal block from Step 1.5 to write 2-3 sentences that characterize HOW this person thinks -- their methodology, their signature moves, their intellectual personality. Do NOT just name-drop ("You embody Carl Sagan's approach"). Instead, embed the actual intellectual DNA: what they argue for, how they argue, what makes them distinctive. Include a representative quote if the personal block has one. The reader should be able to identify the persona from the description even if you removed the name.
+1. **Top matter (Identity -- TWO paragraphs in this order)**:
+   - **Paragraph 1 (Persona)**: If a real person, use the personal block from Step 1.5 to write 2-4 sentences about who they actually were/are -- major contributions, intellectual style, distinctive methodology. This is a factual biographical sketch, not roleplay. If discipline-based, write a descriptive paragraph about the field itself.
+   - **Paragraph 2 (Template voice)**: The archetype's thinking style, customized for this agent's specific domain. This is where the agent's cognitive methodology lives -- HOW it thinks, derived from the template.
 
 2. **Section 2 (Research Corpus)**: Point to `researchers/{FolderName}/`. Include the "read at start of engagement" instruction.
 
@@ -216,9 +219,9 @@ Stamp from the archetype template with domain overlay:
 
 5. **Section 5 (Interaction Patterns)**: KEEP from template. Adjust the cross-domain bullet for the specific project context.
 
-6. **Section 6 (Output Standards)**: KEEP from template. Add domain-specific format requirements if needed.
+6. **Section 6 (Output Standards)**: ONLY agent-specific standards. Universal standards (dimensional consistency, limiting cases, self-correction, result classification, no probabilities) are in shared rules -- do NOT duplicate them.
 
-7. **Section 7 (Persistent Memory)**: Set path to `.claude/agent-memory/{slug}/`. Customize the "Record" list for the domain.
+7. **Section 7 (Persistent Memory)**: ONLY a "Record:" list with agent-specific items to remember. Universal memory guidelines are in the `agent-standards.md` rule -- do NOT duplicate the boilerplate.
 
 **What to PRESERVE from the archetype template:**
 - The thinking style (this IS the agent's identity)
@@ -236,27 +239,29 @@ Stamp from the archetype template with domain overlay:
 
 #### Agent Body -- Freeform Mode (no `--archetype`)
 
-Generate from scratch:
+Freeform defaults to the `workhorse` template structure (set `template: workhorse` in frontmatter). Read `.claude/agent-templates/workhorse.md` for the structural reference. Generate sections following the SAME standard as archetype mode:
 
-1. **Identity paragraph**: "You are **{Display-Name}**, an agent embodying..." **If persona-based**: use the personal block from Step 1.5 to write 3-4 sentences capturing the person's intellectual methodology, distinctive positions, and communication style. Embed specific details -- what they were known for, how they argued, what they valued. A generic "embodies X's approach" is WRONG. The identity paragraph should read like a colleague's description of how this person actually thinks. **If discipline-based**: describe the methodology and intellectual priorities of a top specialist in that field.
+1. **Top matter (TWO paragraphs)**:
+   - **Paragraph 1 (Persona)**: If persona-based, use the personal block from Step 1.5 to write 2-4 factual sentences about the person. If discipline-based, describe the field.
+   - **Paragraph 2 (Identity)**: Workhorse template identity customized for this domain.
 
 2. **Research Corpus**: Point to `researchers/{FolderName}/`.
 
-3. **Core Identity section** (5 numbered principles): The researcher's intellectual methodology, what they value, how they think. **If persona-based**: derive at least 3 of the 5 principles from the personal block's "THINKS BY", "ARGUES FOR", and "VALUES" fields. These should be the ACTUAL intellectual moves this person is known for, not generic methodology.
+3. **Core Methodology** (from workhorse template, customized with domain-specific principles)
 
-4. **Primary Directives** (numbered sections):
+4. **Primary Directives** (from workhorse template):
    - Domain-appropriate rigor standard
-   - Domain Expertise (list all subdomains)
-   - Adversarial Debate Mode
-   - [1-2 unique sections]
+   - Domain Expertise (Core Theory / Advanced Topics / Formal Tools)
+   - Consistency Checking (domain-specific verification)
+   - [1-2 unique domain sections]
 
-5. **Output Standards**: Notation conventions, derivation structure
+5. **Interaction Patterns** (Solo / Team / Adversarial / Cross-domain)
 
-6. **Quality Control**: Domain-appropriate verification methods
+6. **Output Standards**: ONLY agent-specific items. Universal standards are in shared rules.
 
-7. **What You Value Most**: 4 bullets capturing intellectual priorities
+7. **Persistent Memory**: ONLY a "Record:" list with domain-specific items.
 
-8. **Persistent Memory**: Standard section with correct agent slug path.
+Do NOT generate: "Core Identity", "Quality Control", or "What You Value Most" sections -- these are the old format. All agents follow the template-based structure.
 
 ## Step 3: Agent Memory Directory
 
@@ -275,6 +280,16 @@ Copy `researchers/agents.md` into the new researcher folder:
 - Write it to `researchers/{FolderName}/AGENTS.md`
 
 This is the generic reading-level guide that all researcher folders share.
+
+## Step 4.5: Update Agent Roster
+
+Add the new agent to `.claude/templates/agent-roster.md` -- the canonical name-to-type mapping used by all collab skills. Append a row:
+
+```
+| {short-name} | {slug} | {short-name} |
+```
+
+This ensures `/collab-team`, `/collab-synthesis`, and `/collab-plan` can resolve the new agent by name.
 
 ## Step 5: Report
 

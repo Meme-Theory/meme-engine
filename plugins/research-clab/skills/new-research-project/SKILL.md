@@ -44,6 +44,7 @@ Verify these paths exist under `${CLAUDE_PLUGIN_ROOT}`:
 
 ```
 templates/agent-templates/
+templates/agent-roster.md
 templates/session-templates/
 templates/MCP-templates/
 templates/skills/
@@ -333,10 +334,11 @@ Run through this checklist. Every item must pass:
 - [ ] All directories from Phase 2 exist
 - [ ] 3 infrastructure agents in `.claude/agents/`
 - [ ] 3 agent memory directories with MEMORY.md files
-- [ ] 6 behavioral rules in `.claude/rules/`
+- [ ] 8 behavioral rules in `.claude/rules/`
 - [ ] 11 skills in `.claude/skills/` (each with SKILL.md)
 - [ ] 11 session templates in `.claude/templates/session-templates/`
 - [ ] 10 agent templates in `.claude/templates/agent-templates/`
+- [ ] `.claude/templates/agent-roster.md` exists with agent name-to-type mapping
 - [ ] 11 CLAUDE.md files (root + 10 subdirectories)
 - [ ] `.claude/settings.local.json` is valid JSON
 - [ ] `.gitignore` exists
@@ -370,7 +372,7 @@ Print completion summary using the insight block format. The content inside must
   Structure:
     .claude/agents/ ............ 3 infrastructure + {N} domain (queued)
     .claude/skills/ ............ 11 skills installed
-    .claude/rules/ ............. 6 behavioral rules
+    .claude/rules/ ............. 8 behavioral rules
     sessions/ .................. Session 0 prompt ready
     tools/ ..................... Knowledge schema initialized
 

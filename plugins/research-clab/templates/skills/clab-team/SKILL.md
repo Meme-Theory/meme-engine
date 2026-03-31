@@ -97,28 +97,11 @@ Read the session file completely. Extract:
 - **Date**: From file or today's date
 - **Session folder**: Derived (e.g., `sessions/session-05/`)
 
-### 1b. Agent Roster — Dynamic Discovery
+### 1b. Agent Roster
 
 Find the agent assignment section (typically `## AGENT ASSIGNMENTS`, `## Agent Allocation`, or a role table). Extract agent names, roles, and assigned work.
 
-**Agent resolution**: Match each agent name referenced in the file to an agent definition in `.claude/agents/`:
-
-1. List all `.claude/agents/*.md` files
-2. For each agent referenced, find the matching definition by **case-insensitive substring** match against filenames
-3. The filename (minus `.md`) becomes the `subagent_type`
-4. Derive a short name: first segment before the first hyphen (e.g., `domain-specialist.md` -> `domain`), or use whatever short name the file specifies
-
-**Build the roster table dynamically:**
-
-| Short Name | subagent_type | Role (from file) |
-|:-----------|:-------------|:-------------------|
-| {auto} | {filename - .md} | {from file} |
-
-**ALWAYS include a coordinator** — project mandate. If the file omits one, add it automatically using `subagent_type: coordinator`.
-
-If an agent name doesn't match any definition in `.claude/agents/`:
-- Warn the user: "No agent definition found for '{name}'. Use `general-purpose` as fallback?"
-- If user agrees, use `general-purpose` with the role description injected into the spawn prompt.
+**Canonical agent name -> subagent_type mapping:** Read `.claude/templates/agent-roster.md` for the complete mapping table.
 
 ### 1c. Mode-Specific Extraction
 
@@ -218,7 +201,11 @@ Do NOT create teams, tasks, or agents. Stop here.
 
 Compute mode does NOT create teams. Each computation is a standalone Agent call.
 
-1. **TaskCreate** one task per computation across ALL waves (title = `W{wave}-{letter}: {computation title}`, description = full specs). This gives the user a dashboard.
+1. **TaskCreate** one task per computation across ALL waves:
+   - `subject`: `W{wave}-{letter}: {computation title}`
+   - `description`: full specs from session plan
+   - `activeForm`: `"Computing {computation title}"` (for spinner display)
+   - `metadata`: `{ "wave": N, "gate_id": "{gate-id}", "agent_type": "{subagent_type}" }`
 2. **TaskCreate** one coordinator task: "Evaluate decision points and write synthesis" (description includes all gates, decision-point logic, and working paper path).
 3. **TaskUpdate** with `addBlockedBy` for cross-wave dependencies (e.g., W2-A blocked by all W1 tasks). Tasks within the same wave have NO blockers.
 4. Do NOT call TeamCreate. Proceed directly to Phase 3.
@@ -290,8 +277,9 @@ You are the {agent-display-name}. You have ONE task. Complete it and stop.
 Use the Agent tool to spawn ALL agents for the current wave in a single response (multiple parallel Agent calls). Each gets its self-contained prompt. No waiting for ready messages — agents start immediately.
 
 Agent tool parameters:
-- `subagent_type`: from the dynamically resolved roster
+- `subagent_type`: from mapping table (read `.claude/templates/agent-roster.md`)
 - `prompt`: the self-contained prompt from 3a
+- `mode`: `"acceptEdits"` — agents write scripts and working paper sections, should not be permission-blocked
 - Do NOT set `team_name` — these are independent agents, not teammates
 
 **No agent count limit per wave.** Each agent is independent — no notification avalanche risk. Typical wave: 3-6 parallel agents.
@@ -321,25 +309,15 @@ For workshop and panel modes, use the team-based blast-first workflow:
 
 #### 3a-blast. Spawn ALL agents with hard-stop prompts
 
-Spawn each agent as a teammate using the Agent tool. ALL get the same **hard-stop** prompt that mandates exactly ONE action (send a ready message) and then NOTHING ELSE:
+Spawn each agent as a teammate using the Agent tool. ALL get the same minimal **hard-stop** prompt -- the teammate-behavior rule's "Ready protocol" handles the behavioral constraints:
 
 ```
 You are a teammate on team "{team-name}". Your name is "{short-name}".
-
-YOUR ONLY ACTION RIGHT NOW: Send a message to "team-lead" saying "ready" using SendMessage. Then STOP. Do absolutely nothing else.
-
-DO NOT:
-- Read any files
-- Check TaskList
-- Read your agent memory
-- Read team config
-- Start any work
-
-JUST send the ready message and go idle. You will receive a roster blast and your full assignment AFTER all agents have checked in. Do not act until you receive those messages.
+Send a ready message to "team-lead" using SendMessage, then wait for instructions.
 ```
 
 Agent tool parameters:
-- `subagent_type`: from the dynamically resolved roster
+- `subagent_type`: from mapping table (read `.claude/templates/agent-roster.md`)
 - `team_name`: the team name
 - `name`: the short name
 
@@ -503,15 +481,11 @@ In compute mode, "hands off" means: let each wave's agents run to completion wit
 
 ### Workshop & Panel Modes — Full Hands Off
 
-1. **Do NOT send follow-up messages** unless an agent explicitly asks for help.
-2. **Do NOT run scripts** — agents' job.
-3. **Do NOT mark tasks completed** — agents mark their own.
-4. **Do NOT write output files** — agents write their designated files.
-5. **Do NOT nudge idle agents** — idle notifications fire between every tool call. Normal.
-6. **Do NOT initiate shutdown** — ONLY the user decides.
-7. **Do NOT take over if an agent seems slow** — ask user first.
-8. **All agents must confirm completion of tasks AND cross-talk before shutdown is evaluated by user** — No trashed sessions because of incorrectly identified "idle" agents. Trust the user; they can see agent activity directly.
-9. **AGENTS LIE ABOUT BEING DONE.** An agent claiming "final," "complete," or "all results delivered" means NOTHING. Agents routinely claim completion 3+ times, then produce their best cross-talk results afterward. The capstone findings always come late. NEVER relay agent completion claims to the user as fact. The USER decides when work is done — they can see agent activity directly.
+Follow team-lead-behavior.md hands-off protocol. Mode-specific additions:
+
+1. **Trust the user's visibility** — the user can see agent activity directly while Bash on Windows limits your awareness. Do NOT identify agents as "idle" or "done."
+2. **AGENTS LIE ABOUT BEING DONE.** An agent claiming "final," "complete," or "all results delivered" means NOTHING. Agents routinely produce their best cross-talk results after claiming completion. NEVER relay completion claims as fact.
+3. **All agents must confirm completion AND cross-talk before shutdown is evaluated by user.**
 
 **What you MAY do:**
 - Respond to agent questions routed to team-lead.
@@ -624,7 +598,6 @@ Synthesis: {path}
 - File doesn't exist -> report and stop.
 - No agent assignment section -> ask user which agents to use.
 - Stale teams can't be cleaned -> stop and report.
-- Agent name doesn't match any definition -> warn and offer `general-purpose` fallback.
 - Agent fails to spawn -> report to user, continue with remaining if >= 2.
 - Fewer than 2 agents spawn -> abort team.
 - `/team-blast` unavailable -> manual roster fallback (Phase 3c).

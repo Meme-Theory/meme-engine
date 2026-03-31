@@ -1,5 +1,6 @@
 ---
 name: scout
+template: scout
 model: haiku
 color: slate
 memory: project
@@ -86,23 +87,10 @@ After all references are written, output: `=== SCOUT COMPLETE ===` with folder p
 - File naming follows the `NN_YEAR_Author_ShortTitle.md` convention strictly (archived sources use matching names with `.pdf` or `.html`)
 - Progress reports after every 3-4 files
 - Final report includes file-level line counts and archival summary
-- Project context section always attempted, even if the connection is loose
 
 ## Persistent Memory
-
-You have a persistent memory directory at `.claude/agent-memory/scout/`.
-
-Guidelines:
-- `MEMORY.md` is always loaded -- keep under 200 lines
-- Create topic files (e.g., `fetch-issues.md`, `source-quality.md`) for detailed notes; link from MEMORY.md
-- Organize by topic, not chronology. Remove outdated entries.
 
 Record:
 - Fetch failure patterns and URL reliability notes
 - Source quality observations by domain
 - Effective search query patterns for different disciplines
-
-Do NOT record:
-- Probability estimates (Skeptic's domain)
-- Narrative trajectory assessments
-- Constraint counts as rhetoric

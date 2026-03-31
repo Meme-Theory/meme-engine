@@ -55,7 +55,7 @@ Each directory gets a scoped CLAUDE.md that tells agents what belongs there and 
 
 | Template Source | Install To | Substitutions |
 |:----------------|:-----------|:-------------|
-| `claude-md-root.md` | `{root}/CLAUDE.md` | Project name, domain, hardware specs, python env |
+| `claude-md-root.md` | `{root}/CLAUDE.md` | Project name, domain, project root path |
 | `claude-md-dot-claude.md` | `.claude/CLAUDE.md` | None (generic) |
 | `claude-md-agents.md` | `.claude/agents/CLAUDE.md` | None (generic) |
 | `claude-md-agent-memory.md` | `.claude/agent-memory/CLAUDE.md` | None (generic) |
@@ -70,16 +70,16 @@ Each directory gets a scoped CLAUDE.md that tells agents what belongs there and 
 
 ### Root CLAUDE.md — the most important file
 
-The root CLAUDE.md is the project constitution. Read `claude-md-root.md` as a template, then generate the real file with these sections filled in:
+The root CLAUDE.md is the project constitution — LEAN, universal orientation only. Read `claude-md-root.md` as a template, then generate the real file with these sections filled in:
 
 1. **Project Name & Domain** — from user input
 2. **Verify Working Directory** — `pwd` check with the actual project path
-3. **Hardware** — from user input (or "Not configured" if omitted)
-4. **Python Environment** — discover or ask: `.venv/bin/python`, system python, or none
-5. **Project Structure** — the directory tree from Step 1
-6. **Knowledge Index** — boilerplate about `/weave` (copy from template)
-7. **Team Lead Behavior** — copy from template (these are universal rules)
-8. **Teammate Behavior** — copy from template (universal rules)
+3. **Project Structure** — the directory tree from Step 1
+4. **Computation Environment** — pointer to conditional rule (hardware/python live there, not here)
+5. **Knowledge Index** — boilerplate about `/weave` (copy from template)
+6. **Behavioral Rules** — pointer to `.claude/rules/` (8 files)
+7. **Agent Roster** — pointer to `.claude/templates/agent-roster.md`
+8. **Personal Overrides** — `CLAUDE.local.md` guidance
 
 ---
 
@@ -160,6 +160,18 @@ ${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/generalist.md       → .claude/
 ```
 
 These are verbatim copies — no substitutions needed. `/new-researcher` resolves templates from `.claude/templates/agent-templates/` at runtime, so the project is self-contained after scaffolding.
+
+---
+
+## Step 4c-ii: Copy Agent Roster Template
+
+Copy the agent roster from `${CLAUDE_PLUGIN_ROOT}/templates/agent-roster.md` into `.claude/templates/`:
+
+```
+${CLAUDE_PLUGIN_ROOT}/templates/agent-roster.md → .claude/templates/agent-roster.md
+```
+
+This is a verbatim copy — no substitutions needed. `/new-researcher` appends new domain agents to this file as they are created. The root CLAUDE.md references this file for name-to-type resolution.
 
 ---
 
@@ -347,7 +359,7 @@ Before reporting completion, verify:
 
 - [ ] All directories from Step 1 exist
 - [ ] Root CLAUDE.md has all required sections filled in
-- [ ] All 6 rule files exist in `.claude/rules/`
+- [ ] All 8 rule files exist in `.claude/rules/`
 - [ ] All 11 skills exist in `.claude/skills/`
 - [ ] `settings.json` exists, is valid JSON, and contains `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`
 - [ ] `settings.local.json` exists and is valid JSON
@@ -355,6 +367,7 @@ Before reporting completion, verify:
 - [ ] 3 agent-memory stubs exist with MEMORY.md files
 - [ ] 11 session templates exist in `.claude/templates/session-templates/`
 - [ ] 10 agent templates exist in `.claude/templates/agent-templates/`
+- [ ] `agent-roster.md` exists in `.claude/templates/`
 - [ ] `agents.md` exists at root
 - [ ] `.gitignore` exists at root
 - [ ] Session-0 prompt exists in `sessions/session-plan/`

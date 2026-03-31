@@ -1,6 +1,7 @@
 ---
 paths:
   - "{{COMPUTATION_DIR}}/**"
+  - "sessions/session-plan/**"
 ---
 
 # Gate Verdict Standards

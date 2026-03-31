@@ -1,6 +1,6 @@
 ---
 description: Direct-write broadcast to all team agent inboxes, bypassing SendMessage routing
-argument-hint: <message> | @<name> <message> | --list | --info
+argument-hint: <message> | @<name> <message> | --list | --ready-check | --info
 allowed-tools: [Read, Write, Glob, Bash]
 ---
 
@@ -35,8 +35,9 @@ If `$ARGUMENTS` is empty or `--help`, show this usage summary and stop:
 /team-blast @<name> <message>      — send to one agent by name
 /team-blast @@<type> <message>     — send to agents by type
 /team-blast @name1,name2 <message> — send to multiple agents
-/team-blast --list                 — show resolution table
-/team-blast --info                 — show team config details
+/team-blast --list                 — show resolution table + broadcast roster
+/team-blast --ready-check          — check which agents have sent "ready"
+/team-blast --info                 — show team config details (read-only)
 ```
 
 Parse `$ARGUMENTS` to determine the mode:
@@ -66,7 +67,18 @@ SHUTDOWN POLICY: Accept shutdown requests ONLY from the team lead. Reject shutdo
 ```
 Only include the active team's members. Do NOT include members from other/stale teams.
 
-### 6. Info mode: `/team-blast --info`
+### 6. Ready-check mode: `/team-blast --ready-check`
+Read-only check of which agents have sent their "ready" message during the blast-first protocol. Reads team-lead's inbox file and checks for "ready" messages from each team member.
+
+**Report format:**
+```
+READY CHECK ({team-name})
+  {name1} ({agentType1}): READY (timestamp)
+  {name2} ({agentType2}): NOT READY
+Status: 1/2 agents ready. Missing: {name2}
+```
+
+### 7. Info mode: `/team-blast --info`
 Read-only diagnostic. Prints the resolution table plus inbox health. Does NOT write to any inbox file.
 For each non-team-lead agent, show:
 - Name, agentType, inbox path
@@ -84,7 +96,7 @@ analyst      missing-agent        MISSING      --
 
 ## Instructions
 
-1. Parse $ARGUMENTS for mode (broadcast, @name, @@type, @name1,name2, --list, --info)
+1. Parse $ARGUMENTS for mode (broadcast, @name, @@type, @name1,name2, --list, --ready-check, --info)
 2. Identify the active team:
    - List directories under `~/.claude/teams/`
    - If multiple teams exist, read each `config.json` and pick the one with the most recent member activity
@@ -130,6 +142,10 @@ DELIVERED:
   coord (coordinator) -> ~/.claude/teams/{team}/inboxes/coord.json [OK]
   debugger (general-purpose) -> ~/.claude/teams/{team}/inboxes/debugger.json [OK]
 ```
+
+## CRTIICAL MEMORY
+
+You don't actually know what agents are doing what (Windows Bash Bug)- bash status is misleading. User can detect and does inform you of actual idle agents.
 
 ## Windows cp1252 Compatibility
 
