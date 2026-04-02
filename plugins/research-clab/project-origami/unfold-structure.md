@@ -30,7 +30,12 @@ Create this exact structure under the project root. Every directory listed here 
 │   │   └── clab-synthesis/
 │   ├── templates/
 │   │   ├── agent-templates/
-│   │   └── session-templates/
+│   │   ├── session-templates/
+│   │   ├── plan-compute.md
+│   │   ├── plan-workshop.md
+│   │   ├── prompt-session.md
+│   │   ├── synthesis.md
+│   │   └── workshop.md
 │   └── rules/
 ├── researchers/
 ├── sessions/
@@ -172,6 +177,22 @@ ${CLAUDE_PLUGIN_ROOT}/templates/agent-roster.md → .claude/templates/agent-rost
 ```
 
 This is a verbatim copy — no substitutions needed. `/new-researcher` appends new domain agents to this file as they are created. The root CLAUDE.md references this file for name-to-type resolution.
+
+---
+
+## Step 4c-iii: Copy Document Templates
+
+Copy the skill-referenced document templates from `${CLAUDE_PLUGIN_ROOT}/templates/` into `.claude/templates/`. These templates are used by `/clab-plan`, `/clab-synthesis`, and `/clab-team` to generate session plans, prompts, synthesis reports, and workshop documents.
+
+```
+${CLAUDE_PLUGIN_ROOT}/templates/plan-compute.md      → .claude/templates/plan-compute.md
+${CLAUDE_PLUGIN_ROOT}/templates/plan-workshop.md      → .claude/templates/plan-workshop.md
+${CLAUDE_PLUGIN_ROOT}/templates/prompt-session.md     → .claude/templates/prompt-session.md
+${CLAUDE_PLUGIN_ROOT}/templates/synthesis.md          → .claude/templates/synthesis.md
+${CLAUDE_PLUGIN_ROOT}/templates/workshop.md           → .claude/templates/workshop.md
+```
+
+These are verbatim copies — no substitutions needed. Skills resolve these templates at runtime from `.claude/templates/`.
 
 ---
 
@@ -368,6 +389,7 @@ Before reporting completion, verify:
 - [ ] 11 session templates exist in `.claude/templates/session-templates/`
 - [ ] 10 agent templates exist in `.claude/templates/agent-templates/`
 - [ ] `agent-roster.md` exists in `.claude/templates/`
+- [ ] 5 document templates exist in `.claude/templates/` (plan-compute, plan-workshop, prompt-session, synthesis, workshop)
 - [ ] `agents.md` exists at root
 - [ ] `.gitignore` exists at root
 - [ ] Session-0 prompt exists in `sessions/session-plan/`

@@ -1,7 +1,7 @@
 ---
 name: clab-team
 description: Launch a coordinated multi-agent research team from a session file — blast-first spawn, task assignment, hands-off execution
-argument-hint: <session-file> [--mode compute|workshop|panel] [--team-name <name>] [--dry-run] [--agents <name> <name>]
+argument-hint: <session-file(s)> [--mode compute|workshop|panel|solo-workshop] [--agents <name,name,...>] [--team-name <name>] [--wave <N>] [--context <text>] [--dry-run]
 ---
 
 # Clab-Team — Coordinated Research Team Launcher
@@ -11,23 +11,65 @@ Launch a coordinated multi-agent team from a session file. Reads the file to det
 ## Usage
 
 ```
-/clab-team sessions/session-plan/session-5a-prompt.md
-/clab-team sessions/session-plan/session-5a-prompt.md --mode compute
-/clab-team sessions/session-plan/session-3-workshop-agenda.md --mode workshop
+# Compute mode (default for plan files with waves)
+/clab-team sessions/session-plan/session-12-plan.md --mode compute
+
+# Start from wave 3 (skip waves 1-2, already done)
+/clab-team sessions/session-plan/session-12-plan.md --mode compute --wave 3
+
+# With focus context passed to agent prompts
+/clab-team sessions/session-plan/session-12-plan.md --mode compute --context "constraint boundary, stability analysis"
+
+# Workshop mode (team-based, not solo-workshop)
+/clab-team sessions/session-plan/session-5-workshop-agenda.md --mode workshop
+
+# Panel mode
 /clab-team sessions/session-plan/session-7-prompt.md --mode panel
+
+# Override team name
 /clab-team sessions/session-plan/session-8-prompt.md --team-name gap-analysis
+
+# Dry run — parse and show plan, don't spawn
 /clab-team sessions/session-plan/session-8-prompt.md --dry-run
+
+# Solo-workshop: redirects to /clab-synthesis --type workshop (no team infrastructure)
+/clab-team doc1.md doc2.md --mode solo-workshop --agents agent-a,agent-b
+/clab-team doc1.md --mode workshop-solo --agents agent-a,agent-b --rounds 3
 ```
 
 ## Parse Arguments
 
-1. Extract `<session-file>` — path to the session file(s) (REQUIRED).
+1. Extract `<session-file(s)>` — path to the session file(s) (REQUIRED).
 2. Extract flags:
-   - `--mode <mode>`: Session format — `compute`, `workshop`, or `panel`. If omitted, auto-detect from file (see Phase 1).
+   - `--mode <mode>`: Session format — `compute`, `workshop`, `panel`, or `solo-workshop`. If omitted, auto-detect from file (see Phase 1).
+   - `--agents <name,name,...>`: Specific agents in team (comma-separated short names or types).
    - `--team-name <name>`: Override auto-generated team name.
-   - `--agents <name> <name>`: Specific agents in team.
+   - `--wave <N>`: Start from wave N (skips earlier waves). Compute mode only.
+   - `--context <text>`: Focus topics or instructions passed through to agent prompts.
    - `--dry-run`: Parse file and show plan without creating anything.
-3. If no file provided or `--help`, show the usage block above and stop.
+3. If no file provided, show the usage block above and stop.
+
+---
+
+## Mode Redirect: solo-workshop -> /clab-synthesis
+
+If `--mode` is any of: `solo-workshop`, `solo workshop`, `workshop-solo`, the user wants the **2-agent iterative workshop pattern** (no teams, no inbox, pure sequential Agent calls with placeholder-replacement writes). This pattern lives in `/clab-synthesis`, not `/clab-team`.
+
+**Action**: Immediately invoke the `/clab-synthesis` skill with the arguments remapped:
+
+```
+/clab-synthesis <session-file(s)> --agents <agent1>,<agent2> --type workshop [--rounds N]
+```
+
+Mapping:
+- Source documents = the `<session-file>` arguments
+- Agents = from `--agents` flag (EXACTLY 2 required; if not provided, ask)
+- Rounds = from `--rounds` flag if present, otherwise default 2
+- `--context` text = pass through as `--context` to clab-synthesis
+
+**Do NOT proceed with clab-team's own Phase 0/1/2/3.** The redirect is immediate. Announce: "Redirecting to /clab-synthesis workshop mode (2-agent iterative, no team infrastructure)." Then invoke the Skill tool with `skill: "clab-synthesis"` and the remapped args.
+
+This redirect exists because the solo-workshop pattern uses NO team infrastructure -- it's pure sequential Agent calls. Running it through clab-team's blast-first workflow is the wrong pattern and causes confusion.
 
 ---
 
@@ -107,7 +149,10 @@ Find the agent assignment section (typically `## AGENT ASSIGNMENTS`, `## Agent A
 
 **Compute mode**: Extract:
 - **Waves**: Ordered groups of parallel computations (Wave 1, Wave 2, etc.)
-- **Per-computation**: ID, title, assigned agent (subagent_type), model, full prompt text, input data files, output file paths, script name prefix, pre-registered gate (ID, PASS/FAIL criteria)
+- **Per-computation**: ID, title, assigned agent (subagent_type), model, cost estimate, full prompt text, input data files, output file paths, script name prefix, pre-registered gate (ID, PASS/FAIL criteria)
+- **Reviewer** (optional): A second agent (subagent_type + short name) assigned to cross-check the primary agent's results. When present, the reviewer's prompt includes a review step (see Phase 3a). Two patterns:
+  - **Inline review**: The reviewer is ALSO a primary agent on a different task in the same wave. Their prompt gets an appended review section: after completing their own task, read the reviewed agent's working paper section and append a cross-check assessment to their own section.
+  - **Dedicated review**: The reviewer has no primary task -- their sole job is reviewing. Spawned in the same wave (runs in parallel, reads the working paper section when the primary completes). Prompt: read the primary's output, verify key numbers, flag concerns, write a review subsection.
 - **Dependencies**: Between waves (Wave 2 may depend on Wave 1 results). Tasks WITHIN a wave are always independent.
 - **Decision points**: Conditions evaluated between waves that determine whether to proceed, pivot, or stop.
 - **Working paper**: Path to the shared results file where agents write their designated sections.
@@ -272,6 +317,68 @@ You are the {agent-display-name}. You have ONE task. Complete it and stop.
 - When finished, mark your task completed via TaskUpdate.
 ```
 
+**If the computation has a `reviewer` field** (inline pattern), append this section to the primary agent's prompt:
+
+```
+## Cross-Check Review (after your primary task)
+
+After completing your computation above, read the working paper section for {reviewed-task-id} ({reviewed-agent-name}'s output). Verify:
+1. Key numbers are reproducible from the stated inputs
+2. Gate verdict follows logically from the stated criteria
+3. No obvious methodological errors
+
+Append a brief "### Cross-Check by {your-name}" subsection to YOUR working paper section with:
+- Confirmed / Flagged items
+- Any independent verification you performed
+- 2-3 sentences max
+
+This review is secondary to your primary computation. Complete your own task FIRST.
+```
+
+**If the computation has a `reviewer` field** (dedicated reviewer pattern), build a standalone review prompt:
+
+```
+You are the {reviewer-agent-display-name}. You have ONE task: cross-check the results of {primary-task-id}.
+
+## Review Task: Cross-Check {primary-task-id} ({primary-gate-id})
+
+Read Section {section-id} of `{working-paper-path}` (written by {primary-agent-name}).
+
+### Verify:
+1. Key numbers are reproducible from the stated input data
+2. Gate verdict follows logically from the pre-registered criteria
+3. Methodology is sound from your specialist perspective
+4. Any domain-specific concerns
+
+### Output
+Write a "### Review by {your-name}" subsection WITHIN Section {section-id} of the working paper.
+- Confirmed / Flagged / Corrected items
+- Independent spot-checks you performed
+- Overall assessment: ENDORSED / CONCERNS / REJECTED
+- 5-10 lines max
+
+### Rules
+- Do NOT rerun the full computation — spot-check specific numbers
+- Do NOT modify the primary agent's results — write your review BELOW them
+- If the primary agent has not yet written their section, sleep 30 seconds and re-read
+- When finished, mark your task completed via TaskUpdate.
+```
+
+#### 3a.5. Apply `--wave` skip (if provided)
+
+If `--wave N` was specified, skip waves 1 through N-1. Begin execution at wave N. Assumes earlier waves are already complete -- read their working paper sections to confirm results exist. If earlier sections are empty, warn the user before proceeding.
+
+#### 3a.6. Apply `--context` (if provided)
+
+If `--context` was specified, append this block to each agent's prompt:
+
+```
+## Focus Context
+{context text}
+```
+
+This provides additional framing or focus topics beyond what the session plan specifies.
+
 #### 3b. Spawn current wave — ALL in parallel
 
 Use the Agent tool to spawn ALL agents for the current wave in a single response (multiple parallel Agent calls). Each gets its self-contained prompt. No waiting for ready messages — agents start immediately.
@@ -323,7 +430,7 @@ Agent tool parameters:
 
 **Spawn ALL agents in parallel** (single message with multiple Agent tool calls).
 
-**Max 4 agents per team.** If the file needs more, warn the user and suggest sequential sub-sessions or workshop mode.
+**Max 3 agents per team.** If the prompt needs more, warn the user and suggest sequential sub-sessions or workshop mode.
 
 #### 3b-blast. Wait for ALL agents to send their ready message
 
@@ -584,7 +691,7 @@ Synthesis: {path}
 10. **Decision points are checkpoints, not automation.** Always present decision-point outcomes to the user and await direction.
 
 ### Workshop & Panel Modes (team-based)
-11. **MAX 4 AGENTS per team.** 4+ = notification avalanche.
+11. **MAX 3 AGENTS per team.** 4+ = notification avalanche.
 12. **ONE TEAM AT A TIME.** Cross-team inbox contamination is unfixable.
 13. **ALWAYS include a coordinator.** Every team gets one.
 14. **Blast-first workflow.** Minimal prompt -> wait ALL ready -> roster blast -> THEN real work.
