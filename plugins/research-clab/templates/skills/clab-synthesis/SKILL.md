@@ -222,7 +222,7 @@ Read all source documents, then write a synthesis to: `{output_path}`
 
 ## Document Structure
 
-Follow the template in `.claude/templates/synthesis-solo.md`.
+Follow the template in `.claude/templates/synthesis.md`.
 
 ## Rules
 - Gate verdicts from source docs are authoritative — do not re-adjudicate.
@@ -252,25 +252,24 @@ Follow the template in `.claude/templates/synthesis-master.md`. Key structural n
 
 Workshop mode spawns exactly 2 agents **sequentially** — NO team infrastructure. Each agent runs as a background Agent call, reads the running document, appends their contribution, and completes before the next agent spawns. This loops for `--rounds` rounds (default: 2), producing `rounds * 2` total turns.
 
-**Why no team infrastructure**: The 2-Agent Workshop Pattern eliminates every team management bug: no inbox routing, no notification avalanche, no shutdown resistance, no stale teams. Pure sequential Agent calls with append-only writes to a single document.
+**Why no team infrastructure**: The 2-Agent Workshop Pattern eliminates every team management bug: no inbox routing, no notification avalanche, no shutdown resistance, no stale teams. Pure sequential Agent calls with placeholder-replacement writes to a single document.
 
 **Short name mapping**: Read `.claude/templates/agent-roster.md` for the canonical name-to-type mapping.
 
-#### Phase 3W-1: Write Document Header
+#### Phase 3W-1: Build Full Document Skeleton
 
-The team lead (you) creates the workshop document with the header using the Write tool:
+**MANDATORY.** Build the COMPLETE workshop skeleton BEFORE launching any agent. Use `.claude/templates/workshop.md` as the structural reference. The skeleton must include:
 
-```markdown
-# Session {session-id} Workshop: {Agent-A-Short} x {Agent-B-Short}
+- Header (date, format, agents, source docs, focus topics)
+- ALL round headings for ALL rounds
+- ALL turn sections with `*[NOT STARTED]*` placeholders
+- Agent A's labeled topic sections (one per focus topic + cross-cutting)
+- Agent B's response sections (Re: each of A's sections + original analysis + questions)
+- Round 2+ CONVERGENCE / DISSENT / EMERGENCE / QUESTIONS sections
+- Workshop Verdict table shell (final round)
+- Remaining Open Questions placeholder
 
-**Date**: {today}
-**Format**: Iterative 2-agent workshop ({N} rounds, {N*2} turns)
-**Agents**: {agent-a-short} ({agent-a-type}), {agent-b-short} ({agent-b-type})
-**Source Documents**:
-{bulleted list of source doc paths}
-
----
-```
+Write this skeleton with the Write tool in a single call. Agents fill placeholders using Edit -- they never create structure.
 
 #### Phase 3W-1.5: Create Task Tracking
 
@@ -308,72 +307,55 @@ You are writing the OPENING ANALYSIS for a 2-agent iterative workshop.
 ## Source Documents (read ALL of these FIRST)
 {numbered list of all source doc paths}
 
+Also read your agent memory: `.claude/agent-memory/{your-type}/MEMORY.md`
+
+{If --context provided:}
+## Focus Topics
+{context text}
 
 ## Your Task
 
-Read all source documents, then APPEND your analysis to: `{output_path}`
+Read all source documents, then FILL IN your sections in: `{output_path}`
 
-The file already has a header. Read the file first, then use the Edit tool to append after the existing content. Do NOT overwrite the header.
+The file has a pre-built skeleton with `*[NOT STARTED]*` placeholders. Use the Edit tool to replace each placeholder in the "Round 1 — {agent-a-short}" section with your analysis. Do NOT overwrite the header, other sections, or the Round 2 skeleton.
 
-Append a section starting with exactly this heading:
-
-## Round 1 — {agent-a-short}: Opening Analysis
-
-Then write your analysis from your specialist perspective. Structure your analysis with LABELED SECTIONS using your initial (e.g., A1, A2, A3...) so your partner ({agent-b-short}) can reference them precisely. For each section:
-
-- State your key finding or observation clearly
-- Connect to your research papers (cite specific equations, results, paper numbers)
+For each labeled section ({A-initial}1, {A-initial}2, ...):
+- State your key finding clearly
+- Connect to your research papers (cite equations, paper numbers)
 - Identify structural implications for the framework
-- Where relevant, pose specific questions for {agent-b-short} to address from their domain
+- Pose specific questions for {agent-b-short}
 
 ## Rules
-- APPEND to the file. Do NOT overwrite the header or any prior content.
+- REPLACE `*[NOT STARTED]*` placeholders in YOUR sections only.
 - Ground in source docs and your research papers. Cite precisely.
-- Label sections clearly (A1, A2, A3...) — this is load-bearing for cross-reference.
-- Write ONLY to the output file. Do not create any other files.
+- Label sections clearly — load-bearing for cross-reference.
+- Write ONLY to the workshop file.
 ```
 
 **Round 2+ Turn A Prompt:**
 
 ```
-You are writing ROUND {r} FOLLOW-UP for a 2-agent iterative workshop.
+You are writing ROUND {r} FOLLOW-UP for a 2-agent workshop.
 
-## Workshop Document (read this FIRST — it contains ALL prior rounds)
+## Workshop Document (read FIRST — contains all prior rounds)
 `{output_path}`
 
-## Source Documents (for reference if needed)
-{numbered list of all source doc paths}
-
+## Source Documents (reference)
+{numbered list}
 
 ## Your Task
 
-Read the full workshop document (all prior rounds), then APPEND your Round {r} follow-up to: `{output_path}`
+Read the full workshop document, then FILL IN the Round {r} — {agent-a-short} placeholders:
 
-Read the file first, then use the Edit tool to append after the existing content. Do NOT overwrite anything.
-
-Append a section starting with exactly this heading:
-
-## Round {r} — {agent-a-short}: Follow-up
-
-Address {agent-b-short}'s responses to your prior sections. For each of their labeled points:
-
-### CONVERGENCE
-Where you now agree with {agent-b-short}'s corrections or extensions — state what changed your assessment and what you both now hold.
-
-### DISSENT
-Where you still disagree — defend with new evidence, sharper argument, or quantitative counter. Do not simply restate your prior position.
-
-### EMERGENCE
-New insights triggered by the cross-pollination — ideas neither of you had before the exchange that emerge from combining both perspectives.
-
-### QUESTIONS
-Sharper follow-up questions based on what you've learned from {agent-b-short}'s analysis.
+### CONVERGENCE — Where you now agree with {agent-b-short}. State what changed.
+### DISSENT — Where you still disagree. New evidence only; don't restate.
+### EMERGENCE — New insights from cross-pollination.
+### QUESTIONS — Sharper follow-ups. Answer {agent-b-short}'s questions to you.
 
 ## Rules
-- APPEND only. Do NOT overwrite prior content.
-- Reference {agent-b-short}'s prior sections by their labels (e.g., "Re: T3...").
-- Every claim must cite source docs or research papers.
-- Write ONLY to the output file.
+- REPLACE placeholders in YOUR Round {r} sections only.
+- Reference {agent-b-short}'s sections by label.
+- Write ONLY to the workshop file.
 ```
 
 **Wait for Agent A to complete before proceeding to Turn B.**
@@ -393,133 +375,91 @@ Spawn Agent B as a background agent:
 ```
 You are writing the RESPONSE for a 2-agent iterative workshop.
 
-## Source Documents (read ALL of these FIRST)
-{numbered list of all source doc paths}
+## Source Documents (read ALL FIRST)
+{numbered list}
 
-## Workshop Document (read this AFTER source docs)
+## Workshop Document (read AFTER sources)
 `{output_path}`
 
-This file contains the header and your partner {agent-a-short}'s opening analysis with labeled sections (A1, A2, A3...).
+This file contains the header and {agent-a-short}'s opening analysis with labeled sections.
 
+Also read your agent memory: `.claude/agent-memory/{your-type}/MEMORY.md`
 
 ## Your Task
 
-Read all source documents AND the workshop document, then APPEND your response to: `{output_path}`
-
-Read the file first, then use the Edit tool to append after the existing content. Do NOT overwrite anything.
-
-Append a section starting with exactly this heading:
-
-## Round 1 — {agent-b-short}: Response & Cross-Synthesis
-
-Structure your response in TWO parts:
+Read all source documents AND the workshop document, then FILL IN your sections.
 
 ### Part 1: Response to {agent-a-short}'s Sections
 
-For EACH of {agent-a-short}'s labeled sections (A1, A2, A3...), write a response labeled "Re: A1", "Re: A2", etc.:
-
-- **Where you AGREE**: State why, add your domain's supporting evidence
-- **Where you DISAGREE**: State why with specific reasoning and counter-evidence from your research papers
-- **What they MISSED**: Findings your domain reveals that theirs doesn't
-- **What EMERGES**: Cross-domain insights visible only from combining both perspectives
+For EACH "Re:" placeholder, replace `*[NOT STARTED]*` with:
+- **AGREE**: Why, plus your domain's supporting evidence
+- **DISAGREE**: Why, with counter-evidence from your papers
+- **MISSED**: What your domain reveals that theirs doesn't
+- **EMERGES**: Cross-domain insights from combining perspectives
 
 ### Part 2: Original Analysis
 
-Add your own labeled sections (T1, T2, T3... or B1, B2... — use your initial) covering findings from the source documents that {agent-a-short} did not address. These are sections you want {agent-a-short} to respond to in the next round.
+Fill in your labeled sections ({B-initial}1, {B-initial}2, ...) with findings {agent-a-short} did not address.
 
 ## Rules
-- APPEND to the file. Do NOT overwrite anything.
-- Reference {agent-a-short}'s sections by label (e.g., "Re: A3...").
-- Ground in source docs and your research papers. Cite precisely.
-- Write ONLY to the output file.
+- REPLACE placeholders in YOUR sections only.
+- Reference {agent-a-short}'s sections by label.
+- Write ONLY to the workshop file.
 ```
 
 **Round 2+ Turn B Prompt:**
 
 ```
-You are writing ROUND {r} RESPONSE for a 2-agent iterative workshop.
+You are writing ROUND {r} RESPONSE for a 2-agent workshop.
+{If final round: "This is the FINAL TURN — you must also fill the Workshop Verdict table."}
 
-## Workshop Document (read this FIRST — it contains ALL prior rounds)
+## Workshop Document (read FIRST)
 `{output_path}`
 
-## Source Documents (for reference if needed)
-{numbered list of all source doc paths}
-
+## Source Documents (reference)
+{numbered list}
 
 ## Your Task
 
-Read the full workshop document, then APPEND your Round {r} response to: `{output_path}`
+Read the full workshop document, then FILL IN the Round {r} — {agent-b-short} placeholders:
 
-Read the file first, then use the Edit tool to append after the existing content. Do NOT overwrite anything.
+### CONVERGENCE — Where you accept {agent-a-short}'s corrections.
+### DISSENT — Sharpen, don't repeat.
+### EMERGENCE — New cross-domain insights.
 
-Append a section starting with exactly this heading:
+{FINAL ROUND ONLY — also fill:}
 
-## Round {r} — {agent-b-short}: Cross-Synthesis
+## Workshop Verdict — Replace the placeholder table. For each topic assign:
+- **Converged**: Both agree after exchange
+- **Dissent**: Disagreement persists
+- **Partial**: Structure agreed, specifics disputed
+- **Emerged**: New finding from exchange
 
-Address {agent-a-short}'s Round {r} follow-up. Apply the same structure:
-
-### CONVERGENCE
-Where you accept {agent-a-short}'s follow-up corrections or new evidence.
-
-### DISSENT
-Where disagreement persists — sharpen, don't repeat.
-
-### EMERGENCE
-New cross-domain insights from this round's exchange.
-
-{FINAL_ROUND_BLOCK}
+## Remaining Open Questions — Numbered list. Each specific enough to become a computation or session topic. Include pre-registered gates.
 
 ## Rules
-- APPEND only. Do NOT overwrite prior content.
-- Reference prior sections by label.
-- Write ONLY to the output file.
+- REPLACE placeholders in YOUR sections only.
+- Write ONLY to the workshop file.
 ```
 
-**FINAL_ROUND_BLOCK** (inserted ONLY when `r == --rounds`, i.e., the last round):
-
-```
-### CONVERGENCE TABLE
-
-After your analysis sections, append a verdict table summarizing the full workshop exchange:
-
-## Workshop Verdict
-
-| Topic | Source | Status | Key Insight |
-|:------|:-------|:-------|:------------|
-| {topic from A1} | {agent-a-short} A1, {agent-b-short} Re:A1 | Converged / Dissent / Partial | {1-line summary} |
-| ... | ... | ... | ... |
-
-Status categories:
-- **Converged**: Both agents agree after exchange
-- **Dissent**: Disagreement persists with both sides' best arguments stated
-- **Partial**: Agreement on structure, disagreement on specifics
-- **Emerged**: New finding that neither agent held before the exchange
-
-Then add:
-
-## Remaining Open Questions
-
-{Numbered list of questions that the workshop identified but did not resolve. Each should be specific enough to become a computation or a future session topic.}
-```
-
-**Wait for Agent B to complete before proceeding to the next round.**
+**Wait for Agent B. Proceed to next round automatically (pre-committed via `--rounds`).**
 
 #### Phase 3W-3: Inter-Round Status
 
-After each complete round (both Turn A and Turn B), report to the user:
+After each complete round, report:
 
 ```
 === WORKSHOP ROUND {r}/{N} COMPLETE ===
-
-{agent-a-short}: {line count of their contribution}
-{agent-b-short}: {line count of their contribution}
-
+{agent-a-short}: {line count}
+{agent-b-short}: {line count}
 Document: {output_path} ({total lines} lines)
-{If r < N: "Proceeding to Round {r+1}..."}
-{If r == N: "Final round complete. Workshop finished."}
 ```
 
-**Do NOT ask the user for permission between rounds** — the round count was pre-committed via `--rounds`. Proceed automatically.
+Before launching Round 2+, **audit Round 1 for methodology violations**. Include specific corrections in the Round 2 agent prompts. Common violations:
+- Using deprecated or incorrect framing from other paradigms
+- Explaining domain results through an external rather than native framework
+- "Analog of" language when the domain framework is fundamental
+- Non-domain vocabulary for domain-specific concepts
 
 ---
 
@@ -720,11 +660,12 @@ Source documents: {N}
 3. **Never modify MEMORY.md**, agent memory, or the knowledge index. Read only.
 4. **Never re-adjudicate gate verdicts** — source doc verdicts are authoritative.
 5. **Solo mode: never spawn teams.** Team mode: max 3 agents. **Workshop mode: exactly 2 agents, no team infrastructure.**
-6. **Always include coordinator in team mode** if not already in `--agents`. **Do NOT add coordinator in workshop mode.**
-7. **Never initiate shutdown** — user decides. (Exception: none. This is non-negotiable.)
-8. **Team mode follows blast-first workflow** — no exceptions.
-9. **Workshop mode is purely sequential** — never spawn Agent B before Agent A completes within a turn. Never spawn the next round before the current round completes.
-10. **Workshop header is written by team lead** — agents only APPEND. If an agent overwrites the file, the workshop is corrupted. Prompts emphasize "read first, then Edit to append."
+6. **Workshop skeleton is MANDATORY** -- build ALL sections before ANY agent launches.
+7. **Always include coordinator in team mode** if not already in `--agents`. **Do NOT add coordinator in workshop mode.**
+8. **Never initiate shutdown** — user decides. (Exception: none. This is non-negotiable.)
+9. **Team mode follows blast-first workflow** — no exceptions.
+10. **Workshop mode is purely sequential** — never spawn Agent B before Agent A completes within a turn. Never spawn the next round before the current round completes.
+11. **Workshop skeleton is written by team lead** — agents only REPLACE placeholders via Edit. If an agent overwrites the file structure, the workshop is corrupted.
 
 ## Error Handling
 
