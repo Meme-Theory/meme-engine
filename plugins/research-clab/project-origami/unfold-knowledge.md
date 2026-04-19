@@ -39,64 +39,36 @@ These inputs determine which domain-specific entity types and constraint categor
 
 ---
 
-## Step 2: Generate Knowledge Schema
+## Step 2: Install Knowledge Schema
 
-Write `tools/knowledge-schema.yaml`. The schema defines what knowledge types this project tracks.
+The schema is a static asset, merged from universal + (optionally) discipline pack. The install order is:
 
-### Universal Entity Types (always include these 9)
+1. **Install the universal baseline unconditionally**:
 
-| Type | Purpose | Authority |
-|:-----|:--------|:----------|
-| `sessions` | Session metadata | coordinator |
-| `constraints` | Established boundaries of solution space | coordinator |
-| `gates` | Pre-registered pass/fail tests | skeptic |
-| `proven_results` | Permanent structural results | workhorse |
-| `closed_approaches` | Falsified hypotheses | coordinator |
-| `active_channels` | Surviving hypotheses under investigation | coordinator |
-| `confidence_trajectory` | Bayesian confidence evolution | skeptic |
-| `data_provenance` | Computation lineage (script → output → gate) | indexer |
-| `references` | Reference corpus inventory | indexer |
+   ```
+   ${CLAUDE_PLUGIN_ROOT}/templates/universal/knowledge-schema.yaml → tools/knowledge-schema.yaml
+   ```
 
-### Domain-Specific Entity Type (add at least one)
+   The baseline defines 5 discipline-agnostic entity types: `sessions`, `researchers`, `results`, `references`, `open_questions`. These are always installed.
 
-Choose the structured content type that matters most in this domain. This replaces `equations` from the origin project. Examples:
+2. **If a discipline pack was selected and ships a schema**: `unfold-discipline-overlay.md` Step 5 MERGES the pack's schema into the universal baseline at `tools/knowledge-schema.yaml`. Pack-specific types (e.g., `theorems`, `gates`) are added; pack types with the same name as universal types override the universal definition. Universal types not overridden survive.
 
-| Domain | Type | What It Captures |
-|:-------|:-----|:-----------------|
-| Theoretical Physics | `equations` | Named mathematical expressions with LaTeX |
-| Computational Biology | `protocols` | Experimental procedures with reagents/conditions |
-| Machine Learning | `experiments` | Training runs with hyperparams/metrics |
-| Drug Discovery | `compounds` | Chemical entities with pharmacological data |
-| Software Architecture | `components` | System components with API contracts |
-| Mathematics | `conjectures` | Open problems with approach history |
+3. **Post-install extension**: the coordinator (or user) may append project-specific types to `tools/knowledge-schema.yaml` after scaffolding as the research program defines them. The indexer re-reads the schema on every `/weave --update`.
 
-Define the entity type with its fields. Every entity type needs:
-- At least one `required: true` field
-- A `source_file` field for provenance tracking
-- An `authority` designation (which archetype produces this content)
+### Phase ordering
 
-### Constraint Categories
+This step (universal baseline install) runs in coordinator Phase 3a — BEFORE the discipline overlay (Phase 3b). The overlay's schema-merge expects `tools/knowledge-schema.yaml` to already exist.
 
-Include the 4 universal prefixes plus domain-specific ones from the coordinator:
+### Why the schema is copied, not invented
 
-| Prefix | Universal? | Example |
-|:-------|:-----------|:--------|
-| `S` | Yes | Structural — permanent logical constraints |
-| `F` | Yes | Framework — axiom/scope constraints |
-| `D` | Yes | Dynamical — evolution/stability constraints |
-| `O` | Yes | Observational — external data bounds |
-| `{domain}` | No | Coordinator-defined domain categories |
+Earlier versions of this flow asked the indexer to invent the schema from domain inputs. That proved fragile — indexer output varied across runs and rarely matched what the project actually wanted. Making the schema a static asset keeps the indexer deterministic and shifts schema design to discipline-pack authoring (where it can be reviewed, versioned, and reused across projects).
 
-### Write the Schema
+### Verification
 
-Use the full schema format from `${CLAUDE_PLUGIN_ROOT}/KNOWLEDGE-DATABASE.md` § 2a. Write to `tools/knowledge-schema.yaml`.
-
-**Verification**: After writing, confirm:
-- [ ] All 9 universal types present
-- [ ] At least 1 domain-specific type added
-- [ ] Every type has `authority` and `source_file` field
-- [ ] All 4 universal constraint categories present
-- [ ] Domain constraint categories included
+After install:
+- [ ] `tools/knowledge-schema.yaml` exists and parses as valid YAML
+- [ ] Contains at least the 5 universal types (or the discipline override's types)
+- [ ] Every type has `id`, `session`, `source_file` required fields
 - [ ] Source authority hierarchy defined
 
 ---

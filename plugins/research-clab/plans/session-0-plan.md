@@ -17,7 +17,7 @@ This is the step-by-step script the main agent follows when `/new-research-proje
 **DO**: Run a single mkdir command:
 ```
 mkdir -p .claude/agents .claude/agent-memory .claude/rules
-mkdir -p .claude/skills/{weave,shortterm,clab-review,clab-team,clab-plan,redact,document-prep,new-researcher,librarian,team-blast}
+mkdir -p .claude/skills/{weave,shortterm,rclab-review,rclab-team,rclab-plan,redact,document-prep,new-researcher,librarian,team-blast}
 mkdir -p researchers sessions/session-plan sessions/framework sessions/misc sessions/session-00
 mkdir -p .claude/templates/agent-templates .claude/templates/session-templates
 mkdir -p tools/viz artifacts/source plans
@@ -66,9 +66,9 @@ mkdir -p tools/viz artifacts/source plans
 ```
 weave/SKILL.md
 shortterm/SKILL.md
-clab-review/SKILL.md
-clab-team/SKILL.md
-clab-plan/SKILL.md
+rclab-review/SKILL.md
+rclab-team/SKILL.md
+rclab-plan/SKILL.md
 redact/SKILL.md
 document-prep/SKILL.md
 new-researcher/SKILL.md
@@ -209,7 +209,7 @@ If python env discovered → add `Bash("{python-path}":*)`.
 
 1. **DO**: Append the Team Operations Protocol section to `.claude/agent-memory/coordinator/MEMORY.md` (spawn sequence, hard limits, team lead discipline, orchestration patterns, session format → team size mapping). Content is specified verbatim in unfold-teams.md Step 1.
 
-2. **DO**: Verify `.claude/skills/clab-team/SKILL.md` exists (already copied in Step 4).
+2. **DO**: Verify `.claude/skills/rclab-team/SKILL.md` exists (already copied in Step 4).
 
 3. **DO**: Clean stale state — delete contents of `~/.claude/teams/` and `~/.claude/tasks/` if they exist.
 
@@ -343,7 +343,7 @@ Domain Agents: {N} queued in researcher-queue.md
 
 Next Steps:
   1. Process researcher queue: /new-researcher for each entry
-  2. First session: /clab-team sessions/session-plan/session-0-prompt.md
+  2. First session: /rclab-team sessions/session-plan/session-0-prompt.md
 ```
 
 ---

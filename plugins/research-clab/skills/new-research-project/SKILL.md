@@ -43,18 +43,48 @@ Rules:
 Verify these paths exist under `${CLAUDE_PLUGIN_ROOT}`:
 
 ```
-templates/agent-templates/
-templates/agent-roster.md
-templates/session-templates/
-templates/MCP-templates/
-templates/skills/
-templates/claude-md/
-templates/claude-md/rules/
+templates/universal/agent-templates/
+templates/universal/project-docs/agent-roster.md
+templates/universal/session-templates/
+templates/universal/mcps/
+templates/universal/skills/
+templates/universal/claude-md/
+templates/universal/rules/
+templates/universal/infrastructure-agents/
+templates/universal/knowledge-schema.yaml
+templates/disciplines/
 project-origami/
 agents/
 ```
 
 If any are missing, stop: "Plugin assets incomplete. Reinstall the research-clab plugin."
+
+### 0a-ii. Non-empty spot check
+
+For the following key files, verify they are non-empty (file size > 0):
+
+```
+templates/universal/claude-md/claude-md-root.md
+templates/universal/claude-md/claude-md-settings-json.md
+templates/universal/rules/teammate-behavior.md
+templates/universal/rules/team-lead-behavior.md
+templates/universal/knowledge-schema.yaml
+templates/universal/project-docs/agent-roster.md
+```
+
+If any is empty, stop with "Plugin asset is empty or corrupt: {path}."
+
+### 0a-iii. Orphaned template check
+
+List every `.md` file in `templates/universal/claude-md/`. Compare against the two tables in `project-origami/unfold-structure.md` Step 2:
+- The unconditional install table (11-12 entries)
+- The known-conditional exclusion table (6 entries)
+
+Every file in `templates/universal/claude-md/` must appear in EXACTLY one of those tables. If a file is in neither, stop with "Orphaned template: {path} — add to the install table or the exclusion table before scaffolding."
+
+### 0a-iv. Discipline scan
+
+Also scan `templates/disciplines/` — each subdirectory with a `discipline.json` is a selectable pack. Record the list for Question 6. Read each `discipline.json` to verify `schema-version == "1.0"`; packs with other versions are flagged as "incompatible — exclude from menu."
 
 ### 0b. Verify Target Directory
 
@@ -120,53 +150,89 @@ Ask the user: "Does this project need computation infrastructure?"
 - Use AskUserQuestion with one question. Options: "Yes — describe hardware", "No — purely theoretical", "Not sure yet".
 - **Wait for their answer.**
 
-Store all inputs. These are referenced as `{project-name}`, `{domain}`, `{research-question}`, `{output-format}`, `{hardware}` throughout.
+### Question 6 — Discipline Pack
+
+Ask the user: "Which discipline pack should overlay the universal harness?"
+- Scan `${CLAUDE_PLUGIN_ROOT}/templates/disciplines/` for subdirectories containing `discipline.json`. Read each `display-name` and `description` to build options.
+- Use AskUserQuestion with one question. Options derived from the scan, plus always include **"None — generic research harness"** as a fallback.
+  - Example: `[{"label": "Physics / Cosmology", "description": "Gate-based computation, canonical-constants, astro/arxiv MCPs"}, {"label": "None — generic", "description": "Universal harness only, no discipline overlay"}]`
+- Store the answer as `{discipline}`. Use the literal directory name (e.g., `"physics"`) or `"none"`.
+- **Wait for their answer.**
+
+Store all inputs. These are referenced as `{project-name}`, `{domain}`, `{research-question}`, `{output-format}`, `{hardware}`, `{discipline}` throughout.
 
 ---
 
-## Dispatch 1: Infrastructure + Knowledge (Parallel)
+## Dispatch 1: Infrastructure + Knowledge (SERIAL)
 
-After collecting all user inputs, launch TWO Agent invocations **in parallel** (both in the same response). These agents execute Phases 2-7 concurrently. You (the main skill) do NOT execute any of these phases directly — the agents own them.
+After collecting all user inputs, launch Agent 1 (coordinator) FIRST. When it completes, launch Agent 2 (indexer). **Do not parallelize** — the indexer reads `tools/knowledge-schema.yaml`, which the coordinator writes during its Phase 3a (universal baseline) and merges in Phase 3c (discipline overlay). Running them in parallel creates a race: indexer may read the file before coordinator finishes writing the merged schema.
 
-### Agent 1: Coordinator — Infrastructure Setup (Phases 2-6)
+### Dispatch 1a: Coordinator — Infrastructure Setup (Phases 2-8)
 
 Use the Agent tool:
 - `subagent_type`: `"general-purpose"`
 - `name`: `"coordinator-scaffold"`
-- `prompt`: Must include ALL of the following so the agent can work autonomously:
-  - Identity directive: `"You are the coordinator agent for the research-clab plugin. Read your full agent definition at {plugin-root}/agents/coordinator.md — find the '## /new-research-project — Scaffolding Directives' section and execute the 'Infrastructure Setup Task' exactly as specified."`
-  - All user inputs as key-value pairs:
-    - `project-name`: `{project-name}`
-    - `domain`: `{domain}`
-    - `research-question`: `{research-question}`
-    - `output-format`: `{output-format}`
-    - `hardware-specs`: `{hardware}` (or `"none"`)
-  - `plugin-root`: resolved absolute path of `${CLAUDE_PLUGIN_ROOT}`
-  - `target-dir`: current working directory (absolute path)
-  - Explicit reminder: `"Do NOT call AskUserQuestion. All user interaction is handled by the main skill."`
+- `prompt`: use this exact template. Substitute the bracketed values with the actual inputs collected in Phase 1:
 
-The coordinator will read the project-origami docs, create directories, copy all static assets (using `templates/infrastructure-agents/` as the source for infrastructure agents — NOT `agents/`), generate project-specific files, install methodology and team protocol, and run the infrastructure gate verification.
+```
+You are the coordinator agent for the research-clab plugin. Read your full agent definition at {plugin-root}/agents/coordinator.md — find the "## /new-research-project — Scaffolding Directives" section and execute the "Infrastructure Setup Task" exactly as specified.
 
-### Agent 2: Indexer — Knowledge System Init (Phase 7)
+Inputs:
+  project-name: <project-name>
+  domain: <domain>
+  research-question: <research-question>
+  output-format: <output-format>
+  hardware-specs: <hardware or "none">
+  discipline: <discipline pack name or "none">
+  plugin-root: <absolute path of ${CLAUDE_PLUGIN_ROOT}>
+  target-dir: <absolute path of the current working directory>
 
-Use the Agent tool:
+Do NOT call AskUserQuestion. All user interaction is handled by the main skill.
+Report back: list every phase that completed successfully, every phase that failed (with the exact error), and the final contents of sessions/framework/discipline-manifest.md if a pack was applied.
+```
+
+Use plain text key-value lines (one per line, `key: value` format). Do NOT pass JSON or YAML — the coordinator parses line-by-line.
+
+The coordinator executes Phases 2-8 from its scaffolding directives — directory tree, universal install, CLAUDE.md generation, discipline overlay (if any), fragment-slot strip, project-specific files, methodology, team protocol, rules spot-check, infrastructure gate. Coordinator does NOT do MCP install or knowledge-index init — those belong to the main skill and the indexer respectively.
+
+### Wait for coordinator, then verify schema
+
+Before dispatching the indexer, verify the coordinator's output:
+- `tools/knowledge-schema.yaml` exists and is non-empty.
+- The schema has an `entity_types:` block with at least the 5 universal types.
+- If a discipline pack was selected: `sessions/framework/discipline-manifest.md` exists.
+- Infrastructure gate (coordinator Phase 8) reports success.
+
+If any check fails: do NOT dispatch the indexer. Report the coordinator's failure to the user and stop.
+
+### Dispatch 1b: Indexer — Knowledge Index Initialization
+
+Only after the coordinator has completed successfully. Use the Agent tool:
 - `subagent_type`: `"general-purpose"`
 - `name`: `"indexer-knowledge-init"`
-- `prompt`: Must include ALL of the following:
-  - Identity directive: `"You are the indexer agent for the research-clab plugin. Read your full agent definition at {plugin-root}/agents/indexer.md — find the '## /new-research-project — Scaffolding Directives' section and execute the 'Knowledge System Initialization Task' exactly as specified."`
-  - Key inputs:
-    - `project-name`: `{project-name}`
-    - `domain`: `{domain}`
-    - `research-question`: `{research-question}`
-  - `plugin-root`: resolved absolute path of `${CLAUDE_PLUGIN_ROOT}`
-  - `target-dir`: current working directory (absolute path)
-  - Explicit reminder: `"Do NOT call AskUserQuestion. All user interaction is handled by the main skill."`
+- `prompt`: use this exact template:
 
-The indexer will read unfold-knowledge.md, determine domain-specific entity types, write the schema and index, seed its own memory, and verify the knowledge triad.
+```
+You are the indexer agent for the research-clab plugin. Read your full agent definition at {plugin-root}/agents/indexer.md — find the "## /new-research-project — Scaffolding Directives" section and execute the "Knowledge Index Initialization Task" exactly as specified.
+
+Context: the knowledge schema is already installed at tools/knowledge-schema.yaml (by the coordinator, Phase 3a + merged by Phase 3c if a discipline pack was applied). Do NOT rewrite it. Your job is to generate the empty tools/knowledge-index.json from the schema and seed your own memory.
+
+Inputs:
+  project-name: <project-name>
+  domain: <domain>
+  research-question: <research-question>
+  plugin-root: <absolute path of ${CLAUDE_PLUGIN_ROOT}>
+  target-dir: <absolute path of the current working directory>
+
+Do NOT call AskUserQuestion. Do NOT rewrite tools/knowledge-schema.yaml — the coordinator owns that file.
+Report back: whether tools/knowledge-index.json was created successfully, the entity types you observed in the schema, and any gaps between what the schema specifies and what your initialization could establish.
+```
+
+The indexer reads `unfold-knowledge.md` starting at Step 3 (skip Step 2 — the schema is already in place), generates `tools/knowledge-index.json` from the schema, seeds its own memory, and verifies the knowledge triad.
 
 ### After Both Complete
 
-Wait for BOTH agents to return. Check their reports:
+Wait for both to return. Check their reports:
 - If either reports errors, attempt to fix them before proceeding.
 - Verify key outputs exist: `.claude/agents/coordinator.md`, `tools/knowledge-schema.yaml`, `tools/knowledge-index.json`, `agents.md`.
 - If critical files are missing and unfixable, stop and report to the user.
@@ -182,16 +248,34 @@ This phase runs after infrastructure and knowledge setup are complete but before
 **SERIAL QUESTIONS ONLY.** This phase uses AskUserQuestion — one question per call, wait for each answer.
 
 The unfold-mcp doc handles:
-1. Scanning `${CLAUDE_PLUGIN_ROOT}/templates/MCP-templates/` for available MCPs
+1. Scanning `${CLAUDE_PLUGIN_ROOT}/templates/universal/mcps/` for available MCPs
 2. Presenting the menu to the user (AskUserQuestion)
 3. Detecting Python environment (if an MCP requires it)
 4. Alerting the user if Python is not available (with options to skip or provide a path)
 5. Installing the MCP package, writing `.mcp.json`, updating settings and CLAUDE.md
 6. Verification and reporting
 
-**If the user selects "None"**: skip to Phase 8. No MCP configuration is written.
+**If the user selects "None"**: skip to Phase 7c. No MCP configuration is written.
 
 **If Python is not found**: the unfold explicitly alerts the user — it does NOT silently skip. The user decides whether to skip or provide a Python path.
+
+---
+
+## Phase 7c: Python Backbone (Interactive, Gated)
+
+**READ**: `${CLAUDE_PLUGIN_ROOT}/project-origami/unfold-python-env.md` — follow its 5 steps.
+
+This phase writes `requirements-mcp.txt` and `requirements-compute.txt` at the project root (universal baseline + discipline additions if the selected pack supplies any) and asks the user whether to run `pip install` now.
+
+**SERIAL QUESTIONS ONLY.** The gate is a single AskUserQuestion (three options: Install now / Defer / Skip entirely). Sub-questions about missing Python or missing venv are each their own single-question AskUserQuestion call.
+
+Rules:
+- Runs AFTER Phase 7b so editable MCP installs (e.g., `paper-search-mcp`) resolve against actual on-disk paths.
+- Runs BEFORE Phase 8 so the user's first real session doesn't discover a broken import the first time they invoke an MCP.
+- If the user selects "Skip entirely", NO files are written. Continue to Phase 8.
+- If "Defer install", files ARE written but pip is not run. Continue to Phase 8.
+- If "Install now", the unfold runs dry-run resolves, real installs, and smoke imports, reporting per-interpreter status before continuing to Phase 8.
+- Never auto-install ROCm/CUDA torch. Print the command for manual execution; the wheel index is SDK-specific and can't be safely pinned in a plain-index requirements file.
 
 ---
 
@@ -253,12 +337,17 @@ For each selected archetype, ask the user ONE question for a persona overlay. Th
 2. **Pick a domain-relevant suggestion.** Before calling AskUserQuestion, choose a real person whose work intersects BOTH the archetype's cognitive style AND `{domain}`. The suggestion should make the user think "oh, that's a good fit." Examples of the reasoning:
    - Skeptic + computational biology → "Ioannidis" (replication crisis, evidence standards)
    - Skeptic + mathematical gastronomy → "Rebecca Watson" (science communication, debunking)
+   - Skeptic + pure math → "Grothendieck" (foundational rewrites, trust only full structural understanding) or "Poincaré" (rigor critic across physics and topology)
    - Calculator + climate modeling → "James Hansen" (quantitative modeling pioneer)
    - Calculator + drug discovery → "Patrick Vallance" (data-driven policy)
+   - Calculator + math → "Terence Tao" (computational-experimental number theory) or "Erdős" (prolific explicit constructions and estimates)
    - Dreamer + algebraic topology → "John Conway" (playful cross-domain connections)
+   - Dreamer + geometry / analysis → "Gromov" (metric/structural analogies across areas)
    - Principalist + any domain → field-relevant philosopher or axiomatist
+   - Principalist + math → "Gödel" (foundational limits) or "Bourbaki" (axiomatic structuralism)
    - Observer + any domain → field-relevant empiricist or survey researcher
    - Workhorse + any domain → field-relevant methodical practitioner
+   - Workhorse + math → "Serre" (meticulous exposition, complete proofs) or "Atiyah" (geometric+algebraic synthesis)
    Do NOT reuse names across agents in the same project. Pick someone the user is likely to recognize.
 3. Use AskUserQuestion with one question:
    - Question: `"Persona overlay for {Archetype}?"`
@@ -334,12 +423,12 @@ Run through this checklist. Every item must pass:
 - [ ] All directories from Phase 2 exist
 - [ ] 3 infrastructure agents in `.claude/agents/`
 - [ ] 3 agent memory directories with MEMORY.md files
-- [ ] 8 behavioral rules in `.claude/rules/`
-- [ ] 11 skills in `.claude/skills/` (each with SKILL.md)
-- [ ] 11 session templates in `.claude/templates/session-templates/`
-- [ ] 10 agent templates in `.claude/templates/agent-templates/`
+- [ ] Every file in `templates/universal/rules/` landed in `.claude/rules/` (minus `team-lead-behavior.md`, which goes to project root); plus any additions or overrides supplied by the selected discipline pack. Expect ≥8 files for "none"; more if a pack added rules.
+- [ ] Every subdirectory in `templates/universal/skills/` copied into `.claude/skills/` (each with a `SKILL.md` or `skill.md`); plus any discipline pack skills. Expect ≥14 for "none".
+- [ ] Every file in `templates/universal/session-templates/` copied into `.claude/templates/session-templates/` (expect ≥11 format letter files plus `00-infrastructure.md` and `supporting-documents.md`; exact count tracks the source directory)
+- [ ] Every file in `templates/universal/agent-templates/` copied into `.claude/templates/agent-templates/` (expect ≥10: skeptic, calculator, workhorse, principalist, dreamer, boundary-guard, observer, bridge, formatter, generalist)
 - [ ] `.claude/templates/agent-roster.md` exists with agent name-to-type mapping
-- [ ] 11 CLAUDE.md files (root + 10 subdirectories)
+- [ ] Every entry in `unfold-structure.md` Step 2's unconditional install table produced a CLAUDE.md (or `researchers/agents.md`) at its target path (expect 11 CLAUDE.md targets + 1 `researchers/agents.md`)
 - [ ] `.claude/settings.local.json` is valid JSON
 - [ ] `.gitignore` exists
 - [ ] `agents.md` exists with infrastructure + queued agents
@@ -355,6 +444,10 @@ Run through this checklist. Every item must pass:
 - [ ] `sessions/session-00/` directory exists
 - [ ] If MCP servers were installed: `.mcp.json` exists at project root and is valid JSON
 - [ ] If MCP servers were installed: root CLAUDE.md contains MCP instructions section
+- [ ] If LaTeX format selected: `artifacts/document-templates/latex/` has 14 `.tex` files + `references.bib`
+- [ ] If a discipline pack declared `directories[]`: each listed path exists under the project root
+- [ ] If Phase 7c was not "Skip entirely": `requirements-mcp.txt` and `requirements-compute.txt` exist at project root, with zero surviving `{{...}}` mustache placeholders in either file
+- [ ] If Phase 7c was "Install now": `sessions/framework/discipline-manifest.md` records the install status under a `## Python Environment` section
 
 Print completion summary using the insight block format. The content inside must be GENERATED from the actual project — not boilerplate. Describe what makes THIS project's agent team distinctive, how the selected archetypes create productive tension for THIS research question, and what the first session will actually investigate.
 
@@ -379,7 +472,7 @@ Print completion summary using the insight block format. The content inside must
   Next:
     1. /new-researcher for each entry in researcher-queue.md
     2. Start a NEW SESSION (reload agents and skills)
-    3. /clab-team sessions/session-plan/session-0-prompt.md
+    3. /rclab-team sessions/session-plan/session-0-prompt.md
 
 ─────────────────────────────────────────────────
 ```
@@ -418,7 +511,23 @@ Report: "Researcher queue saved at `sessions/session-plan/researcher-queue.md`. 
 
 ## Dry Run
 
-If `--dry-run`: run Phases 0-1 and 8a-8d only. Display what WOULD be created (directory tree, file list, recommended agent roster, persona specs). Write nothing.
+If `--dry-run` is in `$ARGUMENTS`, run in report-only mode:
+
+1. **Execute Phase 0** normally — all pre-flight checks including plugin-asset spot-check, orphaned-template detection, and discipline-pack schema-version validation. Report every gap found. These checks are non-mutating.
+2. **Execute Phase 1** normally — all 6 user questions, collect answers.
+3. **Execute Phase 8a-8d** (agent menu, persona construction) so the user can see the recommended roster.
+4. **Do NOT dispatch** coordinator (Dispatch 1a) or indexer (Dispatch 1b). Do NOT run Phase 7b (MCP), Phase 7c (Python backbone), Phase 8e-f (researcher queue), or Phase 10/11.
+5. **Report plan**: print a complete plan-of-record listing (not creating):
+   - Directories that would be created (from unfold-structure.md Step 1, with conditional dirs resolved per Q5)
+   - CLAUDE.md files that would be installed and their substitution summary
+   - Rules that would land in `.claude/rules/` (universal + discipline overlay, with override annotations)
+   - Skills that would be copied (universal + any discipline skills)
+   - MCP menu that WOULD be presented (scan universal + discipline MCPs dirs)
+   - LaTeX template count that would install (13 .tex + 1 .bib if Q4=LaTeX)
+   - Agent roster with personas
+6. **Exit cleanly** with a message: "Dry run complete. Re-invoke without --dry-run to actually scaffold."
+
+No file writes happen in dry-run mode.
 
 ---
 
@@ -435,5 +544,5 @@ If `--dry-run`: run Phases 0-1 and 8a-8d only. Display what WOULD be created (di
 | Python not available (MCP) | Alert user explicitly. Offer skip or manual path. Never silently skip. |
 | MCP package install fails | Offer retry, skip, or manual install. Write config anyway if manual. |
 | No git repo | Run `git init` before Phase 2. |
-| Stale team/task state | Delete in Phase 6c. |
+| Stale team/task state | The scaffold does NOT touch `~/.claude/teams/` or `~/.claude/tasks/`. If the user wants them cleaned, they run that manually. |
 | Root CLAUDE.md template has unfilled `{{...}}` variables | Substitute or strip — no mustache variables in final output. |

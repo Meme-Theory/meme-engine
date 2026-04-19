@@ -1,0 +1,9 @@
+{
+  "madrigal": {
+    "type": "stdio",
+    "command": "{{PYTHON_CMD}}",
+    "args": ["{{PROJECT_ROOT}}/tools/mcp-servers/madrigal-mcp/server.py"],
+    "cwd": "{{PROJECT_ROOT}}/tools/mcp-servers/madrigal-mcp",
+    "env": {}
+  }
+}

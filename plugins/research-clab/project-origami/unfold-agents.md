@@ -3,7 +3,7 @@
 **Target agent**: Coordinator
 **Task**: Present the archetype menu, help user select domain agents, design persona specs, write the researcher queue.
 **Inputs**: Domain, user's research question, user's archetype selections.
-**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/`, `${CLAUDE_PLUGIN_ROOT}/ARCHETYPES.md` (reference)
+**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/universal/agent-templates/`, `${CLAUDE_PLUGIN_ROOT}/ARCHETYPES.md` (reference)
 
 ---
 

@@ -3,7 +3,7 @@
 **Target agent**: Coordinator
 **Task**: Install behavioral rules into `.claude/rules/` and verify they're referenced from CLAUDE.md.
 **Inputs**: None (rules are universal).
-**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/claude-md/rules/`
+**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/universal/rules/`
 
 ---
 
@@ -17,11 +17,11 @@ These rules exist because things broke without them. Each one addresses a specif
 
 ## Step 1: Copy Rule Files
 
-Copy each rule file from `${CLAUDE_PLUGIN_ROOT}/templates/claude-md/rules/` into `.claude/rules/`:
+Copy each rule file from `${CLAUDE_PLUGIN_ROOT}/templates/universal/rules/` into `.claude/rules/`:
 
 | Source | Target | What It Enforces |
 |:-------|:-------|:-----------------|
-| `team-lead-behavior.md` | `.claude/rules/team-lead-behavior.md` | Don't over-manage, task-based monitoring, blast-first protocol, compute mode protocol, never self-initiate shutdown |
+| `team-lead-behavior.md` | `{root}/team-lead-behavior.md` | Don't over-manage, compute-mode protocol, never self-initiate shutdown. **Installed at project root, NOT in `.claude/rules/`, so subagents do not auto-load it.** |
 | `teammate-behavior.md` | `.claude/rules/teammate-behavior.md` | Inbox first, limit self-induced work, respond to interrupts, message by name, wait for roster, ready protocol, task ownership |
 | `epistemic-discipline.md` | `.claude/rules/epistemic-discipline.md` | Evidence hierarchy, pre-registration, constraint framing, mechanism assessment, what counts as a result, reporting format |
 | `output-standards.md` | `.claude/rules/output-standards.md` | One writer per file, specific action items, mandatory handoffs, formatting precision |
@@ -31,6 +31,8 @@ Copy each rule file from `${CLAUDE_PLUGIN_ROOT}/templates/claude-md/rules/` into
 | `evoi-prioritization.md` | `.claude/rules/evoi-prioritization.md` | EVOI computation priority, evidence weighting, effort-based probability tracking |
 
 These files are copied verbatim — no substitutions needed.
+
+**This table is the universal baseline only.** If a discipline pack was selected, `unfold-discipline-overlay.md` runs next (Phase 3b) and may ADD pack-specific rules and/or OVERRIDE listed rules (replacing the universal file at the same target path with a pack version). Consult `sessions/framework/discipline-manifest.md` post-scaffold to see exactly what the final rule set contains.
 
 ---
 
@@ -53,7 +55,7 @@ If this section is missing, add it.
 
 After copying, spot-check:
 
-1. **team-lead-behavior.md** contains the blast-first protocol and compute mode protocol
+1. **team-lead-behavior.md** contains the compute-mode protocol and attention-failure deficiencies (installed at project root)
 2. **teammate-behavior.md** contains the inbox-first rule, ready protocol, and task ownership
 3. **epistemic-discipline.md** contains the evidence hierarchy and mechanism assessment sections
 4. **output-standards.md** contains the "one writer per file" rule

@@ -1,0 +1,8 @@
+{
+  "knowledge": {
+    "type": "stdio",
+    "command": "{{PYTHON_CMD}}",
+    "args": ["{{PROJECT_ROOT}}/tools/mcp-servers/knowledge-mcp/server.py"],
+    "env": {}
+  }
+}

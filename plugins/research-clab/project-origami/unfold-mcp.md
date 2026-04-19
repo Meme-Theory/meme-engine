@@ -4,7 +4,7 @@
 **Task**: Detect available MCP servers, ask user which to install, verify runtime dependencies, configure `.mcp.json` and settings, append CLAUDE.md instructions.
 **Inputs**: User's MCP selections (via AskUserQuestion). Python environment status (detected or from `{hardware}` input).
 **Depends on**: `unfold-structure.md` (directories, settings.json, and root CLAUDE.md must exist).
-**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/MCP-templates/`
+**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/universal/mcps/` AND (if a discipline was selected) `${CLAUDE_PLUGIN_ROOT}/templates/disciplines/{discipline}/mcps/`
 
 ---
 
@@ -12,7 +12,7 @@
 
 MCP (Model Context Protocol) servers extend Claude Code with domain-specific tools. Research projects benefit from MCPs that search academic databases, fetch papers, or connect to specialized APIs. These are **optional** — the core research-clab functionality works without them — but they dramatically improve the paper acquisition and corpus-building workflow.
 
-This unfold is **open-ended**: each MCP is a self-contained template directory under `${CLAUDE_PLUGIN_ROOT}/templates/MCP-templates/{mcp-name}/`. To add a new MCP to the menu, create its template directory and add a menu entry in Step 1 below. No other files need modification.
+This unfold is **open-ended**: each MCP is a self-contained template directory under `{mcp-root}/{mcp-name}/`, where `{mcp-root}` is either `${CLAUDE_PLUGIN_ROOT}/templates/universal/mcps/` (for cross-discipline MCPs) or `${CLAUDE_PLUGIN_ROOT}/templates/disciplines/{discipline}/mcps/` (for discipline-specific MCPs). To add a new MCP to the menu, create its template directory in the appropriate location — no other files need modification. When reading an MCP's files in later steps, resolve `{mcp-root}` based on where the MCP was discovered during the Step 1 scan.
 
 ### MCP Template Directory Structure
 
@@ -23,8 +23,11 @@ MCP-templates/{mcp-name}/
 ├── mcp-json-fragment.json     # Server entry for .mcp.json (one key = server name)
 ├── claude-md-instructions.md  # Instructions block appended to root CLAUDE.md
 ├── settings-permissions.md    # Permission entries for settings.json
-└── requirements.md            # Runtime requirements, detection logic, install commands
+├── requirements.md            # Runtime requirements, detection logic, install commands
+└── server/                    # (optional) Bundled server source code
 ```
+
+The `server/` subdirectory is OPTIONAL. When present, the unfold copies its contents into `{target-dir}/tools/mcp-servers/{mcp-name}/` during install (Step 3b below). When absent, the MCP must be installable some other way — typically a PyPI package referenced in `requirements.md` (e.g., paper-search can alternatively install from PyPI; the bundled copy is the default).
 
 ---
 
@@ -32,7 +35,11 @@ MCP-templates/{mcp-name}/
 
 **This step uses AskUserQuestion and MUST NOT run in the first response turn after a skill loads.** The calling skill is responsible for the turn boundary.
 
-Scan `${CLAUDE_PLUGIN_ROOT}/templates/MCP-templates/` for subdirectories. Each subdirectory is an available MCP. Build the menu dynamically:
+Scan `${CLAUDE_PLUGIN_ROOT}/templates/universal/mcps/` for subdirectories. Each subdirectory is an available MCP.
+
+**Also scan** `${CLAUDE_PLUGIN_ROOT}/templates/disciplines/{discipline}/mcps/` if the user selected a discipline pack (read `sessions/framework/discipline-manifest.md` to get the pack's MCPs path if present). Discipline MCPs merge into the same menu — label them with a `[discipline-name]` prefix so the user can see which pack contributes each option.
+
+Build the menu dynamically from the merged list:
 
 ```
 === OPTIONAL MCP SERVERS ===
@@ -130,26 +137,49 @@ If user skips, remove that MCP from the install list and continue.
 
 ---
 
-## Step 3: Install MCP Package
+## Step 3: Install MCP Source and Dependencies
 
-For each selected MCP, read its `requirements.md` and run the installation.
+For each selected MCP, two things may be needed: (a) copy bundled server source to the project's `tools/mcp-servers/` tree, and (b) install any Python dependencies not already covered by the project-level `requirements-mcp.txt`.
 
-### paper-search
+### Step 3a: Copy Bundled Server Source
 
-```bash
-$PYTHON_CMD -m pip install paper-search-mcp
-```
-
-**Verify installation**:
+If `{mcp-root}/{mcp-name}/server/` exists:
 
 ```bash
-$PYTHON_CMD -c "import paper_search_mcp; print('paper-search-mcp installed successfully')"
+mkdir -p "{target-dir}/tools/mcp-servers/{mcp-name}-mcp"
+cp -r "{mcp-root}/{mcp-name}/server/." "{target-dir}/tools/mcp-servers/{mcp-name}-mcp/"
 ```
 
-If installation fails (network error, permission issue, build failure):
+**Folder naming**: the in-project MCP directory is `{mcp-name}-mcp` (with the `-mcp` suffix), matching the live convention. The `mcp-json-fragment.json` args path is written against that same path.
+
+If the MCP has no `server/` subdirectory, skip Step 3a — installation happens entirely through pip in Step 3b.
+
+### Step 3b: Install Dependencies
+
+If the project ran Phase 7c (Python backbone), most MCP dependencies are already installed via `requirements-mcp.txt`. Verify:
+
+```bash
+$PYTHON_CMD -c "import mcp, fastmcp, httpx; print('MCP deps OK')"
+```
+
+If Phase 7c was deferred or skipped, or if the selected MCP has extra deps not in the universal requirements file, read the MCP's `requirements.md` for any additional pip commands and run them.
+
+### Editable install (paper-search and similar bundled packages)
+
+Some MCPs (paper-search) ship as a Python package under `server/` with a `pyproject.toml`. For each such MCP, install editable so `-m {package_name}.server` resolves:
+
+```bash
+$PYTHON_CMD -m pip install -e "{target-dir}/tools/mcp-servers/{mcp-name}-mcp"
+```
+
+### Per-MCP Verification
+
+Read the `## Verification` section of the MCP's `requirements.md` and run whatever import-smoke-test it specifies.
+
+If any pip install fails (network error, permission issue, build failure):
 
 ```
-⚠ Failed to install paper-search-mcp.
+⚠ Failed to install dependencies for {mcp-name}.
 
 Error: {error message}
 
@@ -160,11 +190,11 @@ This usually means:
 ```
 
 Ask ONE AskUserQuestion:
-- Question: "paper-search-mcp installation failed. How to proceed?"
-- Options: "Retry", "Skip paper-search", "I'll install manually"
+- Question: "{mcp-name} install failed. How to proceed?"
+- Options: "Retry", "Skip this MCP", "I'll finish install manually"
 - **Wait for the user's answer.**
 
-If "I'll install manually": write the `.mcp.json` config anyway (the server will fail at runtime but the config is ready for when the package is installed). Note this in the completion report.
+If "I'll finish install manually": write the `.mcp.json` config anyway (the server will fail at runtime but the config is ready for when deps are installed). Note this in the completion report.
 
 ---
 
@@ -174,7 +204,7 @@ If "I'll install manually": write the `.mcp.json` config anyway (the server will
 
 The `.mcp.json` file lives at **project root** (not inside `.claude/`).
 
-Read `${CLAUDE_PLUGIN_ROOT}/templates/MCP-templates/{mcp-name}/mcp-json-fragment.json` for each selected MCP. Each fragment contains one JSON key-value pair representing a server entry.
+Read `{mcp-root}/{mcp-name}/mcp-json-fragment.json` for each selected MCP. Each fragment contains one JSON key-value pair representing a server entry.
 
 **If `.mcp.json` does not exist**: create it with the standard wrapper:
 
@@ -192,13 +222,13 @@ Read `${CLAUDE_PLUGIN_ROOT}/templates/MCP-templates/{mcp-name}/mcp-json-fragment
 
 ### 4b. Update `.claude/settings.json` Permissions
 
-Read `${CLAUDE_PLUGIN_ROOT}/templates/MCP-templates/{mcp-name}/settings-permissions.md` for each selected MCP. It lists permission entries to add to `settings.json`.
+Read `{mcp-root}/{mcp-name}/settings-permissions.md` for each selected MCP. It lists permission entries to add to `settings.json`.
 
 **Use Edit, not Write.** Read `.claude/settings.json`, add the new permission entries to `permissions.allow` (skip duplicates), and write back. Preserve all existing entries.
 
 ### 4c. Append to Root CLAUDE.md
 
-Read `${CLAUDE_PLUGIN_ROOT}/templates/MCP-templates/{mcp-name}/claude-md-instructions.md` for each selected MCP.
+Read `{mcp-root}/{mcp-name}/claude-md-instructions.md` for each selected MCP.
 
 **Use Edit, not Write.** Append the instructions block to the root CLAUDE.md. Place it after the existing "Tools" or "Knowledge" section. If neither exists, append at the end.
 
@@ -224,27 +254,24 @@ Add `downloads/*.pdf` to `.gitignore` if not already present.
 
 ## Step 5: Verify Installation
 
-For each installed MCP, run its verification check.
+For each installed MCP, run the verification block defined in its `requirements.md` (every MCP template ships one). The generic contract every MCP must satisfy:
 
-### paper-search Verification
+1. **Dependencies importable**: the `## Verification` block runs cleanly.
+2. **Config present**: `.mcp.json` exists and contains the MCP's server entry with `{{PYTHON_CMD}}` and `{{PROJECT_ROOT}}` resolved.
+3. **Permissions**: `.claude/settings.json` contains the MCP's `WebFetch` domain entries (if any).
+4. **CLAUDE.md**: Root CLAUDE.md contains the MCP's instructions section.
+5. **Server source present** (only if the MCP ships bundled source): `{target-dir}/tools/mcp-servers/{mcp-name}-mcp/` exists and its entry script (`server.py`, `nasa_server.py`, or the module's `__main__`) is present.
 
-1. **Package import**: `$PYTHON_CMD -c "import paper_search_mcp; print('OK')"`
-2. **Config present**: `.mcp.json` exists and contains the `paper-search` server entry
-3. **Permissions**: `.claude/settings.json` contains the academic domain whitelist entries
-4. **CLAUDE.md**: Root CLAUDE.md contains the "Paper-Search MCP" instructions section
-
-Report results per MCP:
+Report results per MCP using this structure:
 
 ```
 MCP Installation Results:
-  paper-search:
-    ✓ Package installed ($PYTHON_CMD -m paper_search_mcp.server)
-    ✓ .mcp.json configured
-    ✓ Settings permissions added (8 academic domains)
-    ✓ CLAUDE.md instructions appended
-    ✓ downloads/ directory created
-
-  {future MCPs here}
+  {mcp-name}:
+    [OK] Server source copied to tools/mcp-servers/{mcp-name}-mcp/ ({N} files, {M} KB)
+    [OK] Dependencies verified
+    [OK] .mcp.json configured
+    [OK] Settings permissions added ({K} domains)
+    [OK] CLAUDE.md instructions appended
 ```
 
 ---
@@ -277,7 +304,7 @@ Paper search tools are not available. Papers can still be fetched
 manually via WebFetch or by the scout agent using web search.
 
 To add MCP servers later, see:
-  ${CLAUDE_PLUGIN_ROOT}/templates/MCP-templates/README.md
+  ${CLAUDE_PLUGIN_ROOT}/templates/universal/mcps/README.md
 ```
 
 ---

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paper-search-mcp"
+version = "0.2.0.dev1"
+description = "Paper search MCP server (local fork with Semantic Scholar + arXiv relevance fixes)"
+requires-python = ">=3.10"
+dependencies = [
+    "beautifulsoup4",
+    "fastmcp",
+    "feedparser",
+    "lxml",
+    "mcp",
+    "pypdf2",
+    "requests",
+]
+
+[project.scripts]
+paper-search-mcp = "paper_search_mcp.server:mcp.run"

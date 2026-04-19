@@ -1,0 +1,33 @@
+{
+  "schema-version": "1.0",
+  "name": "math",
+  "display-name": "Mathematics (pure + applied)",
+  "description": "Proof-centric research — theorems, lemmas, conjectures, counterexamples. Evidence hierarchy runs proof > computer-verified case > heuristic > conjecture. Gates are proof obligations. Compute is symbolic (Sage, Lean, Coq) when used.",
+  "extends": "universal",
+  "rules": [
+    "proof-standards.md",
+    "counterexample-before-conjecture.md"
+  ],
+  "rule-overrides": {
+    "epistemic-discipline.md": "epistemic-discipline-math.md",
+    "gate-verdicts.md": "gate-verdicts-math.md"
+  },
+  "mcps": ["mathscinet", "oeis", "sage", "zbmath"],
+  "skills": [],
+  "knowledge-schema": "knowledge-schema.yaml",
+  "claude-md-fragments": {
+    "reference-data": "proof-standards-block.md",
+    "knowledge-query-discipline": "prior-results-query.md",
+    "computation-environment": "computation-environment-block.md"
+  },
+  "agent-flavoring": "agent-flavoring/",
+  "directories": [
+    "sessions/framework/theorems",
+    "artifacts/formal"
+  ],
+  "vocabulary": {
+    "pre-registered-test": "proof-obligation",
+    "pass-fail-record": "proof-verdict",
+    "reference-data-module": "axiom-registry"
+  }
+}

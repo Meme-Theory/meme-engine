@@ -10,9 +10,9 @@
 ## Context
 
 The team management protocol is already encoded in three places:
-1. `.claude/rules/team-lead-behavior.md` — loaded into every agent's context
+1. `{root}/team-lead-behavior.md` — at project root so subagents do NOT auto-load it; read by the orchestrator only
 2. `.claude/rules/teammate-behavior.md` — loaded into every agent's context
-3. `/clab-team` skill — enforces blast-first spawn (workshop/panel) or parallel independent agents (compute), hands-off discipline
+3. `/rclab-team` skill — enforces blast-first spawn (workshop/panel) or parallel independent agents (compute), hands-off discipline
 
 This unfold doc ensures the coordinator ALSO has the protocol in its memory so it can reference it when orchestrating teams.
 
@@ -25,84 +25,60 @@ Append to `.claude/agent-memory/coordinator/MEMORY.md` (after the methodology se
 ```markdown
 ## Team Operations Protocol
 
-### Blast-First Spawn Sequence (Workshop/Panel — MANDATORY)
-1. Spawn agents with minimal prompt: `"Send a ready message to team-lead using SendMessage, then wait for instructions."`
-2. Wait for ALL agents to send their "ready" message (verify with `/team-blast --ready-check`)
-3. Execute `/team-blast --list` (roster lands as each agent's FIRST inbox message)
-4. THEN send real work via SendMessage
+The active pipeline is **compute mode** — each piece of work is a standalone Agent call with no inboxes, no SendMessage routing, no TeamCreate. For concrete procedure see `team-lead-behavior.md` at project root and the `/rclab-coordinate`, `/rclab-review`, `/rclab-workshop` skills.
 
-### Hard Limits
-- MAX 4 agents per team in workshop/panel modes (more = notification avalanche)
-- Compute mode: NO team -- unlimited parallel independent Agent calls per wave
-- ONE team at a time (cross-team inbox contamination is unfixable)
-- ALWAYS include a coordinator in every team (workshop/panel)
-
-### Compute Mode Protocol (Parallel Independent Agents)
-Compute mode does NOT use TeamCreate or blast-first. Each computation is a standalone Agent call.
-1. TaskCreate for all computations across ALL waves (with wave dependencies via `blockedBy`)
-2. Spawn current wave's agents as independent Agent calls (no `team_name`) -- ALL in parallel
-3. Monitor via TaskList -- do NOT intervene unless agent explicitly errors
-4. When all wave tasks complete: read working paper sections, evaluate decision points
+### Compute Mode Protocol
+1. `TaskCreate` for all computations across ALL waves (with wave dependencies via `blockedBy`)
+2. Spawn current wave's agents as independent Agent calls — ALL in a single message (parallel)
+3. Monitor via `TaskList` — do NOT intervene unless an agent explicitly errors
+4. When all wave tasks complete: read working-paper sections, verify on-disk artifacts, evaluate decision points
 5. Report wave results to user with decision-point recommendation
 6. On user go-ahead, spawn next wave (loop back to step 2)
-7. After all waves: read complete working paper, write gate verdicts, write synthesis
+7. After all waves: read the complete working paper, write gate verdicts, write team-lead synthesis
 
 ### Team Lead Discipline
-- Do NOT over-manage -- let specialists work
+- Do NOT over-manage — let specialists work
 - Do NOT run agents' scripts or duplicate their analysis
-- Do NOT mark agents' tasks completed -- they mark their own
+- Do NOT mark agents' tasks completed — they mark their own
 - Do NOT write agents' designated output files
-- Do NOT nudge idle agents -- idle notifications are normal
-- Monitor via TaskList -- do NOT intervene unless agent explicitly errors
-- Shut down agents when work is complete -- one request per agent, move on if rejected
+- Do NOT nudge idle agents — idle notifications are normal
+- Shut down agents when work is complete; move on if they reject the shutdown
 - Only the USER terminates the team lead session
 
+### Hard Limits
+- Concurrency cap: 8 agents per wave — split larger waves into sub-waves dispatched sequentially
+- Compute mode: no TeamCreate, no SendMessage, no inboxes
+
 ### Task Metadata
-TaskCreate should include structured metadata for tracking:
+`TaskCreate` should include structured metadata for tracking:
 `metadata: { wave: N, gate_id: "...", agent_type: "..." }`
 
 ### Permission Mode
 Compute agents that write scripts and working paper sections should be spawned with:
-`mode: "acceptEdits"` -- prevents permission prompts from blocking autonomous computation
+`mode: "acceptEdits"` — prevents permission prompts from blocking autonomous computation
 
-### Orchestration Patterns
-- **Fan-Out**: Independent tasks, parallel work, collect results
-- **Pipeline**: Sequential dependencies, each step gates the next
-- **Debate**: Agents take positions, critique each other (2-3 rounds max)
-- **Coffee Talk**: Paired assessment, joint document
-- **Workshop**: Sequential rounds with markdown handoff between teams
-
-### Ready Verification
-Use `/team-blast --ready-check` after spawning to verify all agents have sent their ready messages before proceeding with the roster blast.
-
-### Session Formats → Team Sizes
-- First Contact / Debate / Panel: 3-4 agents (team-based)
-- Computation Sprint: unlimited per wave (parallel independent Agent calls, NO team)
-- Workshop: 2-3 per round (sequential teams, markdown handoff)
-- Clab Review: batches of 5-6 (parallel independent agents)
-- Clab Synthesis Workshop: exactly 2 agents (sequential Agent calls, NO team)
+### Session Formats → Dispatch Patterns
+- First Contact / Review: independent Agent calls per reviewer (no team)
+- Computation Sprint (`/rclab-coordinate`): unlimited per wave, parallel independent Agent calls
+- Workshop (`/rclab-workshop`): exactly 2 agents, sequential Agent calls (Edit-based on shared doc)
+- Investigate → Review (`/rclab-investigate` → `/rclab-review` campaign): parallel per slot
 ```
 
 ---
 
 ## Step 2: Configure Clab-Team Defaults
 
-The `/clab-team` skill is already installed. No additional configuration needed — it discovers agents dynamically from `.claude/agents/` and uses the blast-first workflow.
+The `/rclab-team` skill is already installed. No additional configuration needed — it discovers agents dynamically from `.claude/agents/` and uses the blast-first workflow.
 
-Verify the skill exists at `.claude/skills/clab-team/SKILL.md`. If missing, report the gap.
+Verify the skill exists at `.claude/skills/rclab-team/SKILL.md`. If missing, report the gap.
 
 ---
 
-## Step 3: Clean Runtime State
+## Step 3: Runtime State Note
 
-Ensure no stale team/task state exists:
+`~/.claude/teams/` and `~/.claude/tasks/` hold Claude Code's runtime state for active teams and task lists. The scaffold does NOT delete this state — it may contain the user's in-flight work on other projects.
 
-```
-~/.claude/teams/     → should be empty (no active teams)
-~/.claude/tasks/     → should be empty (no active task lists)
-```
-
-If stale state exists, delete it.
+If the user wants stale team/task state cleaned before starting a new session, they can do so manually outside the scaffold flow. The `/rclab-team` and `/rclab-coordinate` skills also handle stale-state cases at invocation time.
 
 ---
 
@@ -111,6 +87,6 @@ If stale state exists, delete it.
 - **Do NOT modify the team management protocol** — it's battle-tested
 - **Do NOT create a team during unfolding** — teams are created when the user runs sessions
 - **Do NOT add project-specific team rules** — put those in CLAUDE.md if needed
-- **Do NOT modify the clab-team skill** — it's already generalized
+- **Do NOT modify the rclab-team skill** — it's already generalized
 
 Your job is embedding the protocol in coordinator memory. The skills and rules enforce it at runtime.

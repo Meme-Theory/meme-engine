@@ -1,0 +1,105 @@
+# ==============================================================================
+#  Requirements: numerical-compute environment (project compute venv)
+# ==============================================================================
+#
+# This file covers every dependency needed to run the project's compute
+# pipelines: eigenvalue sweeps, integration, optimization, symbolic algebra,
+# plotting. The physics and math disciplines share this baseline; each appends
+# its own discipline-specific additions below.
+#
+# ---- INSTALL ----------------------------------------------------------------
+#
+#   # Replace {{COMPUTE_VENV_PY}} with the venv interpreter path, e.g.:
+#   #   Windows:  {{COMPUTATION_DIR}}/.venv/Scripts/python.exe
+#   #   Unix:     {{COMPUTATION_DIR}}/.venv/bin/python
+#
+#   "{{COMPUTE_VENV_PY}}" -m pip install -r requirements-compute.txt
+#
+# ---- WHERE USED -------------------------------------------------------------
+#
+#   {{COMPUTATION_DIR}}/*.py   - all active compute scripts
+#   (discipline packs may add further script paths in their overlay notes)
+#
+# ---- NOT FOR ----------------------------------------------------------------
+#
+#   tools/mcp-servers/ - use requirements-mcp.txt installed into system Python
+#   3.13. MCP servers run as stdio subprocesses spawned by Claude Code; they do
+#   not need torch, cvxpy, camb, or anything GPU-related.
+#
+# ---- ENV VARS (set BEFORE numpy import in CPU-bound scripts) ---------------
+#
+#   import os
+#   os.environ.setdefault('OMP_NUM_THREADS', '8')
+#   os.environ.setdefault('MKL_NUM_THREADS', '8')
+#   # Prevents numpy/scipy from fanning out to all cores when multiple
+#   # compute-mode agents run in parallel. Tune to your core count.
+#
+# ==============================================================================
+
+
+# ---- Core numerics (required; every compute script uses at least one) --------
+
+numpy==2.4.2                     # Used by: everything
+scipy==1.17.0                    # Used by: eigvals, sparse solvers, special functions, integration
+sympy==1.14.0                    # Used by: symbolic algebra (and as local CPU fallback for Sage-style work)
+matplotlib==3.10.8               # Used by: plotting (mpl_toolkits.mplot3d too)
+
+
+# ---- Data I/O ---------------------------------------------------------------
+
+h5py==3.15.1                     # Used by: large simulation data I/O
+
+
+# ==============================================================================
+#  Discipline-pack additions
+# ==============================================================================
+#
+# The unfold-python-env step appends pack-specific compute deps here when a
+# discipline pack is active. Common examples:
+#
+# # ---- Physics / Cosmology additions ---
+# camb==1.6.6                    # Used by: CMB anisotropy / transfer functions (mack-cosmic-bridge tier)
+# cvxpy==1.8.1                   # Used by: convex-optimization scripts (LP/SDP-based constraint gates)
+#
+# # ---- Math additions (compute-light; most math work is proof + symbolic) ---
+# # (minimal - sympy already covers CAS; formal-verifier clients belong in a
+# #  separate requirements file since they pull heavy non-Python deps)
+
+
+# ==============================================================================
+#  GPU (ROCm / CUDA) - install MANUALLY, NOT via pip install -r
+# ==============================================================================
+#
+# The ROCm / CUDA torch wheel MUST match your locally installed GPU SDK, and
+# the wheel lives on PyTorch's ROCm or CUDA index, not PyPI. Pinning it here in
+# a plain-index requirements file would break reproducibility across machines.
+# Install separately, using the command appropriate for your hardware:
+#
+#   # AMD ROCm (example - match to your ROCm SDK version):
+#   "{{COMPUTE_VENV_PY}}" -m pip install \
+#       torch==2.9.1+rocmsdk20260116 \
+#       --index-url https://download.pytorch.org/whl/rocm7.2
+#
+#   # NVIDIA CUDA (example):
+#   "{{COMPUTE_VENV_PY}}" -m pip install \
+#       torch \
+#       --index-url https://download.pytorch.org/whl/cu124
+#
+#   # CPU-only torch (if no GPU):
+#   "{{COMPUTE_VENV_PY}}" -m pip install torch
+#
+# Used by:
+#   - torch.linalg.eigvals / .svd / .matmul on GPU for large matrices
+#   - torch.fft for large FFTs
+#   - First-use validation: cross-check first few eigenvalues against numpy.linalg
+#     on a small test matrix before trusting GPU results.
+
+
+# ==============================================================================
+#  OPTIONAL accelerators (uncomment if you want them; every script that
+#  imports them has a scipy/numpy fallback path)
+# ==============================================================================
+
+# numexpr==2.14.1                # Used by: ne.evaluate fast paths in heavy numerical scripts
+# pyFFTW==0.15.1                 # Used by: GPE-style solvers (32-thread FFT); scipy.fft fallback exists
+# cupy-rocm-5-0                  # Used by: historical GPU-fallback scripts; torch.linalg on GPU is preferred now

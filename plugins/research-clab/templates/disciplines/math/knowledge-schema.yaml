@@ -1,0 +1,194 @@
+# Math Discipline Schema — extends universal
+#
+# Inherits the 5 universal types (sessions, researchers, results, references, open_questions)
+# and adds 6 math-native types. `results` in universal remains usable for empirical-flavored
+# findings; math-specific findings go in the types below.
+
+version: "1.0-math"
+extends: "universal"
+description: >
+  Proof-centric entity types for pure and applied math projects. A theorem is a
+  proven statement; a conjecture is a stated claim without a proof; a lemma is
+  a reusable intermediate result; a counterexample falsifies a claim;
+  definitions are the glossary; open problems are the tracked frontier.
+
+entity_types:
+
+  theorems:
+    universal: false
+    description: "Proven statements. A theorem lives here only if a proof (informal, detailed, or formally-verified) has been written down somewhere the project can reference."
+    authority: skeptic
+    fields:
+      id:
+        type: string
+        required: true
+        description: "Theorem ID (e.g., T-12, RIE-3). Stable; once assigned, never reused."
+      statement:
+        type: string
+        required: true
+      proof_reference:
+        type: string
+        required: true
+        description: "Path to the file + section / equation label where the proof is written. Or a Lean/Coq artifact identifier."
+      proof_rigor:
+        type: string
+        required: true
+        description: "SKETCH | DETAILED | FORMALLY-VERIFIED"
+      depends_on:
+        type: list
+        required: false
+        description: "IDs of lemmas and prior theorems the proof uses"
+      session:
+        type: string
+        required: true
+      source_file:
+        type: string
+        required: true
+
+  conjectures:
+    universal: false
+    description: "Stated claims without complete proofs. A conjecture stays open until a proof moves it to theorems or a counterexample moves it to counterexamples."
+    authority: coordinator
+    fields:
+      id:
+        type: string
+        required: true
+      statement:
+        type: string
+        required: true
+      scope:
+        type: string
+        required: false
+        description: "The domain of claimed generality — 'all compact Riemann surfaces', 'all finite-dimensional algebras', etc."
+      approaches_tried:
+        type: list
+        required: false
+        description: "Past proof attempts and why they blocked"
+      current_status:
+        type: string
+        required: true
+        description: "OPEN | PARTIAL-PROOF-ONLY | REDUCED-TO-<theorem-id> | SUPERSEDED-BY-<theorem-id>"
+      session:
+        type: string
+        required: true
+      source_file:
+        type: string
+        required: true
+
+  definitions:
+    universal: false
+    description: "Formal definitions — the project's glossary. Every term with a precise technical meaning specific to this project should appear here."
+    authority: coordinator
+    fields:
+      id:
+        type: string
+        required: true
+      term:
+        type: string
+        required: true
+      definition:
+        type: string
+        required: true
+        description: "Formal definition, LaTeX-ready"
+      motivation:
+        type: string
+        required: false
+        description: "Why this definition was chosen — alternatives considered, trade-offs"
+      session:
+        type: string
+        required: true
+        description: "Session where the definition was established or last revised"
+      source_file:
+        type: string
+        required: true
+
+  lemmas:
+    universal: false
+    description: "Reusable intermediate results. Smaller than theorems, usually cited as premises inside multiple proofs. Structurally identical to theorems but flagged as auxiliary."
+    authority: skeptic
+    fields:
+      id:
+        type: string
+        required: true
+      statement:
+        type: string
+        required: true
+      proof_reference:
+        type: string
+        required: true
+      proof_rigor:
+        type: string
+        required: true
+        description: "SKETCH | DETAILED | FORMALLY-VERIFIED"
+      used_by:
+        type: list
+        required: false
+        description: "Theorem or lemma IDs that cite this one"
+      session:
+        type: string
+        required: true
+      source_file:
+        type: string
+        required: true
+
+  counterexamples:
+    universal: false
+    description: "Concrete objects that refute a stated claim or conjecture. A counterexample closes a conjecture by construction."
+    authority: skeptic
+    fields:
+      id:
+        type: string
+        required: true
+      refutes:
+        type: string
+        required: true
+        description: "Conjecture ID this counterexample falsifies"
+      construction:
+        type: string
+        required: true
+        description: "The explicit object (formula, data, diagram) or a reference to where it is constructed"
+      verification:
+        type: string
+        required: true
+        description: "How the counterexample was verified — direct computation, formal proof, cited theorem"
+      session:
+        type: string
+        required: true
+      source_file:
+        type: string
+        required: true
+
+  open_problems:
+    universal: false
+    description: "Tracked frontier — distinct from `conjectures` in that open problems need not have a specific stated claim. They are directions, not propositions."
+    authority: coordinator
+    fields:
+      id:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+      related_conjectures:
+        type: list
+        required: false
+      related_theorems:
+        type: list
+        required: false
+      priority:
+        type: string
+        required: false
+        description: "HIGH | MED | LOW"
+      session:
+        type: string
+        required: true
+      source_file:
+        type: string
+        required: true
+
+authority_order:
+  - skeptic
+  - coordinator
+  - librarian
+  - indexer
+  - raw_files

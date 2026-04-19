@@ -1,0 +1,33 @@
+{
+  "schema-version": "1.0",
+  "name": "physics",
+  "display-name": "Mathematical Physics / Cosmology",
+  "description": "Gate-based pre-registered computation, canonical-constants discipline, astro/arxiv/gwosc data access. Designed for theoretical physics, cosmology, and adjacent quantitative sciences.",
+  "extends": "universal",
+  "rules": [
+    "canonical-constants.md",
+    "substitution-chain.md",
+    "computation-environment.md",
+    "knowledge-index-usage.md"
+  ],
+  "rule-overrides": {
+    "epistemic-discipline.md": "epistemic-discipline-physics.md",
+    "gate-verdicts.md": "gate-verdicts-physics.md",
+    "evoi-prioritization.md": "evoi-prioritization-physics.md"
+  },
+  "mcps": ["astro", "gwosc", "madrigal", "nasa"],
+  "skills": ["c-compare", "penrose-diagram", "latex"],
+  "knowledge-schema": "knowledge-schema.yaml",
+  "claude-md-fragments": {
+    "reference-data": "canonical-constants-block.md",
+    "knowledge-query-discipline": "knowledge-mcp-block.md",
+    "computation-environment": "computation-environment-block.md"
+  },
+  "agent-flavoring": "agent-flavoring/",
+  "vocabulary": {
+    "pre-registered-test": "gate",
+    "pass-fail-record": "verdict",
+    "reproducibility-hash": "closure-hash",
+    "reference-data-module": "canonical-constants"
+  }
+}

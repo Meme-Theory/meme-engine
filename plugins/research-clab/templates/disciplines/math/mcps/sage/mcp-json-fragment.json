@@ -1,0 +1,9 @@
+{
+  "sage": {
+    "type": "stdio",
+    "command": "{{PYTHON_CMD}}",
+    "args": ["{{PROJECT_ROOT}}/tools/mcp-servers/sage-mcp/server.py"],
+    "cwd": "{{PROJECT_ROOT}}/tools/mcp-servers/sage-mcp",
+    "env": {}
+  }
+}

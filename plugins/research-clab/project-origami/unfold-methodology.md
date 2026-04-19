@@ -3,7 +3,7 @@
 **Target agent**: Coordinator
 **Task**: Configure the session architecture, handoff protocol, and constraint methodology.
 **Inputs**: Project name, domain.
-**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/session-templates/`, `${CLAUDE_PLUGIN_ROOT}/METHODOLOGY.md` (reference)
+**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/universal/session-templates/`, `${CLAUDE_PLUGIN_ROOT}/METHODOLOGY.md` (reference)
 
 ---
 
@@ -13,7 +13,7 @@ The `sessions/session-plan/` directory should already exist (created by unfold-s
 
 ### Selection Guide
 
-Copy `${CLAUDE_PLUGIN_ROOT}/templates/session-templates/selection-guide.md` → `sessions/session-plan/format-selection-guide.md`
+Copy `${CLAUDE_PLUGIN_ROOT}/templates/universal/session-templates/selection-guide.md` → `sessions/session-plan/format-selection-guide.md`
 
 This is the decision tree users consult when planning a session. It maps research needs to session formats.
 

@@ -1,0 +1,115 @@
+\documentclass[11pt, reqno]{amsart}
+
+% --- Fonts, encoding, geometry ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+
+% --- AMS math stack ---
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+
+% --- Graphics, tables, hyperlinks ---
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[colorlinks=true, linkcolor=blue!60!black, citecolor=blue!60!black, urlcolor=blue!60!black]{hyperref}
+\usepackage[capitalise, noabbrev]{cleveref}
+
+% --- Bibliography ---
+\usepackage[numbers, sort&compress]{natbib}
+
+% --- Theorem environments (shared counter, sectioned) ---
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% --- Custom operators (add as needed) ---
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\End}{End}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\id}{id}
+\DeclareMathOperator{\im}{im}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\Tr}{Tr}
+
+% --- Number sets ---
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+
+% --- Metadata ---
+\title{Title}
+\author{Author Name}
+\address{Institution, Department}
+\email{author@institution.edu}
+\date{\today}
+
+\subjclass[2020]{Primary ; Secondary }
+\keywords{keyword one, keyword two}
+
+\begin{document}
+
+\begin{abstract}
+Abstract text. State the main result, the setting, and the key method in one paragraph.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}\label{sec:intro}
+
+Motivate the problem, state the main theorem, sketch the proof strategy, and
+outline the paper.
+
+\begin{theorem}[Main]\label{thm:main}
+Statement of the main theorem.
+\end{theorem}
+
+\section{Preliminaries}\label{sec:prelim}
+
+Definitions, notation, cited background results.
+
+\begin{definition}\label{def:widget}
+A \emph{widget} is \ldots
+\end{definition}
+
+\section{Auxiliary Results}\label{sec:aux}
+
+Lemmas used in the main proof.
+
+\begin{lemma}\label{lem:key}
+Statement of the key lemma.
+\end{lemma}
+\begin{proof}
+Proof body. Each step cites a theorem, lemma, definition, or named inference
+rule (see \cref{def:widget}).
+\end{proof}
+
+\section{Proof of the Main Theorem}\label{sec:proof}
+
+\begin{proof}[Proof of \cref{thm:main}]
+Proof body, structured as stated in \cref{sec:intro}. Cite auxiliary results
+with \verb|\cref{lem:key}|.
+\end{proof}
+
+\section{Open Questions}\label{sec:open}
+
+\begin{conjecture}\label{conj:one}
+A conjecture the paper leaves open.
+\end{conjecture}
+
+\bibliographystyle{amsplain}
+\bibliography{references}
+
+\end{document}
