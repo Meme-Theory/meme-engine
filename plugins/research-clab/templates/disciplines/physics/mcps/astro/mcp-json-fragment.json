@@ -1,0 +1,8 @@
+{
+  "astro": {
+    "type": "stdio",
+    "command": "{{PYTHON_CMD}}",
+    "args": ["{{PROJECT_ROOT}}/tools/mcp-servers/astro-mcp/server.py"],
+    "env": {}
+  }
+}

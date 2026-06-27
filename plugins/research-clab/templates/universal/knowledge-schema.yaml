@@ -1,0 +1,186 @@
+# Universal Knowledge Schema (discipline-agnostic baseline)
+#
+# This schema is the fallback when no discipline pack supplies its own. It defines
+# domain-neutral entity types sufficient for the /weave skill and indexer agent to
+# operate on any research project. Discipline packs should either extend this schema
+# (add domain-specific types) or replace it entirely with a richer domain-native version.
+#
+# Contract: every entity type MUST have `id`, `session`, `source_file`. Anything else
+# is domain-adaptation surface.
+
+version: "1.0"
+description: >
+  Discipline-agnostic baseline. Five entity types cover the minimum: what was
+  decided, who decided it, where it came from, what's still open, and who did the
+  work. Disciplines extend this with domain-specific types (e.g., theorems for
+  math, gates for physics, protocols for biology).
+
+# --- Universal entity types ---
+
+entity_types:
+
+  sessions:
+    universal: true
+    description: "Per-session metadata — the unit of work in this project"
+    authority: coordinator
+    fields:
+      id:
+        type: string
+        required: true
+        description: "Session identifier (e.g., session-42 or session-42a)"
+      date:
+        type: string
+        required: true
+      format:
+        type: string
+        required: true
+        description: "Session format letter (A-I) and human name"
+      agents:
+        type: list
+        required: true
+      prompt:
+        type: string
+        required: true
+        description: "Research question or objective driving the session"
+      outputs:
+        type: list
+        required: true
+        description: "Files produced during the session"
+      source_file:
+        type: string
+        required: true
+
+  researchers:
+    universal: true
+    description: "Domain-agent identities with their paper corpora and specialization"
+    authority: coordinator
+    fields:
+      id:
+        type: string
+        required: true
+      archetype:
+        type: string
+        required: true
+        description: "Cognitive archetype (skeptic, calculator, workhorse, etc.)"
+      domain:
+        type: string
+        required: true
+        description: "Specialization within the project's research area"
+      papers:
+        type: list
+        required: false
+        description: "Paper IDs or paths in the researcher's corpus"
+      source_file:
+        type: string
+        required: true
+        description: "Path to the agent definition file"
+
+  results:
+    universal: true
+    description: "Established findings — theorems, closures, empirical results, proven propositions, whatever counts as settled in the project's epistemology"
+    authority: skeptic
+    fields:
+      id:
+        type: string
+        required: true
+      statement:
+        type: string
+        required: true
+        description: "The finding in one sentence"
+      kind:
+        type: string
+        required: true
+        description: "Discipline-specific kind tag (theorem/closure/observation/verdict/proposition/etc.)"
+      evidence:
+        type: string
+        required: true
+        description: "What supports the result — proof reference, gate-verdict ID, observation, citation"
+      status:
+        type: string
+        required: true
+        description: "ESTABLISHED | PROVISIONAL | CONTESTED | RETRACTED"
+      session:
+        type: string
+        required: true
+      source_file:
+        type: string
+        required: true
+
+  references:
+    universal: true
+    description: "External sources cited by the project — papers, books, datasets, prior work"
+    authority: librarian
+    fields:
+      id:
+        type: string
+        required: true
+        description: "Reference ID (e.g., arxiv-2401.12345, doi-10.1234/x, internal-registry-NN)"
+      title:
+        type: string
+        required: true
+      authors:
+        type: list
+        required: true
+      venue:
+        type: string
+        required: false
+      year:
+        type: string
+        required: false
+      relevance:
+        type: string
+        required: false
+        description: "Why this project cites it; 1-2 sentences"
+      source_file:
+        type: string
+        required: true
+
+  open_questions:
+    universal: true
+    description: "Unresolved items the project is actively tracking — open problems, uncomputed gates, contested claims, pending reviews"
+    authority: coordinator
+    fields:
+      id:
+        type: string
+        required: true
+      statement:
+        type: string
+        required: true
+      priority:
+        type: string
+        required: false
+        description: "HIGH | MED | LOW or discipline-specific prioritization tag"
+      blockers:
+        type: list
+        required: false
+        description: "Other entities that must resolve first"
+      session:
+        type: string
+        required: true
+        description: "Session where the question was raised or last updated"
+      source_file:
+        type: string
+        required: true
+
+# --- Discipline extension point ---
+#
+# The discipline pack's own knowledge-schema.yaml may add types here. Examples:
+#
+#   Mathematics:     theorems, conjectures, definitions, lemmas, counterexamples
+#   Physics:         gates, closed, trajectory, constants, equations
+#   Biology:         protocols, assays, organisms, compounds
+#   Software:        components, benchmarks, bugs, interfaces
+#
+# To add a type, copy the structure above: `<type-name>: { universal: false, description, authority, fields }`.
+
+# --- Authority hierarchy ---
+#
+# When two sources disagree about an entity, the higher-authority source wins.
+# Disciplines may override this ordering via their own schema.
+
+authority_order:
+  - skeptic         # Adjudicator of last resort for factual disputes
+  - coordinator     # Canonical project state, session minutes
+  - librarian       # Reference metadata
+  - indexer         # Extracted entities (yields to any above)
+  - raw_files       # Session markdown, data outputs (lowest)

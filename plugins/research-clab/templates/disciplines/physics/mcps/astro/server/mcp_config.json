@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "astro-mcp": {
+      "command": "/path/to/conda/envs/mcp/bin/python",
+      "args": ["/path/to/astro_mcp/server.py"],
+      "cwd": "/path/to/astro_mcp",
+      "env": {}
+    }
+  }
+} 

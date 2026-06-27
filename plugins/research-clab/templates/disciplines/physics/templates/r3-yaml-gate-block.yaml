@@ -1,0 +1,204 @@
+# R3 YAML Gate Block Template
+# ---------------------------------------------------------------------------
+# Canonical machinery-enumeration scaffold for every pre-registered gate.
+# Consumed by the project's gate-block validator (the PRDR cardinality audit).
+#
+# Authoring discipline: copy this block into the session plan under each gate
+# and fill every field. A gate with ANY of the 8 PRDR checklist items empty
+# OR missing schema_version "R3" is PRU-vulnerable (Class 8 plan-property
+# failure; see .claude/rules/epistemic-discipline.md).
+#
+# Generalize at unfold: this is a physics-pack scaffold. {{COMPUTATION_DIR}}
+# resolves to the project's compute directory; the classification enum and the
+# scheme set are project-authored (see the NOTEs inline).
+# ---------------------------------------------------------------------------
+
+# ---- Identity (7 fields) ----
+gate_id: "{WAVE}-{INDEX}-{SLUG}"          # e.g. "S12-W3-007-MASS-RATIO"
+schema_version: "R3"                      # PINNED -- must read exactly "R3"
+gate_type: "compute"                      # compute|review|workshop -- default compute (field ABSENT => compute). NO solo type -- see note.
+trigger: "[SIGN|VERIFY|AUDIT|CHAIN|VERIFY-THEOREM]"
+classification: "<project classification tag>"   # the project authors its own enum; see .claude/rules/gate-verdicts.md
+agent_type: "<agent-name>"                # compute executor -- a dispatched specialist; for review/workshop see the per-type blocks
+hypothesis: "<one-sentence testable claim>"
+
+# ---- gate_type dispatch + closure ----
+#
+# gate_type selects BOTH the dispatch pattern AND the closure semantic.
+# DEFAULT (field absent) is "compute". The three types:
+#
+#   compute   -- one subagent runs a producing script; closes on a VERDICT LINE
+#                (emit_verdict) + working-paper section. ALL PRDR / verdict-rubric
+#                / output_artifacts fields below apply.
+#   review    -- N independent agents each write their OWN synthesis md from shared
+#                sources. NO verdict line; closes on ARTIFACT-EXISTENCE-WITH-CONTENT
+#                of each synthesis file. Fill the `review:` block; PRDR numerics N/A.
+#   workshop  -- EXACTLY 2 agents, N rounds, sequential, shared document. NO verdict
+#                line; closes on artifact-existence of the workshop md. Fill the
+#                `workshop:` block; PRDR numerics N/A.
+#
+# There is NO `solo` gate_type. A compute gate is DISPATCHED to its specialist
+# research agent, never run inline by the orchestrator. The no-spawn mode is a
+# whole-plan run launched AS a research agent (a separate session), NOT a per-gate
+# type. A planner must never stamp `solo` onto a gate.
+#
+# review: (REQUIRED iff gate_type == review; OMIT otherwise)
+#   agents: ["<agent-type-1>", "..."]        # 1+ independent authors (default 1 = question owner)
+#   sources: ["<doc path or glob>", "..."]   # what every reviewer reads
+#   output_paths:                            # one per agent
+#     - "sessions/investigation/investigation-{n}/investigation-{n}-{short}-synthesis.md"
+#   context: "<full-fidelity focus string: gate IDs, numeric anchors, the question>"
+#
+# workshop: (REQUIRED iff gate_type == workshop; OMIT otherwise)
+#   agents: ["<agent-A>", "<agent-B>"]       # EXACTLY 2
+#   rounds: 2                                # 1-5; default 2
+#   sources: ["<doc path>", "..."]
+#   output_path: "sessions/investigation/investigation-{n}/workshops/{slug}.md"
+#   adjudication_question: "<the competing-claim tension + (a)(b)(c) sub-questions>"
+#   context: "<full-fidelity: competing positions, numeric stakes, adjudication rule>"
+
+method:
+  description: "<specific script / test procedure>"
+  producing_script: "{{COMPUTATION_DIR}}/_shared/<path>.py"
+
+# ---- PRDR Checklist (8 items) -- ALL required, ALL non-empty ----
+#
+# NON-COMPUTE gate note: fields (2)(3)(4) are shaped for numerical-threshold
+# gates. Non-numerical gates (set-membership, two-branch/adjudication,
+# characterization/closed-form, artifact-existence/hygiene) set these to N/A or
+# false with a one-word reason -- the validator ACCEPTS that and does NOT coerce
+# them into a scalar inequality. Do NOT invent a numerical threshold to fill them.
+
+# (1) operator -- the mathematical comparison form
+operator:
+  type: "[equality|inequality|ratio|span|set|etc.]"
+  form: "<mathematical form, e.g. |x - y| / y <= tau>"
+
+# (2) strict_PASS_boundary -- exact threshold value + direction
+strict_PASS_boundary:
+  value: "<exact threshold number or symbolic expression>"
+  direction: "[<=|>=|=|!=|<|>]"
+
+# (3) boundary_reachable_analytically -- is the threshold analytically derived?
+boundary_reachable_analytically:
+  bool: true                               # or false
+  proof_ref: "<path to analytic derivation or 'null'>"
+
+# (4) reachable_rationals -- does the admissible region contain a rational mesh?
+reachable_rationals:
+  includes_integer_mesh: true              # or false
+  mesh_density: "<N points or 'continuous'>"
+
+# (5) machinery_pin_map -- every free parameter of producing_script, pinned
+machinery_pin_map:
+  # Enumerate via static analysis (AST) of producing_script. Leave no key empty.
+  N_eval: "<int>"
+  L_max: "<int or N/A>"
+  scan_range: "<[min, max] or N/A>"
+  step_size: "<value or 'adaptive'>"
+  tolerance: "<float>"
+  scheme: "<project scheme tag>"           # the project authors its own scheme set
+  convention: "<ABSOLUTE|RATIO|MIXED|...>"
+  random_seed: "<int or 'N/A -- deterministic'>"
+  GPU_path: "<torch.linalg|numpy.linalg|cpu-cap-OMP8>"
+  # CONDITIONAL pins -- MANDATORY when they apply (the plan-author must declare):
+  # regulator_pin: "a_n^{zeta|Pauli-Villars|Mellin|lattice|cutoff}"  # iff the gate cites a scheme-dependent quantity (.claude/rules/regulator-pin-discipline.md)
+  # publication_precision: "<sig figs>"  # iff this gate's value is cited downstream (epistemic-discipline.md Class 8.3)
+
+# (6) audit_discriminators -- which inputs feed which SHA
+audit_discriminators:
+  content_sha256_inputs: ["script", "canonical", "pinmap"]   # the closure SHA
+  script_sha256_inputs: ["script"]                            # script-only SHA
+
+# (7) substitution_chain -- mandatory for sign/direction/threshold claims
+substitution_chain:
+  required: true
+  content: |
+    Definition 1: <quantity> = <definition, cite canonical source>
+    Definition 2: ...
+    Substitute:  <plug definitions into target, no simplification>
+    Simplify:    <one algebra step per line>
+    Canonical form: <final expression>
+    Direction:   <sign/direction read-off>
+    Conclusion:  <the claim, now justified>
+
+# (8) input_files -- every file the producing_script reads, with SHA pin
+input_files:
+  canonical_constants:
+    path: "{{COMPUTATION_DIR}}/_shared/canonical_constants.py"
+    sha256: "<precomputed hash or '<computed-at-runtime>'>"
+  # Add one entry per input file. Static files get precomputed SHAs;
+  # dynamic files use '<computed-at-runtime>' and are verified at execution.
+
+# ---- Output artifacts (closure-verification checklist) ----
+# Mirror of input_files for OUTPUTS. The agent MUST verify every entry on disk
+# before marking the gate complete; the orchestrator re-verifies between waves.
+# Stub outputs (file present but missing a must_contain pattern) are the
+# documented compute-mode closure-failure mode (agent-standards.md). NO length
+# or size requirements -- verification is by CONTENT (must_contain), not bytes.
+#
+# gate_type DEPENDENCE:
+#   compute  -> keep the verdict_line entry (compute gates emit a line).
+#   review   -> one entry per review.output_paths synthesis md; DROP verdict_line.
+#   workshop -> one entry for workshop.output_path; DROP verdict_line.
+output_artifacts:
+  script:
+    path: "{{COMPUTATION_DIR}}/session-{N}/s{N}_{gate_slug}.py"
+    artifact_kind: "script"
+    must_contain:
+      # script imports the canonical module AND prints the emit_verdict payload;
+      # the agent then calls the emit_verdict MCP tool (no raw open("a")).
+      - "from canonical_constants import"
+      - "print_verdict_payload"
+  data:
+    path: "{{COMPUTATION_DIR}}/session-{N}/s{N}_{gate_slug}.npz"
+    artifact_kind: "data"
+    optional: false                       # set true iff gate has no data output
+  plot:
+    path: "{{COMPUTATION_DIR}}/session-{N}/s{N}_{gate_slug}.png"
+    artifact_kind: "plot"
+    optional: false                       # set true iff gate has no plot output
+  verdict_line:
+    path: "{{COMPUTATION_DIR}}/session-{N}/s{N}_gate_verdicts.txt"
+    artifact_kind: "verdict_line"
+    must_contain: "^{GATE_ID}:.* content_sha256=[a-f0-9]{64}"   # grep -E pattern
+    sign_3tuple_required: false           # set true iff gate has [SIGN] trigger
+  wp_section:
+    path: "sessions/session-{N}/session-{N}-w{W}-workingpaper.md"
+    artifact_kind: "wp_section"
+    section_anchor: "### W{W}-{INDEX}. {GATE_ID}"
+    must_contain:
+      - "\\*\\*Status\\*\\*:.*COMPLETED"
+      - "\\*\\*Verdict\\*\\*:.*(PASS|FAIL|INFO)"
+      - "\\*\\*Output Artifacts\\*\\*"
+      - "\\*\\*MCP Pre-Compute Audit\\*\\*"
+
+# ---- Verdict rubric (3 fields) ----
+PASS_meaning: "<what PASS maps in solution space>"
+FAIL_meaning: "<what FAIL maps in solution space>"
+INFO_meaning: "<what INFO maps -- intermediate regime or diagnostic flag>"
+
+# ---- Effort + framing (2 fields) ----
+effort:
+  files_created: ["<list of relative paths>"]
+  estimated_time: "<hours or days>"
+
+domain_framing: |
+  <classification-respecting explanation: how the computed quantity follows from
+   the project's primitives to the observable. For NON-applicable gates, state
+   that explicitly and describe the methodology contribution.>
+
+# ---------------------------------------------------------------------------
+# Validation: the 8 required PRDR keys are:
+#   operator, strict_PASS_boundary, boundary_reachable_analytically,
+#   reachable_rationals, machinery_pin_map, audit_discriminators,
+#   substitution_chain, input_files
+# Plus schema_version == "R3", plus the POST-flight output_artifacts block.
+#
+# gate_type AND the validator path:
+#   compute           -> the 8 PRDR keys are REQUIRED and non-empty.
+#   review / workshop -> numeric PRDR items (2)(3)(4) are N/A; the gate's real
+#                        pre-registration is the review:/workshop: block + the
+#                        artifact-existence output_artifacts. A review/workshop
+#                        gate is NOT PRU-vulnerable for lacking a numeric threshold.
+# ---------------------------------------------------------------------------

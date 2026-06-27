@@ -1,0 +1,95 @@
+# ==============================================================================
+#  Requirements: MCP-server environment (system Python 3.13)
+# ==============================================================================
+#
+# This file covers every dependency needed to run the MCP servers configured in
+# the project's .mcp.json. The servers are stdio processes spawned by Claude
+# Code; they do NOT need GPU, torch, or anything in the numerical compute stack.
+#
+# ---- INSTALL ----------------------------------------------------------------
+#
+#   # Windows:
+#   py -3.13 -m pip install -r requirements-mcp.txt
+#
+#   # macOS / Linux:
+#   python3.13 -m pip install -r requirements-mcp.txt
+#
+#   # paper-search-mcp is a local editable package (installed by the MCP unfold
+#   # when the paper-search MCP is selected); install separately if present:
+#   py -3.13 -m pip install -e tools/mcp-servers/paper-search-mcp
+#
+# ---- WHERE USED -------------------------------------------------------------
+#
+#   tools/mcp-servers/*/server.py   - the MCP servers configured in .mcp.json
+#
+# ---- NOT FOR ----------------------------------------------------------------
+#
+#   Numerical compute scripts - use requirements-compute.txt installed into the
+#   project's compute venv (if a compute directory was scaffolded).
+#
+# ---- PIN RATIONALE ----------------------------------------------------------
+#
+#   Versions pin to a tested Windows 11 / Python 3.13 set. The MCP SDK (`mcp`)
+#   and `fastmcp` APIs have churned across minor releases - loosening these pins
+#   is a gamble. If you bump, verify with `/mcp` that every server still
+#   connects and at least one tool-call round-trip succeeds.
+#
+# ---- DISCIPLINE ADDITIONS ---------------------------------------------------
+#
+#   The selected discipline pack may append lines below. Each appended line
+#   includes a `# Used by:` comment pointing to the MCP server that needs it.
+#   Extras you don't use are harmless (tens of MB on disk).
+#
+# ==============================================================================
+
+
+# ---- MCP SDK + server framework (universal) ---------------------------------
+
+mcp==1.26.0                      # Used by: knowledge-mcp and any stdio-MCP server that uses the low-level SDK
+fastmcp==3.0.2                   # Used by: paper-search-mcp and any MCP that wraps via fastmcp
+pydantic==2.12.5                 # Transitive: pulled in by mcp + fastmcp; pin explicitly (pydantic 2.x has breaking minors)
+
+
+# ---- HTTP / network clients (universal) -------------------------------------
+
+httpx==0.28.1                    # Used by: async REST MCPs (oeis, zbmath, mathscinet, sage when added)
+requests==2.31.0                 # Used by: paper-search-mcp (sync arXiv/PubMed GETs), fallback paths in other MCPs
+websockets==16.0                 # Used by: sage-mcp (SageCell Jupyter WebSocket protocol - `/service` HTTP is unreliable)
+
+
+# ---- paper-search-mcp deps (universal - paper-search is the always-on MCP) --
+
+feedparser==6.0.12               # Used by: paper-search-mcp (arXiv Atom feed parser)
+PyPDF2==3.0.1                    # Used by: paper-search-mcp (read_*_paper tools extract text from downloaded PDFs)
+python-dotenv==1.2.1             # Used by: paper-search-mcp (optional SEMANTIC_SCHOLAR_API_KEY loader)
+
+
+# ==============================================================================
+#  Discipline-pack additions
+# ==============================================================================
+#
+# The unfold-python-env step appends pack-specific MCP deps here when a
+# discipline pack is active. Examples below are kitchen-sink safe to install
+# even if the corresponding MCP is not enabled - they are pure Python and add
+# only a small install-time footprint.
+#
+# # ---- Physics / Astronomy additions ---
+# astropy==7.2.0                 # Used by: astro-mcp (FITS I/O, coord transforms, time systems)
+# astroquery==0.4.11             # Used by: astro-mcp (SIMBAD, VizieR, SDSS, Gaia, MAST, IRSA, NED, etc.)
+# sparclclient==1.2.8            # Used by: astro-mcp (DESI SPectra Access Client)
+# h5py==3.15.1                   # Used by: astro-mcp (HDF5 output)
+# numpy==2.3.5                   # Used by: astro-mcp, madrigal-mcp (numerical ops on query results)
+# pandas==3.0.1                  # Used by: astro-mcp (tabular serialization of query results)
+# gwosc==0.8.1                   # Used by: gwosc-mcp (LIGO/Virgo event catalogs + strain URLs)
+# madrigalWeb==3.3.7             # Used by: madrigal-mcp (CEDAR Madrigal database client)
+#
+# # ---- Math additions (populated when math MCPs ship) ---
+# # (none yet)
+
+
+# ==============================================================================
+#  OPTIONAL - not needed for any currently-exercised MCP flow
+# ==============================================================================
+
+# anthropic>=0.34                # Used by: client-side Claude helpers bundled with some MCPs (not the server itself).
+                                 # Enable only if you want to drive an MCP from a standalone Python script.

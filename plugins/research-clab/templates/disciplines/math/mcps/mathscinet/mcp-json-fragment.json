@@ -1,0 +1,9 @@
+{
+  "mathscinet": {
+    "type": "stdio",
+    "command": "{{PYTHON_CMD}}",
+    "args": ["{{PROJECT_ROOT}}/tools/mcp-servers/mathscinet-mcp/server.py"],
+    "cwd": "{{PROJECT_ROOT}}/tools/mcp-servers/mathscinet-mcp",
+    "env": {}
+  }
+}

@@ -3,7 +3,7 @@
 **Target agent**: Coordinator
 **Task**: Present the archetype menu, help user select domain agents, design persona specs, write the researcher queue.
 **Inputs**: Domain, user's research question, user's archetype selections.
-**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/agent-templates/`, `${CLAUDE_PLUGIN_ROOT}/ARCHETYPES.md` (reference)
+**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/universal/agent-templates/` (the archetype definitions; the archetype menu is inline in Step 1 below)
 
 ---
 
@@ -206,7 +206,7 @@ The main orchestrator will update this with actual agent names after running `/n
 
 - **Do NOT create agent definitions** -- `/new-researcher` stamps them from archetype templates
 - **Do NOT create agent memory directories** -- `/new-researcher` handles this
-- **Do NOT fetch papers** -- `/new-researcher` delegates to web-researcher
+- **Do NOT fetch papers** -- `/new-researcher` delegates to scout
 - **Do NOT invoke `/new-researcher` yourself** -- you write the queue, the main orchestrator processes it
 - **Do NOT force archetype selections** -- user decides (you suggest)
 - **Do NOT queue more than 5 domain agents at launch** -- start small, add via `/new-researcher` later

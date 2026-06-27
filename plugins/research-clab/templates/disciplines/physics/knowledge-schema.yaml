@@ -1,0 +1,252 @@
+# Physics Discipline Schema — extends universal
+#
+# Inherits the 5 universal types (sessions, researchers, results, references, open_questions)
+# and adds 6 physics-native types. Authority hierarchy is inherited from the universal schema
+# unless overridden here.
+#
+# Source: entity types derived from the Ainulindale Exflation tools/knowledge-index.json
+# canonical structure (theorems, closed_mechanisms, gates, constants, probability_trajectory,
+# equations).
+
+version: "1.0-physics"
+extends: "universal"
+description: >
+  Gate-and-constraint entity types for mathematical physics and cosmology projects.
+  A theorem is a proven structural constraint; a closed mechanism is a ruled-out approach;
+  a gate is a pre-registered compute test carrying a PASS/FAIL/INFO verdict; a constant is
+  an audited framework value with provenance; the trajectory is the ordered evidence-
+  accumulation log the EVOI methodology draws from; equations are named mathematical
+  expressions with LaTeX and audit status.
+
+entity_types:
+
+  theorems:
+    universal: false
+    description: "Proven structural results — monotonicity, block-diagonality, representation-theoretic identities, closed-form bounds. These define the walls of the solution space and survive regardless of the framework's empirical fate."
+    authority: skeptic
+    fields:
+      id:
+        type: string
+        required: true
+        description: "Theorem ID (e.g., T-12, KC-3). Stable; once assigned, never reused."
+      statement:
+        type: string
+        required: true
+      proof_reference:
+        type: string
+        required: true
+        description: "Path to the file + section / equation label where the proof is written."
+      proof_rigor:
+        type: string
+        required: true
+        description: "SKETCH | DETAILED | FORMALLY-VERIFIED"
+      depends_on:
+        type: list
+        required: false
+        description: "IDs of lemmas, prior theorems, or closed mechanisms the proof uses"
+      session:
+        type: string
+        required: true
+      source_file:
+        type: string
+        required: true
+
+  closed_mechanisms:
+    universal: false
+    description: "Ruled-out approaches. A mechanism is closed when a gate FAIL, a structural theorem violation, or a decisive observational mismatch eliminates it from the solution space. Closed mechanisms are a PERMANENT addition to the constraint map and prevent re-derivation in later sessions."
+    authority: skeptic
+    fields:
+      id:
+        type: string
+        required: true
+        description: "Mechanism ID (e.g., CM-07)."
+      name:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+      closure_reason:
+        type: string
+        required: true
+        description: "Why the mechanism is closed — theorem ID, gate ID, observation, or cited constraint."
+      closure_kind:
+        type: string
+        required: true
+        description: "THEOREM-VIOLATION | GATE-FAIL | OBSERVATIONAL-MISMATCH | CONSTRAINT-INCOMPATIBLE"
+      related_gates:
+        type: list
+        required: false
+      related_theorems:
+        type: list
+        required: false
+      session:
+        type: string
+        required: true
+      source_file:
+        type: string
+        required: true
+
+  gates:
+    universal: false
+    description: "Pre-registered compute tests with PASS / FAIL / INFO verdicts. Each gate carries a machinery pin, input SHA-256 pins, an expected output 4-tuple, and (when closed) a closure hash. See .claude/rules/gate-verdicts.md for the full specification."
+    authority: skeptic
+    fields:
+      id:
+        type: string
+        required: true
+        description: "Gate ID (e.g., V-1, M-3, T3-<SCRIPT>)."
+      trigger:
+        type: string
+        required: true
+        description: "[SIGN] | [VERIFY] | [AUDIT] | [VERIFY-THEOREM] | [CHAIN]"
+      classification:
+        type: string
+        required: true
+        description: "Project-specific classification tag (the project authors the enum in its own rule)."
+      hypothesis:
+        type: string
+        required: true
+      threshold:
+        type: string
+        required: true
+        description: "Quantitative pass / fail / INFO criterion with tolerance rule (RATIO | ABSOLUTE | THEOREM)"
+      machinery_pin:
+        type: object
+        required: true
+        description: "PRDR output — every free parameter of the producing script pinned or declared diagnostic"
+      input_sha256:
+        type: list
+        required: true
+        description: "SHA-256 pins for every static input the script reads"
+      expected_output:
+        type: string
+        required: true
+        description: "The 4-tuple: (value=<v>, scheme=<s>, convention=<c>, L_max=<L>)"
+      verdict:
+        type: string
+        required: false
+        description: "PASS | FAIL | INFO | UNCOMPUTED | PRE-REG-INCOMPLETE"
+      closure_sha:
+        type: string
+        required: false
+        description: "64-character hex closure SHA (required on canonical-form verdict lines)"
+      session:
+        type: string
+        required: true
+      source_file:
+        type: string
+        required: true
+
+  constants:
+    universal: false
+    description: "Canonical framework constants with provenance. A constant's single source of truth is the project's canonical constants module; the knowledge index caches the value, provenance, and usage for query-before-compute discipline."
+    authority: skeptic
+    fields:
+      id:
+        type: string
+        required: true
+        description: "Constant name as it appears in the canonical constants module (e.g., M_KK, tau_fold)."
+      value:
+        type: string
+        required: true
+        description: "Canonical numerical value (stored as string to preserve precision, units, and scientific notation)."
+      units:
+        type: string
+        required: false
+      provenance:
+        type: string
+        required: true
+        description: "Where the value came from — PDG, Planck, DESI, registry ID, or a gate verdict ID."
+      first_session:
+        type: string
+        required: true
+        description: "Session where the constant was first added to the canonical module."
+      last_updated_session:
+        type: string
+        required: false
+      related_gates:
+        type: list
+        required: false
+      session:
+        type: string
+        required: true
+        description: "Session of the current record (duplicates last_updated_session when present)."
+      source_file:
+        type: string
+        required: true
+
+  trajectory:
+    universal: false
+    description: "Framework evidence trajectory — a time-ordered log of evidence-accumulation events (gate PASS, mechanism closure, predictive match, parameter-free observable hit). Read by the EVOI prioritization rule to compute joint probabilities and effort-based framework status."
+    authority: coordinator
+    fields:
+      id:
+        type: string
+        required: true
+        description: "Trajectory entry ID (e.g., TRJ-042)."
+      event_kind:
+        type: string
+        required: true
+        description: "GATE-PASS | GATE-FAIL | MECHANISM-CLOSED | PREDICTIVE-MATCH | PARAMETER-FREE-HIT | CONSTRAINT-ADDED"
+      event_ref:
+        type: string
+        required: true
+        description: "ID of the underlying entity (gate ID, mechanism ID, etc.)."
+      delta_P:
+        type: string
+        required: false
+        description: "Effect on framework probability (free text; see evoi-prioritization.md for weighting rules)."
+      independent_of:
+        type: list
+        required: false
+        description: "Other trajectory entries this event is statistically independent of (used for joint-probability multiplication)."
+      session:
+        type: string
+        required: true
+      source_file:
+        type: string
+        required: true
+
+  equations:
+    universal: false
+    description: "Named mathematical expressions with LaTeX source and audit status. The equation registry supports cross-paper / cross-session referencing and underpins the LaTeX audit pipeline."
+    authority: librarian
+    fields:
+      id:
+        type: string
+        required: true
+        description: "Equation ID (e.g., EQ-0412)."
+      name:
+        type: string
+        required: false
+        description: "Human-readable name if one exists (e.g., 'Mukhanov-Sasaki mode equation')."
+      latex:
+        type: string
+        required: true
+        description: "LaTeX source of the equation."
+      context:
+        type: string
+        required: false
+        description: "One-sentence description of what the equation means in this project."
+      audit_status:
+        type: string
+        required: true
+        description: "UNVERIFIED | AUDITED | CONTESTED | DEPRECATED"
+      references:
+        type: list
+        required: false
+        description: "Reference IDs (papers, sessions) where the equation appears."
+      session:
+        type: string
+        required: true
+      source_file:
+        type: string
+        required: true
+
+authority_order:
+  - skeptic
+  - coordinator
+  - librarian
+  - indexer
+  - raw_files
