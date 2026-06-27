@@ -10,7 +10,7 @@ Decisive computations are focused sprints — use `/rclab-team --mode compute`:
 
 ```bash
 # Launch the computation sprint
-/rclab-team sessions/session-plan/session-18-prompt.md --mode compute --team-name s18-veff
+/rclab-team sessions/session-plan/session-18-prompt.md --mode compute --team-name s18-sprint
 
 # Dry run to verify assignments and gate pre-registration
 /rclab-team sessions/session-plan/session-18-prompt.md --mode compute --dry-run

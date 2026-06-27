@@ -13,7 +13,7 @@
     "gate-verdicts.md": "gate-verdicts-math.md"
   },
   "mcps": ["mathscinet", "oeis", "sage", "zbmath"],
-  "skills": [],
+  "skills": ["proof-check", "sage-compute"],
   "knowledge-schema": "knowledge-schema.yaml",
   "claude-md-fragments": {
     "reference-data": "proof-standards-block.md",

@@ -13,7 +13,7 @@ Adversarial debate is a live panel — use `/rclab-team --mode panel`:
 /rclab-team sessions/session-plan/session-05-debate-prompt.md --mode panel
 
 # Explicit team name for tracking
-/rclab-team sessions/session-plan/session-05-debate-prompt.md --mode panel --team-name debate-qm-claims
+/rclab-team sessions/session-plan/session-05-debate-prompt.md --mode panel --team-name debate-core-claims
 
 # Dry run first to verify agent roster and task extraction
 /rclab-team sessions/session-plan/session-05-debate-prompt.md --mode panel --dry-run

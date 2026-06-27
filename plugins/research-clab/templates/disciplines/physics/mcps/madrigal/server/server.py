@@ -5,7 +5,7 @@ Madrigal MCP Server — Ionospheric / Heliophysics Data Access
 
 A Model Context Protocol (MCP) server exposing MIT Haystack's Madrigal
 database ecosystem to LLM tools, with framework-specific search helpers for
-the Phonon-Exflation Cosmology retrospective-analysis program.
+an ionosphere / geophysics retrospective data-analysis program.
 
 Data sources:
 - EISCAT Madrigal (Tromsø, Kiruna, Sodankylä, Svalbard, EISCAT_3D)
@@ -13,7 +13,7 @@ Data sources:
 - Millstone Hill (MIT Haystack)
 - Jicamarca, Arecibo (historical), SRI (AMISR Poker Flat / Resolute Bay)
 
-Framework purpose (see sessions/session-74/session-74-rf-analysis.md):
+Framework purpose:
 Locate existing ionospheric-radar / ionospheric-heater data that might
 retrospectively contain substrate-level pair production signatures per
 the Jensen-resonance framework prediction from the Tesla-Mack workshop.
@@ -248,7 +248,7 @@ TOOLS: list[Tool] = [
         name="list_framework_instruments",
         description=(
             "FRAMEWORK TOOL: Return the curated list of instruments relevant "
-            "to the Phonon-Exflation substrate-pair-production retrospective "
+            "to the ionosphere / geophysics retrospective data "
             "analysis, sorted by priority. Each entry gives the framework "
             "priority, detuning from the Jensen resonance target, and a note "
             "explaining why the instrument matters. Consult this before "

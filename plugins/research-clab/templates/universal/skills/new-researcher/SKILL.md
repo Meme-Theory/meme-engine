@@ -6,9 +6,9 @@ allowed-tools: [Read, Write, Edit, Glob, Grep, Bash, Agent, WebFetch, WebSearch]
 
 # New Researcher Skill
 
-You are the **Researcher Factory**. Your job is to create a domain agent and populate its research corpus: fetch papers via web-researcher, stamp the agent definition (optionally from an archetype template), and set up the memory scaffold.
+You are the **Researcher Factory**. Your job is to create a domain agent and populate its research corpus: fetch papers via scout, stamp the agent definition (optionally from an archetype template), and set up the memory scaffold.
 
-You do NOT index the papers -- the caller handles that separately via `/indexing`.
+You do NOT index the papers -- the caller handles that separately via `/librarian`.
 
 ## Arguments
 
@@ -17,17 +17,17 @@ The user invoked: `/new-researcher $ARGUMENTS`
 Parse `$ARGUMENTS` to extract:
 1. **Researcher/discipline spec** (required): Can be:
    - A real person: "Emmy Noether", "Edward Witten", "Lise Meitner"
-   - A discipline: "Neutrino Detection Specialist", "Lattice QCD Expert"
+   - A discipline: "Protein Folding Specialist", "Graph Theory Expert"
    - A hybrid: "Penrose-style twistor theorist", "Bohr complementarity analyst"
-   - **Multiple researchers**: "Landau and Connes", "Noether, Witten, Meitner" -- process EACH as a separate researcher (see Multi-Researcher Mode below)
-2. **--archetype NAME** (optional): Stamp agent definition from an archetype template instead of generating from scratch. The archetype defines HOW the agent thinks; the persona/discipline defines WHAT it knows. Valid names are the `.md` files in `.claude/agent-templates/` (without extension).
+   - **Multiple researchers**: "Turing and Lovelace", "Noether, Witten, Meitner" -- process EACH as a separate researcher (see Multi-Researcher Mode below)
+2. **--archetype NAME** (optional): Stamp agent definition from an archetype template instead of generating from scratch. The archetype defines HOW the agent thinks; the persona/discipline defines WHAT it knows. Valid names are the `.md` files in `.claude/templates/agent-templates/` (without extension).
 3. **--papers N** (optional, default 14): Number of papers to fetch
 4. **--color COLOR** (optional): Agent color for the UI. ONLY these 8 values are valid: red, blue, green, yellow, purple, orange, pink, cyan. Auto-assigned if omitted.
 
 If `$ARGUMENTS` is `--help`, show this usage summary and stop:
 ```
 /new-researcher "Emmy Noether"                          — fetch papers, create agent
-/new-researcher "Lattice QCD Expert" --archetype skeptic — archetype-stamped agent
+/new-researcher "Graph Theory Expert" --archetype skeptic — archetype-stamped agent
 /new-researcher "Noether, Witten" --papers 10           — multiple researchers
 /new-researcher "Penrose-style twistor theorist" --color teal
 ```
@@ -38,7 +38,7 @@ If `$ARGUMENTS` is blank, ask the user for a researcher/discipline.
 
 When multiple researchers are specified (detected by "and", commas, or multiple names):
 1. Parse into separate researcher specs (each inherits any shared flags like --papers)
-2. Run Steps 0-1 for ALL researchers in PARALLEL (one web-researcher per researcher)
+2. Run Steps 0-1 for ALL researchers in PARALLEL (one scout per researcher)
 3. Steps 2-4 (agent definitions, memory dirs, AGENTS.md) can also run in parallel
 4. Report all researchers in a combined final report
 
@@ -46,11 +46,11 @@ When multiple researchers are specified (detected by "and", commas, or multiple 
 
 Derive THREE names from the input:
 
-| Name | Format | Example (input: "Emmy Noether") | Example (input: "Neutrino Detection Specialist") |
+| Name | Format | Example (input: "Emmy Noether") | Example (input: "Protein Folding Specialist") |
 |:-----|:-------|:-------------------------------|:-----------------------------------------------|
-| **Display Name** | Human-readable | Emmy Noether | Neutrino Detection |
-| **Folder Name** | PascalCase, hyphen-separated | Noether | Neutrino-Detection |
-| **Agent Slug** | kebab-case with role suffix | noether-symmetry-theorist | neutrino-detection-specialist |
+| **Display Name** | Human-readable | Emmy Noether | Protein Folding |
+| **Folder Name** | PascalCase, hyphen-separated | Noether | Protein-Folding |
+| **Agent Slug** | kebab-case with role suffix | noether-symmetry-theorist | protein-folding-specialist |
 
 For real researchers, the **role suffix** should reflect their primary contribution (e.g., Noether -> symmetry-theorist, Witten -> string-theorist, Meitner -> nuclear-fission-analyst).
 
@@ -74,9 +74,9 @@ Before doing anything:
 2. Check if `.claude/agents/{slug}.md` already exists
 3. If EITHER exists, warn the user and ask whether to overwrite or abort
 
-## Step 1: Paper Research & Generation (DELEGATED to web-researcher)
+## Step 1: Paper Research & Generation (DELEGATED to scout)
 
-**DO NOT do this yourself.** Spawn a `web-researcher` agent (haiku model, fast and cheap) to handle the entire search + paper-writing pipeline.
+**DO NOT do this yourself.** Spawn a `scout` agent (haiku model, fast and cheap) to handle the entire search + paper-writing pipeline.
 
 First, read the project's root `CLAUDE.md` to extract:
 - **Project domain** (e.g., "computational biology", "algebraic topology")
@@ -87,7 +87,7 @@ For EACH researcher, use the Agent tool:
 
 ```
 Agent(
-  subagent_type: "web-researcher",
+  subagent_type: "scout",
   model: "haiku",
   mode: "bypassPermissions",
   description: "Fetch papers for {DisplayName}",
@@ -109,22 +109,22 @@ Agent(
 )
 ```
 
-**For multi-researcher mode**: spawn ALL web-researchers in a SINGLE message (parallel Agent calls). Then wait for all to complete before proceeding.
+**For multi-researcher mode**: spawn ALL scouts in a SINGLE message (parallel Agent calls). Then wait for all to complete before proceeding.
 
-**While web-researchers run**: proceed immediately to Steps 2-4 (agent definition, memory, AGENTS.md) since these don't depend on the papers being written.
+**While scouts run**: proceed immediately to Steps 2-4 (agent definition, memory, AGENTS.md) since these don't depend on the papers being written.
 
 ### Verification
 
-After the web-researcher completes, verify:
+After the scout completes, verify:
 - All N paper files exist in `researchers/{FolderName}/`
 - Each file is >= 100 lines (flag any that are thin)
 - No placeholder or TODO content
 
-If any papers are missing or thin, either re-run the web-researcher for specific papers or write them yourself.
+If any papers are missing or thin, either re-run the scout for specific papers or write them yourself.
 
 ## Step 1.5: Persona Research (if persona-based agent)
 
-**Skip this step if the input is a discipline spec** (e.g., "Neutrino Detection Specialist"). Only run it when the input names or references a REAL PERSON (e.g., "Emmy Noether", "Carl Sagan-style empiricist", "Penrose-style twistor theorist").
+**Skip this step if the input is a discipline spec** (e.g., "Protein Folding Specialist"). Only run it when the input names or references a REAL PERSON (e.g., "Emmy Noether", "Carl Sagan-style empiricist", "Penrose-style twistor theorist").
 
 Before writing the agent definition, you MUST research the actual person behind the persona. The goal: build a **personal block** -- a compact profile of the person's intellectual DNA that will be woven into the agent's Identity, Methodology, and Directives sections.
 
@@ -173,7 +173,7 @@ Run 2-3 searches. Prefer primary sources (interviews, autobiographies, obituarie
 
 Search for the archetype template in this order:
 1. `${CLAUDE_PLUGIN_ROOT}/templates/universal/agent-templates/{archetype}.md`
-2. `.claude/agent-templates/{archetype}.md`
+2. `.claude/templates/agent-templates/{archetype}.md`
 
 Read the template file. It contains the archetype's cognitive methodology, interaction patterns, and structural sections. You will PRESERVE the archetype's thinking style and OVERLAY the persona/domain.
 
@@ -332,20 +332,20 @@ Paper List:
   02. {title} ({year}) -- {reason}
   ...
 
-NOTE: Indexing not yet run. Invoke `/indexing {FolderName}` to build the paper index.
+NOTE: Indexing not yet run. Invoke `/librarian {FolderName}` to build the paper index.
 ```
 
 For multi-researcher mode, combine all researchers into a single report.
 
 ## Rules
 
-1. **Delegate paper fetching to web-researcher.** Do NOT write papers yourself or spawn opus agents for paper generation. The web-researcher (haiku) handles this faster and cheaper.
-2. **Papers must be substantive.** 150-400 lines each. Verify after web-researcher completes. Agents will READ these as their primary knowledge base. Thin papers = weak agents.
+1. **Delegate paper fetching to scout.** Do NOT write papers yourself or spawn opus agents for paper generation. The scout (haiku) handles this faster and cheaper.
+2. **Papers must be substantive.** 150-400 lines each. Verify after scout completes. Agents will READ these as their primary knowledge base. Thin papers = weak agents.
 3. **The agent definition description field controls routing.** Get it right. Test it mentally: "If a user asks about [topic], would this description cause the orchestrator to select this agent?"
 4. **Respect the existing ecosystem.** Don't duplicate coverage of an existing agent's domain. If overlap exists, make the new agent complementary, not redundant.
 5. **Connection to the project's research question is OPTIONAL per paper** but REQUIRED in the agent definition. Every agent should know how their domain connects to the project's central question.
 6. **Color assignment**: ONLY 8 valid values: red, blue, green, yellow, purple, orange, pink, cyan.
 7. **Windows cp1252 compatibility**: All generated content must use ASCII-safe characters. No unicode arrows, checkmarks, em dashes. Use `->`, `[OK]`, `--` instead.
-8. **Parallel where possible.** Multiple web-researchers run in parallel. Agent definitions can be written while papers are being fetched.
-9. **Do NOT invoke `/indexing`.** The caller is responsible for indexing after this skill completes. This skill creates the agent and its corpus; indexing is a separate step.
+8. **Parallel where possible.** Multiple scouts run in parallel. Agent definitions can be written while papers are being fetched.
+9. **Do NOT invoke `/librarian`.** The caller is responsible for indexing after this skill completes. This skill creates the agent and its corpus; indexing is a separate step.
 10. **When using `--archetype`, preserve the archetype's methodology.** The archetype defines HOW the agent thinks. The persona/discipline defines WHAT it knows. Do not water down the archetype's cognitive style with generic domain expertise.

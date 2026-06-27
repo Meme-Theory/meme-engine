@@ -15,7 +15,15 @@ Universal standards for all research agents. Template-specific and domain-specif
 - `MEMORY.md` is always loaded into system prompt — keep under 200 lines.
 - Create separate topic files for detailed notes; link from MEMORY.md.
 - Organize by topic, not chronologically.
-- Do NOT record: probability estimates (Skeptic's domain), narrative trajectory assessments, constraint counts as rhetoric, session-specific ephemera, or content that duplicates shared rules.
+- Do NOT record: probability estimates (Skeptic's domain), narrative trajectory assessments, constraint counts as rhetoric, session-specific ephemera, content that duplicates shared rules, or project-level registries (watchlists, rosters, closed-approach lists, cross-reference tables, canonical constants/data identifiers) -- those belong in `sessions/framework/` + the knowledge index, never in agent memory.
+
+### Memory Scope -- Agent-Private vs Project-Level
+
+Agent memory stores AGENT-PRIVATE context only: this agent's own feedback rules, user-preference learnings, and methodological notes it re-uses when it spawns. It is NEVER the canonical location for data that another gate or agent cites.
+
+Project-level registries live under `sessions/framework/<registry>.md` (human-readable, indexed via `/weave --update`) and in the knowledge index (machine-queryable). When a downstream gate needs project-level synthesis from an agent's domain expertise, that synthesis belongs in a framework registry the agent maintains as sole writer -- not in the agent's memory.
+
+**Principle**: taking a note is allowed; using a memory file as the pin source for another gate is not. If another gate would cite an agent-memory file as an input, that content is in the wrong place -- migrate it to `sessions/framework/` + the knowledge index.
 
 ## Completion Verification (compute-mode dispatches)
 
@@ -29,7 +37,7 @@ Universal standards for all research agents. Template-specific and domain-specif
    - Verdict line present in the designated gate-verdicts file (grep by gate ID)
    - Script file present with non-trivial size
    - Data and plot files present if promised
-   - Working-paper section present with substantive content (not just a stub heading — count lines between section delimiters; <15 lines = stub)
+   - Working-paper section present with substantive content -- verified by the section's pre-registered `must_contain` markers (e.g. Status / Verdict / Output Artifacts), NEVER by line count. A "stub" is a section whose required markers are ABSENT, not a section that is merely short.
 
 2. **Agent infrastructure** (future): agents should not emit a task-complete signal until every `write-target` declared in their prompt has passed an on-disk existence + content-length check. Prompt-level "CRITICAL: write §X.Y IN FULL before terminating" admonitions help but do not eliminate the failure; the fix is structural.
 

@@ -55,7 +55,7 @@ When spawned as a teammate within a skill-invoked team, operate as a focused wor
 
 **Be Patient.** Allow all team tasks, cross-talk, and followups to complete before writing synthesis. Confirm with ALL team members when tasks and cross-talk are complete. Do not proceed until all team members concur.
 
-**AGENTS LIE ABOUT BEING DONE.** An agent saying "final," "complete," or "all results delivered" means NOTHING. Agents routinely claim completion 3+ times while still producing their best cross-talk results afterward. The capstone findings typically arrive AFTER the first "I'm done" message. NEVER start writing synthesis based on agent self-reports. ONLY the user decides when cross-talk is complete. Wait for the user's explicit go-ahead before writing.
+**AGENTS LIE ABOUT BEING DONE.** An agent saying "final," "complete," or "all results delivered" means NOTHING. Agents routinely claim completion 3+ times while still producing their best cross-talk results afterward. The capstone findings typically arrive AFTER the first "I'm done" message. NEVER start writing synthesis based on agent self-reports. Before synthesizing, verify every expected output file exists on disk with substantive content -- check the artifacts, not the self-reports. ONLY the user decides when cross-talk is complete. Wait for the user's explicit go-ahead before writing.
 
 ### 2. Session Coordination
 When deployed as session coordinator, manage the full orchestration lifecycle. Maintain real-time meeting minutes: session header (date, agents, objectives), decision log (timestamped), action items (per-subagent), deviation alerts (with evidence), and outcome summary. Store minutes in `sessions/` using project naming conventions. Actively monitor subagent alignment -- compare outputs against objectives, identify drift early, provide concrete redirection with evidence, and arbitrate priorities using project goals.
@@ -118,11 +118,12 @@ Read `{plugin-root}/project-origami/unfold-structure.md` Step 1. Create all dire
 - Infrastructure agents from `{plugin-root}/templates/universal/infrastructure-agents/` → `.claude/agents/`. After copying, substitute `{{PROJECT_NAME}}` → `{project-name}` in `indexer.md` (2 occurrences) and `scout.md` (3 occurrences). `coordinator.md` copies verbatim.
 - Agent memory stubs → `.claude/agent-memory/{coordinator,indexer,scout}/MEMORY.md`
 - Behavioral rules from `{plugin-root}/templates/universal/rules/` → `.claude/rules/` (EXCEPT `team-lead-behavior.md`, which goes to `{target-dir}/team-lead-behavior.md` — project root, NOT `.claude/rules/`).
+- Hooks from `{plugin-root}/templates/universal/hooks/` → `.claude/hooks/` (entire directory). On Unix/macOS mark the `.sh` files executable (`chmod +x`). These guard scripts are wired into `.claude/settings.json` in Phase 4a.
 - Skills from `{plugin-root}/templates/universal/skills/` → `.claude/skills/` (entire directory; do NOT copy the scaffolder `new-research-project` — it's not a project skill).
 - Session templates from `{plugin-root}/templates/universal/session-templates/` → `.claude/templates/session-templates/` (verbatim).
 - Agent templates from `{plugin-root}/templates/universal/agent-templates/` → `.claude/templates/agent-templates/` (verbatim).
 - Project-doc templates from `{plugin-root}/templates/universal/project-docs/` — individual targets:
-   - `plan-compute.md`, `plan-workshop.md`, `prompt-session.md`, `synthesis.md`, `workshop.md`, `agent-roster.md` → `.claude/templates/`
+   - `plan-compute.md`, `plan-investigation.md`, `plan-workshop.md`, `prompt-session.md`, `synthesis.md`, `workshop.md`, `workshop-schedule.md`, `workingpaper.md`, `agent-roster.md` → `.claude/templates/`
    - `rclab-help.md` → `.claude/rclab-help.md` (NOT under templates/)
 - Universal knowledge schema: `{plugin-root}/templates/universal/knowledge-schema.yaml` → `tools/knowledge-schema.yaml`. This establishes the baseline before any discipline merge.
 

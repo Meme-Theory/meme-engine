@@ -15,7 +15,7 @@ This skill exists because agent-generated paper transcriptions frequently contai
 The user invoked: `/rebuild-library $ARGUMENTS`
 
 Parse `$ARGUMENTS` to extract:
-1. **Researcher folder** (required): The folder name under `researchers/` (e.g., `Baptista`, `Volovik`, `Einstein`)
+1. **Researcher folder** (required): The folder name under `researchers/` (e.g., `Turing`, `Lovelace`, `Hopper`)
 2. **--download-only** (optional): Only run Phase 1 (download PDFs), skip transcription
 3. **--transcribe-only** (optional): Only run Phase 2 (transcribe existing PDFs), skip download
 4. **--index-only** (optional): Only run Phase 3 (rebuild index from existing markdown files)
@@ -23,11 +23,11 @@ Parse `$ARGUMENTS` to extract:
 
 If `$ARGUMENTS` is `--help`, show usage and stop:
 ```
-/rebuild-library Baptista                     -- full rebuild (download + transcribe + index)
-/rebuild-library Volovik --download-only      -- just download PDFs to downloads/{folder}/
-/rebuild-library Baptista --transcribe-only   -- transcribe existing PDFs, skip download
-/rebuild-library Einstein --index-only        -- rebuild index from existing markdown
-/rebuild-library Baptista --batch-size 4      -- use 4 parallel agents per round
+/rebuild-library Turing                       -- full rebuild (download + transcribe + index)
+/rebuild-library Lovelace --download-only     -- just download PDFs to downloads/{folder}/
+/rebuild-library Turing --transcribe-only     -- transcribe existing PDFs, skip download
+/rebuild-library Hopper --index-only          -- rebuild index from existing markdown
+/rebuild-library Turing --batch-size 4        -- use 4 parallel agents per round
 ```
 
 If `$ARGUMENTS` is blank, ask the user for a researcher folder.
@@ -74,26 +74,26 @@ For papers without arXiv IDs, search using the MCP tools:
 
 **arXiv search** (CRITICAL SYNTAX -- field prefixes bind to ONE token only):
 ```
-WRONG: ti:dark matter annihilation        (only "dark" hits title field)
-WRONG: "Katherine Mack dark matter"       (natural language, returns garbage)
-RIGHT: au:Mack_Katherine AND ti:dark AND ti:matter
-RIGHT: au:Baptista AND ti:higher AND ti:dimensional AND ti:Standard AND ti:Model
+WRONG: ti:graph neural networks           (only "graph" hits title field)
+WRONG: "Geoffrey Hinton graph networks"   (natural language, returns garbage)
+RIGHT: au:Hinton_Geoffrey AND ti:graph AND ti:neural AND ti:networks
+RIGHT: au:Noether_Emmy AND ti:invariant AND ti:variational AND ti:problems
 ```
 
 Every keyword needs its own `ti:` prefix joined by AND. Author format: `au:LastName_FirstName`.
 
 **Google Scholar search** (natural language OK):
 ```
-search_google_scholar("Bourguignon Gauduchon spinors Dirac operators 1992")
+search_google_scholar("Turing computing machinery intelligence 1950")
 ```
 
 ### Step 1.4: Download all PDFs
 
 Create download directory: `downloads/{folder}/`
 
-For old-style arXiv IDs with slashes (e.g., `hep-th/0208001`), create subdirectories first:
+For old-style arXiv IDs with slashes (e.g., `math/0211159`), create subdirectories first:
 ```bash
-mkdir -p downloads/{folder}/hep-th downloads/{folder}/math-ph downloads/{folder}/math downloads/{folder}/gr-qc
+mkdir -p downloads/{folder}/math downloads/{folder}/cs downloads/{folder}/nlin downloads/{folder}/q-bio
 ```
 
 Then download in parallel batches of ~12:
@@ -204,7 +204,7 @@ For LOW papers: brief summary, ~0.5 pages.]
 
 ## Relevance to {{PROJECT_NAME}}
 
-[1-5 sentences connecting to the M4 x SU(3) framework.
+[1-5 sentences connecting to {{PROJECT_NAME}}'s central framework or research question.
 Be specific about which project results depend on this paper.]
 ```
 
@@ -275,7 +275,7 @@ Paper count: {old} -> {new}
 
 2. **arXiv search syntax is critical.** The `ti:` prefix binds to ONE token. Multi-word title searches MUST use `ti:word1 AND ti:word2 AND ti:word3`. See Step 1.3. Getting this wrong returns garbage (latest papers instead of targeted results).
 
-3. **Old-style arXiv IDs have slashes.** IDs like `hep-th/0208001` create subdirectories when downloaded. Pre-create the subdirs (`hep-th/`, `math-ph/`, `math/`, `gr-qc/`, etc.) before downloading.
+3. **Old-style arXiv IDs have slashes.** IDs like `math/0211159` create subdirectories when downloaded. Pre-create the subdirs (`math/`, `cs/`, `nlin/`, `q-bio/`, etc.) before downloading.
 
 4. **Max 3-4 agents per parallel batch.** More causes notification avalanche. Each agent handles 6-10 papers.
 

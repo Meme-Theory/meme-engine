@@ -29,6 +29,8 @@ Copy each rule file from `${CLAUDE_PLUGIN_ROOT}/templates/universal/rules/` into
 | `session-handoffs.md` | `.claude/rules/session-handoffs.md` | Handoff document structure, chronological integrity, recommendation carry-forward |
 | `agent-standards.md` | `.claude/rules/agent-standards.md` | Formal rigor, dimensional consistency, persistent memory guidelines |
 | `evoi-prioritization.md` | `.claude/rules/evoi-prioritization.md` | EVOI computation priority, evidence weighting, effort-based probability tracking |
+| `joint-theorem-promotion.md` | `.claude/rules/joint-theorem-promotion.md` | Independent cross-axis verification: agreement counts only when reviewers are independent |
+| `Investigating-Workshops.md` | `.claude/rules/Investigating-Workshops.md` | Distinguishes a real workshop from a deferred carry-forward; honest-count discipline |
 
 These files are copied verbatim — no substitutions needed.
 

@@ -43,9 +43,17 @@
 
 ---
 
-## V. Forward Projection
+## V. Carry-Forward Computations
 
-{Specific next computations. Which gates are now decisive. What the results enable or block.}
+**MANDATORY -- this section is the PRIMARY input to the next session's planning. Narrative recommendations ("further work needed") are NOT acceptable.** Produce a numbered list. EACH entry (V.1, V.2, ...) has all four fields:
+
+V.N. <one-line title>
+- **What**: specific computation (equation, method, output variable)
+- **Inputs**: data / constants / files needed to run (cite project constants or data identifiers where applicable)
+- **Gate**: which pre-registered gate it feeds, or the new gate ID it creates, with PASS / FAIL / INFO thresholds
+- **Effort**: hours or agent-session count (e.g., "2-3 hours, 1 agent session")
+
+At minimum: one entry per finding / eliminated approach / untested adjacency identified in Sections II-IV. An entry without all four fields fails the synthesis contract.
 
 ---
 

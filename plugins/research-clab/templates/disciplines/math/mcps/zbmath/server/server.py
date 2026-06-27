@@ -28,7 +28,7 @@ from mcp.server import Server
 
 SERVER_DIR = Path(__file__).resolve().parent
 ZBMATH_BASE = "https://api.zbmath.org/v1"
-USER_AGENT = "Ainulindale-Exflation/zbMATH-MCP (math-research)"
+USER_AGENT = "research-clab/zbMATH-MCP (academic research)"
 HTTP_TIMEOUT = 25.0
 
 logging.basicConfig(

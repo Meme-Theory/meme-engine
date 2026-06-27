@@ -4,7 +4,7 @@
 **Task**: Create domain agents and fetch their research papers.
 **Inputs**: Researcher queue from coordinator (see `sessions/session-plan/researcher-queue.md`).
 **Depends on**: `unfold-agents.md` must complete first (coordinator writes the researcher queue).
-**Mechanism**: `/new-researcher` skill (which internally delegates to web-researcher for paper fetching).
+**Mechanism**: `/new-researcher` skill (which internally delegates to scout for paper fetching).
 
 ---
 
@@ -39,6 +39,8 @@ Read `sessions/session-plan/researcher-queue.md` (created by the coordinator dur
 
 ## Step 2: Invoke `/new-researcher` for Each Entry
 
+> **Agent refresh first.** Before the first `/new-researcher` (which spawns `scout` by `subagent_type`), the main orchestrator runs the agent-refresh gate (SKILL.md Phase 11): the user passes `\` to register the infrastructure agents written at scaffold. `scout` must be registered or the spawn fails.
+
 For each row in the queue:
 
 ```
@@ -46,20 +48,22 @@ For each row in the queue:
 ```
 
 This creates:
-1. Research papers in `researchers/{FolderName}/` (via web-researcher)
+1. Research papers in `researchers/{FolderName}/` (via scout)
 2. Agent definition at `.claude/agents/{slug}.md` (stamped from archetype template)
 3. Agent memory directory at `.claude/agent-memory/{slug}/`
 4. AGENTS.md in the researcher folder
 
 ### Sequencing
 
-- Process entries ONE AT A TIME (each `/new-researcher` invocation spawns a web-researcher)
+- Process entries ONE AT A TIME (each `/new-researcher` invocation spawns a scout)
 - Wait for each to complete before starting the next
 - If one fails, report the failure and continue to the next entry
 
 ---
 
 ## Step 3: Index Each Researcher Folder
+
+> **Agent refresh again.** Before `/librarian` (which spawns each new domain agent by `subagent_type` to index its corpus), the main orchestrator runs the second agent-refresh gate (SKILL.md Phase 11) so the just-created domain agents are registered.
 
 After ALL `/new-researcher` invocations complete, invoke `/librarian` on each researcher folder:
 
@@ -107,7 +111,7 @@ Update `agents.md` at project root -- replace the "Queued" placeholders from the
 
 ## What You Do NOT Do
 
-- **Do NOT fetch papers yourself** -- `/new-researcher` delegates to web-researcher
+- **Do NOT fetch papers yourself** -- `/new-researcher` delegates to scout
 - **Do NOT create agent definitions yourself** -- `/new-researcher` handles this
 - **Do NOT modify the researcher queue** -- the coordinator wrote it, you execute it
 - **Do NOT skip entries** -- process every row, report failures

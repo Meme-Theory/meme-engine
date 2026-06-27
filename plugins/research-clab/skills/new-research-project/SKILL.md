@@ -50,6 +50,7 @@ templates/universal/mcps/
 templates/universal/skills/
 templates/universal/claude-md/
 templates/universal/rules/
+templates/universal/hooks/
 templates/universal/infrastructure-agents/
 templates/universal/knowledge-schema.yaml
 templates/disciplines/
@@ -279,6 +280,28 @@ Rules:
 
 ---
 
+## Phase 7d: MCP Reset Gate (turn boundary)
+
+**Run ONLY if one or more MCP servers were installed in Phase 7b.** If the user picked "None" for MCPs, skip this phase entirely.
+
+Newly written `.mcp.json` entries are NOT live in the current session — Claude Code loads MCP servers at session start. The researcher phase (scout using `paper-search`) and the user's first real session need them active, so reload now.
+
+This is a turn-boundary gate, exactly like the Phase 0 "go": print the block as plain text and **STOP**. Do NOT proceed to Phase 8 until the user replies.
+
+```
+=== MCP RESET REQUIRED ===
+
+Installed MCP servers: {list}. They are configured in .mcp.json but are not yet
+loaded in this session.
+
+  1. Pass  \  to reset/reload the MCP servers.
+  2. Then type 'go' to continue.
+```
+
+If the user chose "Defer" or "Skip" in Phase 7c (deps not installed), note it in the block: the servers cannot start until their Python deps are installed (`pip install -r requirements-mcp.txt`), so they should install first, then `\`, then `go` — or skip the reset for now and reload later. Wait for the user's reply; their reply is the turn boundary. Then continue to Phase 8.
+
+---
+
 ## Phase 8: Interactive Agent Selection
 
 **READ**: `${CLAUDE_PLUGIN_ROOT}/project-origami/unfold-agents.md` — follow its 5 steps.
@@ -423,8 +446,9 @@ Run through this checklist. Every item must pass:
 - [ ] All directories from Phase 2 exist
 - [ ] 3 infrastructure agents in `.claude/agents/`
 - [ ] 3 agent memory directories with MEMORY.md files
-- [ ] Every file in `templates/universal/rules/` landed in `.claude/rules/` (minus `team-lead-behavior.md`, which goes to project root); plus any additions or overrides supplied by the selected discipline pack. Expect ≥8 files for "none"; more if a pack added rules.
-- [ ] Every subdirectory in `templates/universal/skills/` copied into `.claude/skills/` (each with a `SKILL.md` or `skill.md`); plus any discipline pack skills. Expect ≥14 for "none".
+- [ ] Every file in `templates/universal/rules/` landed in `.claude/rules/` (minus `team-lead-behavior.md`, which goes to project root); plus any additions or overrides supplied by the selected discipline pack. Expect ≥9 files for "none"; more if a pack added rules.
+- [ ] Every subdirectory in `templates/universal/skills/` copied into `.claude/skills/` (each with a `SKILL.md` or `skill.md`); plus any discipline pack skills. Expect ≥17 for "none".
+- [ ] Every file in `templates/universal/hooks/` copied into `.claude/hooks/`, and `.claude/settings.json` references them by path
 - [ ] Every file in `templates/universal/session-templates/` copied into `.claude/templates/session-templates/` (expect ≥11 format letter files plus `00-infrastructure.md` and `supporting-documents.md`; exact count tracks the source directory)
 - [ ] Every file in `templates/universal/agent-templates/` copied into `.claude/templates/agent-templates/` (expect ≥10: skeptic, calculator, workhorse, principalist, dreamer, boundary-guard, observer, bridge, formatter, generalist)
 - [ ] `.claude/templates/agent-roster.md` exists with agent name-to-type mapping
@@ -435,7 +459,7 @@ Run through this checklist. Every item must pass:
 - [ ] `sessions/session-plan/format-selection-guide.md` exists
 - [ ] `sessions/framework/constraint-methodology.md` exists
 - [ ] `sessions/framework/handoff-template.md` exists
-- [ ] `tools/knowledge-schema.yaml` has 9+ universal entity types + domain type
+- [ ] `tools/knowledge-schema.yaml` has the 5 universal entity types (sessions, researchers, results, references, open_questions), plus any discipline-pack types if a pack was selected
 - [ ] `tools/knowledge-index.json` is valid JSON with empty arrays
 - [ ] Coordinator MEMORY.md has methodology section AND team protocol section
 - [ ] Indexer MEMORY.md has knowledge maintenance protocol
@@ -464,8 +488,8 @@ Print completion summary using the insight block format. The content inside must
 
   Structure:
     .claude/agents/ ............ 3 infrastructure + {N} domain (queued)
-    .claude/skills/ ............ 11 skills installed
-    .claude/rules/ ............. 8 behavioral rules
+    .claude/skills/ ............ 17 skills installed
+    .claude/rules/ ............. 9 behavioral rules
     sessions/ .................. Session 0 prompt ready
     tools/ ..................... Knowledge schema initialized
 
@@ -489,16 +513,40 @@ Ask via AskUserQuestion: "Create domain agents now, or defer to later?"
 
 **READ**: `${CLAUDE_PLUGIN_ROOT}/project-origami/unfold-papers.md` for the full processing protocol.
 
-For each row in `researcher-queue.md`, sequentially invoke:
+**Agent refresh gate (turn boundary) — before spawning named agents.** The infrastructure agents (coordinator/indexer/scout) are on disk in `.claude/agents/` but are NOT registered in this session until Claude Code reloads agents. `/new-researcher` spawns `scout` by `subagent_type`, so it must be registered first. Same pattern as the Phase 0 "go": print the block as plain text and **STOP** — do not invoke `/new-researcher` until the user replies.
+
+```
+=== AGENT REFRESH REQUIRED ===
+
+The infrastructure agents (coordinator, indexer, scout) are written to disk but
+not yet registered in this session — /new-researcher needs `scout` registered.
+
+  1. Pass  \  to refresh agents.
+  2. Then type 'go' — I'll process the researcher queue.
+```
+
+After the user confirms, for each row in `researcher-queue.md`, sequentially invoke:
 ```
 /new-researcher "{Persona Spec}" --archetype {archetype} --papers {N} --color {color}
 ```
 
-- Process ONE AT A TIME — each `/new-researcher` spawns a web-researcher agent.
+- Process ONE AT A TIME — each `/new-researcher` spawns the `scout` agent to fetch papers.
 - Wait for each to complete before starting the next.
 - If one fails, report the failure and continue to the next entry.
 
-After ALL `/new-researcher` invocations complete:
+**Second agent refresh gate (turn boundary) — before `/librarian`.** The `/new-researcher` invocations just wrote new domain-agent definitions to `.claude/agents/`. `/librarian {FolderName}` spawns each domain agent by `subagent_type` to index its own corpus, so the new agents must be registered. Print and **STOP**:
+
+```
+=== AGENT REFRESH REQUIRED ===
+
+{N} new domain agents were created: {slugs}. They must be registered before
+/librarian can spawn them to index their corpora.
+
+  1. Pass  \  to refresh agents.
+  2. Then type 'go' — I'll run /librarian for each researcher.
+```
+
+After the user confirms:
 1. Invoke `/librarian {FolderName}` for each created researcher folder (sequential — each creates a team).
 2. Create or update `researchers/index.md` with a cross-domain table.
 3. **Use Edit (not Write)** on `agents.md` — replace "Queued" status entries with actual agent names and roles.
@@ -523,7 +571,7 @@ If `--dry-run` is in `$ARGUMENTS`, run in report-only mode:
    - Rules that would land in `.claude/rules/` (universal + discipline overlay, with override annotations)
    - Skills that would be copied (universal + any discipline skills)
    - MCP menu that WOULD be presented (scan universal + discipline MCPs dirs)
-   - LaTeX template count that would install (13 .tex + 1 .bib if Q4=LaTeX)
+   - LaTeX template count that would install (14 .tex + 1 .bib if Q4=LaTeX)
    - Agent roster with personas
 6. **Exit cleanly** with a message: "Dry run complete. Re-invoke without --dry-run to actually scaffold."
 

@@ -3,7 +3,7 @@
 **Target agent**: Coordinator
 **Task**: Configure the session architecture, handoff protocol, and constraint methodology.
 **Inputs**: Project name, domain.
-**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/universal/session-templates/`, `${CLAUDE_PLUGIN_ROOT}/METHODOLOGY.md` (reference)
+**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/universal/session-templates/` (the methodology content this doc generates is inline below)
 
 ---
 

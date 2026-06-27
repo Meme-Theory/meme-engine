@@ -23,10 +23,10 @@ For 2-agent iterative workshops on a shared document, use `/rclab-workshop`.
 /rclab-review session-63-W6*.md --agents <domain-generalist>
 
 # Three agents each independently write a report
-/rclab-review session-63*.md --agents hawking,landau,volovik --session 63
+/rclab-review session-63*.md --agents skeptic,calculator,workhorse-1 --session 63
 
 # With focus topics
-/rclab-review session-74*.md --agents qa,connes --context CC closure, GL stability
+/rclab-review session-74*.md --agents observer,bridge --context core claims, robustness
 ```
 
 ---

@@ -7,7 +7,9 @@
 ```json
 {
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "BASH_DEFAULT_TIMEOUT_MS": "180000",
+    "BASH_MAX_TIMEOUT_MS": "300000"
   },
   "effortLevel": "xhigh",
   "permissions": {
@@ -40,10 +42,38 @@
   "hooks": {
     "SessionStart": [
       {
+        "matcher": "startup|resume|clear|compact",
         "hooks": [
           {
             "type": "command",
             "command": "echo '{\"systemMessage\":\"effort: MAX (session-start hook)\",\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"EFFORT LEVEL: MAX. Every task in this session is non-trivial. Do not self-limit thinking. Research/audit/orchestration work = MAX reasoning.\"}}'",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/SESSION-START-DIRECTIVE.sh\"",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/rules-folder-subagent-block.sh\"",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/mcp-pre-check.sh\"",
             "timeout": 5000
           }
         ]
@@ -55,7 +85,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [[ \"$FILE_PATH\" == */sessions/*.md ]]; then echo \"[weave] Session file modified — run /weave --update to rebuild knowledge index\"; fi'",
+            "command": "bash -c 'if [[ \"$FILE_PATH\" == */sessions/*.md ]]; then echo \"[weave] Session file modified -- run /weave --update to rebuild knowledge index\"; fi'",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/SUBAGENT-START-DIRECTIVE.sh\"",
             "timeout": 5000
           }
         ]
@@ -65,6 +106,15 @@
   "outputStyle": "Explanatory"
 }
 ```
+
+## Environment
+
+| Key | Value | Purpose |
+|:--|:--|:--|
+| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | `"1"` | Enables the multi-agent team features the framework is built on. |
+| `BASH_DEFAULT_TIMEOUT_MS` | `"180000"` | Default Bash timeout (3 min) -- long-compute default for research runs. |
+| `BASH_MAX_TIMEOUT_MS` | `"300000"` | Max Bash timeout (5 min) the model may request for a single command. |
+| `effortLevel` (top-level) | `"xhigh"` | Maximum reasoning budget for inherently non-trivial orchestration/audit work. |
 
 ## Permission Design
 
@@ -94,8 +144,16 @@ IMPORTANT: These deny rules protect against accidental credential exposure. They
 
 ### Hooks
 
-- **`SessionStart`** — injects an "effort: MAX" directive into every session. Research-clab projects are inherently non-trivial (orchestration, audit, multi-agent reasoning); this hook prevents the harness from self-limiting depth of thinking at session open. Combined with the top-level `"effortLevel": "xhigh"` setting, it double-belts the reasoning budget.
-- **`PostToolUse`** — fires after any Edit or Write to a session file, reminding the user to rebuild the knowledge index. This is a reminder, not an enforced action.
+The unfold step deploys the scripts in `templates/universal/hooks/` to
+`project-root/.claude/hooks/` and wires them here. All run on bare `python`
+(stdlib only) -- no virtualenv required. Each is invoked via a project-relative
+path (`bash ".claude/hooks/<name>.sh"`), so the deployed project stays portable.
+
+- **`SessionStart`** (matcher `startup|resume|clear|compact`) -- two hooks: an inline "effort: MAX" directive (belt-and-suspenders with `effortLevel: "xhigh"`), and `SESSION-START-DIRECTIVE.sh`, which reminds that a compact/resume starts a fresh context -- read the latest handoff on disk rather than trusting recall.
+- **`PreToolUse`** (matcher `Edit|Write|MultiEdit`) -- `rules-folder-subagent-block.sh` HARD-denies subagent edits to `.claude/rules/` (rule files are directive-only; corpus content belongs in the knowledge corpus). The orchestrator is unaffected.
+- **`PreToolUse`** (matcher `mcp__.*`) -- `mcp-pre-check.sh` injects a per-server just-in-time brief (knowledge: query-first; paper-search: arXiv API syntax). Discipline packs add their own server arms at the marked extension point.
+- **`PostToolUse`** (matcher `Edit|Write`) -- reminds you to run `/weave --update` after editing a session file. A reminder, not an enforced action.
+- **`SubagentStart`** -- `SUBAGENT-START-DIRECTIVE.sh` briefs each spawned subagent to read its spawn prompt + cited files and to verify promised artifacts on disk by content (not line count) before reporting done.
 
 ## Personal Overrides
 

@@ -29,7 +29,7 @@ from mcp.server import Server
 
 SERVER_DIR = Path(__file__).resolve().parent
 OEIS_BASE = "https://oeis.org"
-USER_AGENT = "Ainulindale-Exflation/OEIS-MCP (math-research; contact via project)"
+USER_AGENT = "research-clab/OEIS-MCP (academic research)"
 HTTP_TIMEOUT = 20.0
 
 logging.basicConfig(

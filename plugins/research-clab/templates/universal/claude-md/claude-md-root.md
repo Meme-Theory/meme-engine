@@ -118,6 +118,15 @@ Never put shared project rules in `CLAUDE.local.md`.
 - Follow `.claude/skills/rclab-*` skill directions when invoked.
 - Be shutdown-adverse: the user decides when the team stops.
 
+## No Technical Debt
+
+At wave close (`/rclab-coordinate`, `/rclab-solo`) and at workshop wrap-up (`/rclab-workshop`), the orchestrator splits everything the wave surfaced by a 4-field test -- **What / Inputs / Gate / Effort**:
+
+- Items satisfying ALL FOUR fields are GENUINE FUTURE COMPUTATION -> they propagate forward as carry-forwards.
+- Everything else is NON-MATH (registry/status edits, rule-file extensions, knowledge-index registrations, documentation hygiene, cross-link fixes, framework housekeeping, audit-script extensions) -> it is EXECUTED NOW, in-session, with concrete file edits, BEFORE the wave/workshop is declared closed.
+
+Deferring a non-math item to "next session" is FORBIDDEN -- deferred hygiene/registry/rule edits become orphans. The self-audit is mechanical: `grep -c '^- \[ \]'` on the "Effected In-Session" sub-section must return 0 before close. Carry-forwards are reserved for new computation with a pre-registered threshold; they are never a parking lot for cleanups the orchestrator could do now.
+
 ## Output File Discipline
 
 - Only ONE agent writes the output file per round (designated in the prompt).

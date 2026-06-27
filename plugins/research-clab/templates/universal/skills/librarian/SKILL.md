@@ -17,14 +17,14 @@ Parse `$ARGUMENTS` to extract:
 - **`<folder>`**: index the entire folder with auto-detected groupings
 - **`<folder> <qualifier1> [qualifier2] ...`**: index ONLY files matching the given qualifiers
   - Qualifiers match by case-insensitive substring against filenames
-  - E.g., `/librarian Baptista 13-18` processes only papers 13 through 18 (interpret numerically if a range)
+  - E.g., `/librarian Lovelace 13-18` processes only papers 13 through 18 (interpret numerically if a range)
   - If `index.md` already exists, MERGE results into it (update/add only the affected sections)
 
 If `$ARGUMENTS` is `--help`, show this usage summary and stop:
 ```
 /librarian                              -- list all indexable folders and status
-/librarian Baptista                     -- index all papers in researchers/Baptista/
-/librarian Baptista 13-18               -- index only papers 13-18 (merge into existing index)
+/librarian Lovelace                     -- index all papers in researchers/Lovelace/
+/librarian Lovelace 13-18               -- index only papers 13-18 (merge into existing index)
 /librarian meeting-minutes session-16   -- index files matching "session-16"
 /librarian tier0-computation            -- index tier0 scripts and data
 ```
@@ -70,7 +70,7 @@ Scan the (filtered) filenames to identify **natural groups** of 3-7 files each. 
 
 **Mode A grouping** (researcher papers):
 - Group by natural clusters in filename numbering, topic, or era
-- E.g., Baptista: Group 1 = "Papers 01-06 (vortex foundations)", Group 2 = "Papers 07-12 (advanced vortices)", Group 3 = "Papers 13-18 (KK/SM geometry)"
+- E.g., Lovelace: Group 1 = "Papers 01-06 (foundational results)", Group 2 = "Papers 07-12 (core methods)", Group 3 = "Papers 13-18 (advanced applications)"
 - Target: 2-5 groups of 3-7 papers each
 
 **Mode B grouping** (general folders):
@@ -88,7 +88,7 @@ Match the folder name to an agent in `.claude/agents/` by case-insensitive subst
 1. Scan all `.claude/agents/*.md` filenames
 2. Find agents whose filename contains the folder name (case-insensitive)
 3. If exactly ONE match: use that agent type
-4. If ZERO matches: use `gen-physicist` as fallback, or ask the user
+4. If ZERO matches: use `coordinator` as fallback, or ask the user
 5. If MULTIPLE matches: show candidates and ask the user to pick
 
 Mode B always uses `coordinator`.
@@ -135,7 +135,7 @@ Read ALL of the following files (actually read them -- full content, not just fi
 <paste the group list from Step 1c>
 
 **Also read for format reference:**
-- `researchers/Baptista/index.md` (first 100 lines -- see the structure to follow)
+- `researchers/Lovelace/index.md` (first 100 lines -- see the structure to follow)
 - Your agent memory: `.claude/agent-memory/<agent-slug>/MEMORY.md` (if it exists)
 
 ## Your Task
@@ -211,12 +211,12 @@ Papers: NN, NN
 ## Cross-Paper Equation Concordance
 
 <equations or quantities referenced across multiple papers>
-<e.g., "The primary operator X appears in Papers 03, 07, 12 with different conventions...">
+<e.g., "The primary quantity X appears in Papers 03, 07, 12 with different conventions...">
 
 ## Notation Conventions
 
 <common notation used across the paper collection>
-<e.g., "τ = deformation parameter", "X = key operator defined in Paper 03">
+<e.g., "τ = primary parameter", "X = key quantity defined in Paper 03">
 
 ## Computational Verification Status
 
@@ -390,7 +390,7 @@ Index:     <name>/index.md (<line count> lines)
 
 - The agent reads the files, NOT you. Your job is discovery (Step 1) and verification (Step 3).
 - Never overwrite an existing index.md without user confirmation (unless merging with qualifiers).
-- If zero agents match in Mode A, use `gen-physicist` or ask the user. Mode B always uses `coordinator`.
+- If zero agents match in Mode A, use `coordinator` or ask the user. Mode B always uses `coordinator`.
 - The AGENTS.md file is generic and identical across all researcher folders.
 - The agent must ACTUALLY READ every file -- no guessing from filenames.
 - When merging into an existing index, preserve all unaffected entries.

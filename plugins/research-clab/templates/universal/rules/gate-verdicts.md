@@ -50,3 +50,14 @@ Discipline packs may add fields (e.g., closure SHA for compute-gate reproducibil
 - INCONCLUSIVE is a legitimate outcome (script crashed, proof blocked on an unscoped lemma, observation too noisy) — do not flatten it to FAIL
 - Only the Skeptic evaluates whether a verdict is *meaningful* for the framework (a PASS against a trivial criterion is not evidence)
 - Record verdicts in the session file AND update the knowledge index via `/weave --update`
+
+## Gate Integrity -- Prohibited Actions
+
+A pre-registered gate can be cheated. The following four actions are FORBIDDEN at every stage of a gate's life -- each manufactures a PASS the criterion did not earn, and each corrupts the verdict record for everyone downstream:
+
+1. **Convention-shopping** -- changing a gate's convention, scheme, or threshold to reach PASS. The criterion is fixed at pre-registration; re-running under a different convention is a NEW gate, not a recovery of this one.
+2. **Iterate-until-PASS** -- re-running the same gate with different seeds, scan ranges, or tolerances until one run lands above threshold. The first pre-registered run is the verdict; cherry-picking a favorable run from repeated trials is not.
+3. **Post-hoc pre-registration editing** -- editing the pass threshold, pass band, or tolerance rule AFTER seeing the computed value. Edits to a plan after a verdict is recorded are documentation-only and MUST be logged with a `post-hoc:` prefix; they never change the verdict.
+4. **Ansatz-forced PASS** -- manually editing a verdict line to read PASS without re-running the producing work. The verdict record is write-once per gate; the only way to change an outcome is to redo the work and record a new line.
+
+Items 3 and 4 are absolute for any pre-registered gate (compute, proof, empirical, benchmark). Items 1 and 2 generalize as: do not change the criterion to pass, and do not retry until the answer is favorable. If a proposed remediation would require any of these four, it is not a remediation -- stop and report the gate as it stands.

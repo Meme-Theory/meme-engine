@@ -59,7 +59,7 @@ See `.claude/rules/gate-verdicts.md` for the full pre-registration + verdict pro
 - **One script per computation** — avoid monolithic scripts that do everything
 - **Document inputs and outputs** — header comment or docstring in every script
 - **Deterministic where possible** — set random seeds, document non-deterministic steps
-- **Output files named descriptively** — `bcs_coupling.png` not `output_3.png`
+- **Output files named descriptively** — `convergence_curve.png` not `output_3.png`
 
 ## Python Execution
 

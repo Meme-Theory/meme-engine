@@ -6,6 +6,8 @@ The knowledge database is the project's institutional memory — a structured, q
 
 **What this replaces**: The 2,296-line `extract_entities.py` with 100+ hardcoded physics regex patterns. The schema-driven approach eliminates the need for domain-specific extraction scripts. Python tools (`knowledge_db.py`, `visualize_knowledge.py`) remain as optional accelerators for large projects.
 
+> **Canonical universal baseline -- read this first.** The authoritative, shipped universal schema is `templates/universal/knowledge-schema.yaml`, which defines exactly **5 discipline-agnostic entity types**: `sessions`, `researchers`, `results`, `references`, `open_questions` (every type requires `id`, `session`, `source_file`). The detailed `entity_types:` example later in this document (with `constraints`, `gates`, `proven_results`, `closed_approaches`, `active_channels`, `confidence_trajectory`, ...) is an ILLUSTRATIVE physics-style schema showing how a discipline pack EXTENDS the baseline -- it is NOT the universal set. When the two disagree, the YAML file wins. This document is a plugin-side dev explainer; it is NOT shipped into scaffolded projects.
+
 ---
 
 ## 1. Architecture
@@ -505,7 +507,7 @@ Add domain-specific constraint category prefixes:
 
 | Domain | Added Categories |
 |:-------|:----------------|
-| **Theoretical Physics** | `P` (Perturbative), `B` (BCS/Condensate), `T` (Topological), `N` (NCG Axiom) |
+| **Theoretical Physics** | `P` (Perturbative), `B` (Condensate), `T` (Topological), `N` (Axiomatic) |
 | **Machine Learning** | `A` (Architectural), `C` (Convergence), `G` (Generalization), `E` (Efficiency) |
 | **Drug Discovery** | `B` (Binding), `T` (Toxicity), `PK` (Pharmacokinetic), `SY` (Synthesis) |
 | **Software Architecture** | `P` (Performance), `SC` (Scalability), `SE` (Security), `C` (Compatibility) |
@@ -607,7 +609,7 @@ The indexer reads session artifacts in this order. Higher-priority sources overr
 
 | Priority | Source Pattern | What It Contains |
 |:---------|:-------------|:-----------------|
-| 1 (highest) | `*sagan-verdict*` / `*skeptic-verdict*` | Confidence trajectory, gate verdicts |
+| 1 (highest) | `*skeptic-verdict*` | Confidence trajectory, gate verdicts |
 | 2 | `*synthesis*` | Session outcomes, closed approaches, active channels |
 | 3 | `*gate_verdicts*` | Gate pass/fail/closed classifications |
 | 4 | `session*.md` | Session minutes, agent reports, decisions |

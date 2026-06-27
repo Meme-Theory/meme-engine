@@ -1,5 +1,20 @@
 # Compute Plan Template
 
+## Plan Shapes
+
+A compute plan comes in one of two shapes; pick the shape at plan time:
+
+| Shape | One file per | When to use |
+|:------|:-------------|:------------|
+| Consolidated (default) | session -- `session-{N}-plan.md` | small sessions (few waves, modest aggregate working-paper size); everything in one file |
+| Fanout | wave -- `session-{N}-plan-w{i}.md`, plus a thin `session-{N}-plan-index.md` | larger sessions; per-wave files keep each plan small and let waves be dispatched independently |
+
+Both shapes use the SAME per-gate block (Section III below). Consolidated puts every wave in one file. Fanout splits each wave into its own `session-{N}-plan-w{i}.md` and adds a thin `session-{N}-plan-index.md` that lists the waves and points at the per-wave plans. Default to Consolidated; switch to Fanout when a single plan file (and its one shared working paper) would grow large enough that agents appending to it would collide.
+
+## Consolidated Session Plan (default)
+
+The template body below is the consolidated shape -- all waves in one file.
+
 ```markdown
 # Session {N} Plan: {Topic Title}
 
@@ -81,4 +96,20 @@ Wave 3 (depends on Wave 1 results):
 - Script prefix: `s{N}_`
 - Each agent writes results ONLY to their designated section in the working paper
 - No TeamCreate — all agents are independent Agent tool calls
+```
+
+## Plan-Index File (fanout only)
+
+In fanout mode, each wave is its own `session-{N}-plan-w{i}.md` (the same per-gate structure as Section III above, scoped to one wave's tasks), and a thin index ties them together:
+
+```markdown
+# Session {N} -- Plan Index (fanout)
+
+| Wave | Theme | Owner agent | Gates | Plan file |
+|:----:|:------|:------------|:-----:|:----------|
+| 1 | {theme} | {owner-agent} | {count} | session-{N}-plan-w1.md |
+| 2 | ... | ... | ... | session-{N}-plan-w2.md |
+
+Each per-wave plan is independently dispatchable: `/rclab-coordinate session-{N}-plan-w{i}.md`.
+Full session: `/rclab-coordinate session-{N}-plan-index.md`.
 ```

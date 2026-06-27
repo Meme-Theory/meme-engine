@@ -2,7 +2,7 @@
 
 **Target agent**: Coordinator (reference doc — not a task, used during agent stamping)
 **Task**: Reference specification for the exact format of agent definition files.
-**Reads from**: `${CLAUDE_PLUGIN_ROOT}/AGENT-DEFINITION-PATTERNS.md`, `${CLAUDE_PLUGIN_ROOT}/CANONICAL-AGENT-FORMAT.md` (originals)
+**Reads from**: self-contained — the canonical agent format is defined inline in this doc; archetype bodies live in `${CLAUDE_PLUGIN_ROOT}/templates/universal/agent-templates/`
 
 ---
 

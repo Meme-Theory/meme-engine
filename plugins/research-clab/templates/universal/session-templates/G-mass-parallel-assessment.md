@@ -10,13 +10,13 @@ Mass parallel assessment IS what `/rclab-review` was built for:
 
 ```bash
 # Full roster — all 17 agents review independently, then auto-synthesize
-/rclab-review sessions/session-19/session-19d-casimir-energy.md
+/rclab-review sessions/session-19/session-19d-key-result.md
 
 # Targeted review — 6 agents most relevant to the topic
-/rclab-review sessions/session-19/session-19d-casimir-energy.md --agents principalist,boundary-guard,dreamer,workhorse-1,workhorse-2,skeptic
+/rclab-review sessions/session-19/session-19d-key-result.md --agents principalist,boundary-guard,dreamer,workhorse-1,workhorse-2,skeptic
 
 # Skip synthesis to inspect individual reviews before combining
-/rclab-review sessions/session-19/session-19d-casimir-energy.md --skip-synthesis
+/rclab-review sessions/session-19/session-19d-key-result.md --skip-synthesis
 
 # After inspecting reviews, run synthesis manually with a smaller panel
 /rclab-team sessions/session-plan/session-19d-synthesis-prompt.md --mode panel --team-name s19d-synthesis
@@ -33,7 +33,7 @@ Mass parallel assessment IS what `/rclab-review` was built for:
 
 ```bash
 # Step 1: Mass review (all 17 agents)
-/rclab-review sessions/session-19/session-19d-casimir-energy.md
+/rclab-review sessions/session-19/session-19d-key-result.md
 
 # Step 2: Cross-evaluations (targeted)
 /rclab-review sessions/session-19/session-19d-calculator-collab.md --agents dreamer,observer

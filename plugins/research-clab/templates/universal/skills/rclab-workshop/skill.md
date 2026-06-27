@@ -20,10 +20,10 @@ For solo synthesis (1+ agents independently writing reports from sources), use `
 
 ```
 # 2 agents, 2 rounds (default), focus topics
-/rclab-workshop session-63*.md --agents hawking,qa --context CC closure, GL stability
+/rclab-workshop session-63*.md --agents skeptic,calculator --context <focus topic 1>, <focus topic 2>
 
 # 3 rounds, explicit output
-/rclab-workshop session-34*.md --agents kk,connes --rounds 3 --output sessions/session-34/session-34-kk-connes-workshop.md
+/rclab-workshop session-34*.md --agents <typeA>,<typeB> --rounds 3 --output sessions/session-34/session-34-a-b-workshop.md
 ```
 
 ---
@@ -263,17 +263,51 @@ Fill this section — it is the PRIMARY output for session planning:
 ### What Breaks or Strains
 {1-3 bullets: what the workshop THREATENS or leaves unresolved. If nothing, "Nothing identified."}
 
-### Carry-Forward Computations
-{Numbered list — EVERY computation suggested across all rounds, deduplicated, with: what to compute, what data it needs, what gate it feeds, estimated effort.}
+### Carry-Forward Computations (MATH ONLY -- propagate to S{N+1})
+
+**Discriminator (4-field test)**: an item belongs HERE iff it satisfies ALL FOUR fields. If ANY field cannot be filled, the item is NOT a math carry-forward -- move it to "Effected In-Session" below and EXECUTE it before terminating.
+- **What**: specific equation / numerical observable / structural result to compute
+- **Inputs**: data files, project constants, upstream gates needed
+- **Gate**: pre-registered PASS / FAIL / INFO threshold with explicit tolerance
+- **Effort**: estimated wave-equivalents (compute time)
+
+{Numbered list of items satisfying ALL FOUR fields.}
+
+### Effected In-Session (NON-MATH -- MANDATORY, executed by YOU before terminating)
+
+**NON-NEGOTIABLE.** Per the project `CLAUDE.md` "No Technical Debt" clause: every non-math item this workshop surfaces MUST be EXECUTED by you NOW with concrete file edits, BEFORE you mark the workshop complete. You are the final agent (R{r} Turn B); you hold `acceptEdits` permission on the entire project tree. Use it.
+
+**Non-math classification** (move ANY item matching here and EXECUTE):
+- Registry / status edits -- status promotions, slot allocations, re-tags, registry-row additions
+- Rule-file extensions -- new sub-clauses, counter advances, taxonomy additions
+- Knowledge-index registrations / updates -- new entities, constant updates
+- Documentation hygiene -- provenance fixes, broken cross-links, stale-pin remediation, missing "see also" pointers
+- Framework housekeeping -- registry index updates, cross-link pointer rows
+- Audit-script extensions -- regex pattern additions, single-function-scope diagnostic flags
+
+**Procedure**:
+1. Enumerate EVERY non-math item surfaced across all rounds (CONVERGENCE / DISSENT / EMERGENCE / QUESTIONS).
+2. For each item, EXECUTE the file edit / Write / registry-write NOW.
+3. Record the action with a concrete file:line reference.
+4. Check the box ONLY after the edit is on disk.
+
+**Output format** (one row per non-math item):
+
+- [x] {item} -- {action taken} -- `{file/path:line-range}` -- {sha-short or session anchor}
+
+**FORBIDDEN**: leaving any non-math item UNCHECKED; deferring non-math items to "Carry-Forward Computations"; writing "queued for S{N+1}" / "TODO" / "deferred" on a non-math item; asking the orchestrator whether to proceed -- proceed and execute.
 
 ### Closing Line
-{One sentence — the single most important thing from this workshop.}
+{One sentence -- the single most important thing from this workshop.}
 
 ## Rules
-- REPLACE placeholders in YOUR sections only.
+- REPLACE placeholders in YOUR sections only WITHIN the workshop document.
+- For NON-MATH carry-forwards: you have Edit/Write permission on the project tree. USE IT. Execute the file edits in-session and check off each item.
 - Project-specific framing (if a framing rule is installed by the discipline pack).
 - The Wrap-Up section is NON-NEGOTIABLE. Do not skip it.
-- Write ONLY to the workshop file.
+- The "Effected In-Session" sub-section is NON-NEGOTIABLE. Every non-math item must be checked off with a concrete file edit before you terminate.
+- You may write to: the workshop file (your sections), AND any non-compute file required to effect a non-math carry-forward (rule files, templates, registries, the knowledge index).
+- You may NOT execute `.py` computation scripts (no compute; that is for next-session math carry-forwards).
 ```
 
 **Wait for Agent B. Proceed to next round automatically (pre-committed via `--rounds`).**
@@ -295,12 +329,28 @@ Before launching Round 2+, **audit Round 1 for project-framing violations** if t
 
 ## Phase 3: Verify & Report
 
+After the final round's Agent B completes, **audit the workshop document for non-math completion compliance BEFORE reporting workshop-complete**:
+
+1. Grep the workshop document for the "Effected In-Session" section header.
+2. Count checked items (`- [x]`) and unchecked items (`- [ ]`) inside that section.
+3. If ANY item is unchecked, re-dispatch the final agent (`workshop-{agent-b-short}-r{N}-effect-followup`) with a write-only follow-up prompt:
+
+   ```
+   The workshop document `{output_path}` has N unchecked non-math items in the "Effected In-Session" section. You have Edit/Write permission on the project tree. Execute each remaining item now (rule-file edit, registry write, knowledge-index update, or whatever the item requires), record the file:line action, and tick the box. Do not terminate until every item is checked off. Do not move any item to "Carry-Forward Computations" -- that section is MATH ONLY per the 4-field test.
+   ```
+
+4. Repeat audit + re-dispatch until all non-math items are checked off (max 3 re-dispatches; if items remain unchecked after 3 attempts, escalate to the user with a list of the still-unchecked items).
+
+5. Then report:
+
 ```
 === RCLAB-WORKSHOP COMPLETE ===
 Rounds: {N} ({N*2} turns)
 Agent A: {agent-a-short} ({type})
 Agent B: {agent-b-short} ({type})
 Convergence: {count} | Partial: {count} | Dissent: {count} | Emerged: {count}
+Math carry-forwards (propagate to S{N+1}): {count, all 4-field-complete}
+Non-math effected in-session: {count, all checked off}
 Output: {path} ({lines} lines)
 ```
 
@@ -309,12 +359,13 @@ Output: {path} ({lines} lines)
 ## Rules
 
 1. **Never overwrite files** without user confirmation (collision check).
-2. **Never execute computations** — this skill produces a workshop document only.
+2. **Never execute `.py` computation scripts** -- this skill does not run compute; math/numerical-threshold work is queued as a 4-field carry-forward for the next session. The final agent MAY edit rule files, registries, templates, and the knowledge index (non-compute targets) to effect non-math carry-forwards.
 3. **Never re-adjudicate gate verdicts** — source doc verdicts are authoritative.
 4. **Workshop skeleton is MANDATORY** — build ALL sections before ANY agent launches.
 5. **Purely sequential** — never spawn B before A completes within a turn.
 6. **Never initiate shutdown** — user decides.
 7. **Project-specific framing** — audit and correct between rounds if a framing rule is installed.
+8. **Effected-In-Session is NON-NEGOTIABLE** -- the final round's Agent B (or its follow-up re-dispatch per Phase 3) MUST execute every non-math carry-forward with concrete file edits and tick each box before the workshop terminates. Non-math items deferred to the next session are FORBIDDEN per the project `CLAUDE.md` "No Technical Debt" clause. Only items satisfying the math 4-field test (what/inputs/gate/effort) propagate forward.
 
 ## Error Handling
 

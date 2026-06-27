@@ -174,9 +174,10 @@ class MadrigalClient:
 
     def __init__(
         self,
-        user_name: str = "phonon-exflation",
-        user_email: str = "phonon-exflation@localhost",
-        user_affiliation: str = "Phonon-Exflation Cosmology Project",
+        # Madrigal's API requires these identity fields; configure for your project.
+        user_name: str = "research-clab",
+        user_email: str = "research-clab@example.org",
+        user_affiliation: str = "Research Collaboration",
     ):
         if not _MADRIGAL_AVAILABLE:
             raise ImportError(

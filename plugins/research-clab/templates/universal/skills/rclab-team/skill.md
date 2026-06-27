@@ -103,7 +103,7 @@ Output: {path}
 ## Phase 2: Create Team and Tasks
 
 1. **TeamCreate** with team name.
-2. **TaskCreate** one per agent — the task description is a short handle (e.g., `"Panel: Hawking interprets thesis from black-hole perspective"`). Full instructions go into the agent prompt at spawn, not into the task.
+2. **TaskCreate** one per agent — the task description is a short handle (e.g., `"Panel: Observer interprets thesis from an empirical perspective"`). Full instructions go into the agent prompt at spawn, not into the task.
 3. Collaborate: start with the first round only. Subsequent rounds get their own teams created after the prior round closes.
 
 ---

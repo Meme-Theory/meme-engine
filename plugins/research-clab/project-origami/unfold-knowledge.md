@@ -3,7 +3,7 @@
 **Target agent**: Indexer
 **Task**: Generate the knowledge schema for the domain, create the empty index, seed your own memory with the maintenance protocol.
 **Inputs**: Domain and research question (from coordinator or user). Constraint categories (from coordinator).
-**Reads from**: `${CLAUDE_PLUGIN_ROOT}/KNOWLEDGE-DATABASE.md` (canonical specification), project `tools/` directory
+**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/universal/_plugin-dev/KNOWLEDGE-DATABASE.md` (canonical specification — plugin-side dev reference, not shipped into the project), project `tools/` directory
 **No Python required**: The core knowledge system is schema-driven and agent-maintained. Python tools are optional accelerators.
 
 ---
@@ -23,7 +23,7 @@ constraint-map.md           ─┘   (read schema,           (canonical)
 
 No extraction scripts. No regex. You read structured session artifacts and populate the index according to the schema's entity types and field definitions.
 
-For the full specification, read `${CLAUDE_PLUGIN_ROOT}/KNOWLEDGE-DATABASE.md`.
+For the full specification, read `${CLAUDE_PLUGIN_ROOT}/templates/universal/_plugin-dev/KNOWLEDGE-DATABASE.md`.
 
 ---
 
@@ -93,23 +93,19 @@ Template:
     "domain": "{domain}",
     "created": "{today}",
     "last_updated": "{today}",
-    "entity_types": ["sessions", "constraints", "gates", "proven_results", "closed_approaches", "active_channels", "confidence_trajectory", "data_provenance", "references"],
+    "entity_types": ["sessions", "researchers", "results", "references", "open_questions"],
     "total_entities": 0,
     "sessions_indexed": 0
   },
   "sessions": [],
-  "constraints": [],
-  "gates": [],
-  "proven_results": [],
-  "closed_approaches": [],
-  "active_channels": [],
-  "confidence_trajectory": [],
-  "data_provenance": [],
-  "references": []
+  "researchers": [],
+  "results": [],
+  "references": [],
+  "open_questions": []
 }
 ```
 
-Add arrays for any domain-specific entity types. Ensure the `entity_types` list in metadata matches the arrays.
+The 5 arrays above are the universal baseline. If the installed `tools/knowledge-schema.yaml` contains additional discipline-pack types (e.g., `theorems`, `gates`, `protocols`), add an empty array for each. Always derive the list from the schema actually on disk — ensure the `entity_types` list in metadata matches the arrays exactly.
 
 Create the visualization output directory: `tools/viz/`
 
@@ -126,7 +122,7 @@ Write to `.claude/agent-memory/indexer/MEMORY.md`:
 - Schema: `tools/knowledge-schema.yaml` (defines entity types and fields)
 - Index: `tools/knowledge-index.json` (single source of truth)
 - Rebuild: `/weave --update` (I read session artifacts and update the index)
-- Specification: `${CLAUDE_PLUGIN_ROOT}/KNOWLEDGE-DATABASE.md` (full protocol reference)
+- Schema reference: `tools/knowledge-schema.yaml` (defines entity types + fields; re-read on every rebuild)
 
 ## Entity Types
 {list each entity type from the schema with a one-line description}
@@ -201,8 +197,7 @@ Knowledge index scaffold complete:
 - Python accelerator: {installed | not needed | not available}
 
 Entity types configured:
-  Universal: sessions, constraints, gates, proven_results, closed_approaches,
-             active_channels, confidence_trajectory, data_provenance, references
+  Universal: sessions, researchers, results, references, open_questions
   Domain:    {list domain-specific types}
 
 Constraint categories: S, F, D, O, {domain categories}

@@ -3,7 +3,7 @@
 **Target agent**: Coordinator
 **Task**: Configure team management defaults, embed operational protocol into coordinator memory.
 **Inputs**: None (protocol is universal).
-**Reads from**: `${CLAUDE_PLUGIN_ROOT}/TEAM-MANAGEMENT-PROTOCOL.md` (reference)
+**Reads from**: `${CLAUDE_PLUGIN_ROOT}/templates/universal/rules/team-lead-behavior.md` and `teammate-behavior.md` (the protocol this doc embeds is inline below)
 
 ---
 

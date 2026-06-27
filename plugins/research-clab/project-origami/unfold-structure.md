@@ -19,6 +19,7 @@ Create this exact structure under the project root. Every directory listed here 
 │   ├── skills/                 # All universal/skills/ + any discipline pack skills
 │   ├── templates/              # All universal/project-docs/ files + session-templates/ + agent-templates/ + agent-roster.md
 │   ├── rules/                  # Universal rules + discipline overlay additions/overrides
+│   ├── hooks/                  # Behavioral hooks (subagent guards, session/subagent briefs), from universal/hooks/
 │   └── rclab-help.md           # Installed from universal/project-docs/rclab-help.md
 ├── team-lead-behavior.md       # Project root — NOT in .claude/rules/ (keeps subagents from auto-loading)
 ├── researchers/                # One folder per domain agent (populated post-scaffold by /new-researcher)
@@ -39,7 +40,7 @@ Create this exact structure under the project root. Every directory listed here 
 
 ### Conditional directories (create only if the user selected them)
 
-- **`{{COMPUTATION_DIR}}/`** — create only if Q5 computation answer is "Yes — describe hardware" (user supplies the name; default is `computation/`). Skip entirely if Q5 is "No — purely theoretical".
+- **`{{COMPUTATION_DIR}}/`** — create only if Q5 computation answer is "Yes — describe hardware" (user supplies the name; default is `tier0-computation/`, matching the convention the knowledge MCP server and rclab-* skills expect). Skip entirely if Q5 is "No — purely theoretical". If the user overrides this name, the knowledge MCP server's `CONSTANTS_PATH` (in `tools/mcp-servers/knowledge-mcp/server.py`) must be pointed at the chosen directory.
 - **`{{SIMULATION_DIR}}/`** — create only if the user explicitly said they need a structured simulation codebase (Q5 answered Yes *and* the hardware spec implied a simulation, or volunteered at Q2/Q3). Skip otherwise.
 
 When either conditional directory is skipped, the coordinator must also:
@@ -118,7 +119,7 @@ The root CLAUDE.md is the project constitution — LEAN, universal orientation o
 3. **Project Structure** — the directory tree from Step 1
 4. **Computation Environment** — pointer to conditional rule (hardware/python live there, not here)
 5. **Knowledge Index** — boilerplate about `/weave` (copy from template)
-6. **Behavioral Rules** — pointer to `.claude/rules/` (8 files)
+6. **Behavioral Rules** — pointer to `.claude/rules/` (9 files; more with a discipline pack)
 7. **Agent Roster** — pointer to `.claude/templates/agent-roster.md`
 8. **Personal Overrides** — `CLAUDE.local.md` guidance
 
@@ -138,6 +139,8 @@ Copy rule files from `${CLAUDE_PLUGIN_ROOT}/templates/universal/rules/` into `.c
 | `session-handoffs.md` | `.claude/rules/session-handoffs.md` | How to write handoff documents |
 | `agent-standards.md` | `.claude/rules/agent-standards.md` | Shared agent behavior baselines (memory discipline, output standards) |
 | `evoi-prioritization.md` | `.claude/rules/evoi-prioritization.md` | Expected-value-of-information ranking for next-step selection |
+| `joint-theorem-promotion.md` | `.claude/rules/joint-theorem-promotion.md` | Independent cross-axis verification pathway (agreement is evidence only when reviewers are independent) |
+| `Investigating-Workshops.md` | `.claude/rules/Investigating-Workshops.md` | Workshop-vs-carry-forward identification + honest-count discipline |
 
 These are universal — no substitutions needed. The coordinator copies the entire `templates/universal/rules/` directory in Phase 3a, so this table reflects whatever is currently in that source directory; add or remove entries here when the universal rule set changes.
 
@@ -221,11 +224,14 @@ Verbatim copy — no substitutions.
 Copy the skill-referenced document templates from `${CLAUDE_PLUGIN_ROOT}/templates/universal/` into `.claude/templates/`. These templates are used by `/rclab-plan`, `/rclab-review`, and `/rclab-team` to generate session plans, prompts, synthesis reports, and workshop documents.
 
 ```
-${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/plan-compute.md      → .claude/templates/plan-compute.md
-${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/plan-workshop.md      → .claude/templates/plan-workshop.md
-${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/prompt-session.md     → .claude/templates/prompt-session.md
-${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/synthesis.md          → .claude/templates/synthesis.md
-${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/workshop.md           → .claude/templates/workshop.md
+${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/plan-compute.md         → .claude/templates/plan-compute.md
+${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/plan-investigation.md   → .claude/templates/plan-investigation.md
+${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/plan-workshop.md        → .claude/templates/plan-workshop.md
+${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/prompt-session.md       → .claude/templates/prompt-session.md
+${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/synthesis.md            → .claude/templates/synthesis.md
+${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/workshop.md             → .claude/templates/workshop.md
+${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/workshop-schedule.md    → .claude/templates/workshop-schedule.md
+${CLAUDE_PLUGIN_ROOT}/templates/universal/project-docs/workingpaper.md         → .claude/templates/workingpaper.md
 ```
 
 These are verbatim copies — no substitutions needed. Skills resolve these templates at runtime from `.claude/templates/`.
@@ -236,7 +242,7 @@ These are verbatim copies — no substitutions needed. Skills resolve these temp
 
 **READ**: `${CLAUDE_PLUGIN_ROOT}/project-origami/unfold-document-prep.md` and execute it.
 
-This step installs format-specific document templates into `artifacts/document-templates/` based on the user's `{output-format}` selection (Question 4). For LaTeX projects, this installs 13 `.tex` templates (paper, poster, slides, thesis, report, etc.) and a sample `.bib` file. For Typst and Markdown, it installs placeholder READMEs.
+This step installs format-specific document templates into `artifacts/document-templates/` based on the user's `{output-format}` selection (Question 4). For LaTeX projects, this installs 14 `.tex` templates (paper, poster, slides, thesis, report, etc.) and a sample `.bib` file. For Typst and Markdown, it installs placeholder READMEs.
 
 The `/paper new <type>` command discovers these templates at runtime.
 
@@ -269,6 +275,10 @@ Generate `.claude/settings.local.json` with:
 ```
 
 If a Python environment was identified, add `Bash("{python-path}":*)`.
+
+### 5c: Install Hooks
+
+Copy the entire `${CLAUDE_PLUGIN_ROOT}/templates/universal/hooks/` directory into `.claude/hooks/`. These are behavioral guard scripts (subagent edit-guard on `.claude/rules/`, SessionStart / SubagentStart context briefs, an MCP pre-check skeleton). On Unix/macOS, mark the `.sh` files executable (`chmod +x .claude/hooks/*.sh`). The `.claude/settings.json` written in Step 5a wires these hooks by path — if you skip this copy, those hook entries point at missing scripts.
 
 ---
 
@@ -431,8 +441,8 @@ Before reporting completion, verify:
 
 - [ ] All directories from Step 1 exist
 - [ ] Root CLAUDE.md has all required sections filled in
-- [ ] All 8 rule files exist in `.claude/rules/`
-- [ ] All 11 skills exist in `.claude/skills/`
+- [ ] All 9 rule files exist in `.claude/rules/` (universal baseline; more with a discipline pack)
+- [ ] All 17 skills exist in `.claude/skills/` (universal baseline; more with a discipline pack)
 - [ ] `settings.json` exists, is valid JSON, and contains `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`
 - [ ] `settings.local.json` exists and is valid JSON
 - [ ] 3 infrastructure agents exist in `.claude/agents/`
@@ -440,14 +450,14 @@ Before reporting completion, verify:
 - [ ] 11 session templates exist in `.claude/templates/session-templates/`
 - [ ] 10 agent templates exist in `.claude/templates/agent-templates/`
 - [ ] `agent-roster.md` exists in `.claude/templates/`
-- [ ] 5 document templates exist in `.claude/templates/` (plan-compute, plan-workshop, prompt-session, synthesis, workshop)
+- [ ] 8 document templates exist in `.claude/templates/` (plan-compute, plan-investigation, plan-workshop, prompt-session, synthesis, workshop, workshop-schedule, workingpaper)
 - [ ] `rclab-help.md` exists at `.claude/rclab-help.md`
 - [ ] `agents.md` exists at root
 - [ ] `.gitignore` exists at root
 - [ ] Session-0 prompt exists in `sessions/session-plan/`
 - [ ] `sessions/session-00/` directory exists
 - [ ] `artifacts/document-templates/` exists with format-specific subdirectory
-- [ ] For LaTeX: 13 `.tex` + 1 `.bib` templates present
+- [ ] For LaTeX: 14 `.tex` + 1 `.bib` templates present
 
 ---
 

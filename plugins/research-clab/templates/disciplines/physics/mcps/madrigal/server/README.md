@@ -2,7 +2,7 @@
 
 MCP (Model Context Protocol) server wrapping the Madrigal ionospheric /
 heliophysics database ecosystem, with framework-specific search helpers
-for the Phonon-Exflation Cosmology retrospective-analysis program.
+for an upper-atmosphere / ionosphere retrospective-analysis program.
 
 ## What It Does
 
@@ -25,8 +25,7 @@ Exposes 11 tools to the Claude Code harness:
 
 ## Why It Exists
 
-Per `sessions/session-74/session-74-rf-analysis.md`, the Phonon-Exflation
-Cosmology framework predicts substrate-level pair production via coherent
+The project's framework predicts substrate-level pair production via coherent
 RF stimulation of the Leggett-channel Jensen mode. Retrospective analysis
 of existing ionospheric-radar and ionospheric-heater operational archives
 is the cheapest framework-test pathway — orders of magnitude cheaper than
@@ -40,7 +39,7 @@ that gap.
 
 ## Known Framework-Relevant Targets
 
-Ranked by priority per `session-74-rf-analysis.md` §V:
+Ranked by priority per the project's RF-analysis session notes:
 
 | Priority | Instrument | Why |
 |:--------:|:-----------|:----|
@@ -72,9 +71,9 @@ Register in the project's `.mcp.json`:
   "mcpServers": {
     "madrigal": {
       "type": "stdio",
-      "command": "C:\\Users\\ryan\\AppData\\Local\\Programs\\Python\\Launcher\\py.exe",
-      "args": ["-3.13", "tools/mcp-servers/madrigal-mcp/server.py"],
-      "cwd": "C:\\sandbox\\Ainulindale Exflation\\tools\\mcp-servers\\madrigal-mcp",
+      "command": "{{PYTHON_CMD}}",
+      "args": ["{{PROJECT_ROOT}}/tools/mcp-servers/madrigal-mcp/server.py"],
+      "cwd": "{{PROJECT_ROOT}}/tools/mcp-servers/madrigal-mcp",
       "env": {}
     }
   }
@@ -116,7 +115,7 @@ for inst in instruments[:5]:
 The framework-specific tools encode:
 
 - The Tesla-Mack workshop target Jensen resonance frequency (~160 MHz, ±50%)
-- The curated instrument priority ranking from `session-74-rf-analysis.md` §V
+- The curated instrument priority ranking from the project's RF-analysis session notes
 - The published anomaly campaigns (EISCAT X-mode 2012, Arecibo 2019, Sura 2021)
 
 When the OQ-TESLA-T1 / OQ-TESLA-T4 pre-computations return refined frequency
@@ -140,6 +139,6 @@ suppressed (required for MCP stdio handshake compatibility).
 - [Madrigal at MIT Haystack](http://madrigal.haystack.mit.edu/)
 - [EISCAT Madrigal](https://madrigal.eiscat.se/madrigal/)
 - [Model Context Protocol Python SDK](https://github.com/modelcontextprotocol/python-sdk)
-- `sessions/session-74/session-74-rf-analysis.md` — framework retrospective-analysis program
-- `sessions/session-74/session-74-tesla-mack-bells-workshop.md` — Jensen-resonance target parameters
-- `sessions/framework/Phononic-C-Causality.md` — framework theorems
+- The project's RF-analysis session notes — framework retrospective-analysis program
+- The project's workshop session notes — Jensen-resonance target parameters
+- The project's framework notes — framework theorems

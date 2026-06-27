@@ -34,7 +34,7 @@ memory: project                # Always "project" for research agents
 |:-----|:-----|:--------|:---------------|
 | `opus` | Highest | Deep derivation, adversarial debate, nuanced analysis | Specialist theorists, Skeptic |
 | `sonnet` | Medium | Structured indexing, synthesis, orchestration | Coordinator, Indexer |
-| `haiku` | Lowest | Fast bulk tasks, paper fetching, simple retrieval | Scout, web-researcher |
+| `haiku` | Lowest | Fast bulk tasks, paper fetching, simple retrieval | Scout |
 
 ## Agent Archetypes
 
@@ -59,8 +59,8 @@ Every research agent maps to one cognitive archetype:
 These three must exist in every project:
 
 1. **coordinator.md** — Orchestration, meeting minutes, context keeping
-2. **knowledge-weaver.md** — Knowledge index curation (sole writer of `knowledge-index.json`)
-3. **web-researcher.md** — Paper fetching and corpus population
+2. **indexer.md** — Knowledge index curation (sole writer of `knowledge-index.json`)
+3. **scout.md** — Paper fetching and corpus population
 
 ## Rules
 

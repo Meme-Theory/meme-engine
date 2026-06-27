@@ -65,7 +65,7 @@ After broad reviews and adversarial debates identify the critical question, you 
 ### {{Agent-2}}: {{VERIFICATION/LITERATURE/COMPUTATION}}
   - {{Specific verification task}}
 
-### {{Agent-3}}: {{PHYSICAL INTERPRETATION/CROSS-CHECK}}
+### {{Agent-3}}: {{INTERPRETATION/CROSS-CHECK}}
   - {{Specific cross-check task}}
 
 # IV. DELIVERABLES

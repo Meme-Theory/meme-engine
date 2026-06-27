@@ -29,3 +29,14 @@ The task with the highest EVOI gets priority. This tells you **where to spend ef
 ## Effort-Based Probability
 
 Framework confidence is not only a function of favorable results — it is also a function of work completed. Confidence rises as the surviving space is progressively mapped, even when individual tasks return null, because the map itself tightens. Track this explicitly: `P(framework) ≈ (checks-completed / checks-required) × (fraction-of-surviving-space-tested)`. The first factor goes up on any completed check; the second goes up only on informative results.
+
+## Maintenance & Enforcement (anti-rot)
+
+If the project maintains a living priority table (`sessions/framework/evoi-framework.md`), it is a LIVING document: its content currency MUST NOT lag the current session. Enforcement is structural, not aspirational:
+
+- **Staleness keys on a content marker, never on file mtime.** Stamp the table with a machine-readable currency marker -- e.g. `<!-- evoi-content-currency: {session-id} -->` -- and compare THAT against the current session: in-sync (no lag), advisory (lag 1-2 sessions), mandatory-rebuild (lag >= 3). A file whose bytes were swept by an unrelated broad commit is NOT thereby refreshed; git mtime lies about currency, the content marker does not.
+- **The planning step consumes AND maintains it.** Whatever orders the next session's work by priority must, in the same pass, rebuild and re-stamp the table when the staleness check trips. A stale guiding document is rebuilt BEFORE it is consumed -- never re-noted and deferred.
+- **The exploratory step feeds it.** Work that surfaces new high-leverage open questions routes them INTO the table, not only into scattered working papers.
+- **Values are ordinal proxies.** EVOI numbers are leverage rankings, not calibrated probabilities; a full re-rank with elicited P(pass) is a separate, explicit maintenance pass.
+
+A lapse, whenever found, is REBUILT in-session, never logged as a carry-forward.

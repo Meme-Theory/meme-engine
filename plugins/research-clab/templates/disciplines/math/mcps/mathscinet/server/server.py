@@ -36,7 +36,7 @@ from mcp.server import Server
 SERVER_DIR = Path(__file__).resolve().parent
 MREF_URL = "https://mathscinet.ams.org/mathscinet-mref"
 SEARCH_URL = "https://mathscinet.ams.org/mathscinet/api/publications/search"
-USER_AGENT = "Ainulindale-Exflation/MathSciNet-MCP (math-research)"
+USER_AGENT = "research-clab/MathSciNet-MCP (academic research)"
 HTTP_TIMEOUT = 25.0
 
 logging.basicConfig(

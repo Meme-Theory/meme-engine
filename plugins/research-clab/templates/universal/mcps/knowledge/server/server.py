@@ -14,6 +14,7 @@ Tools:
   get_constant         — Get a canonical constant with provenance
   list_constants       — List/filter canonical constants
   update_constant      — Add or update a constant in canonical_constants.py
+  emit_verdict         -- Race-safe append of a gate verdict line (Option-A permanence)
 """
 
 # Suppress warnings before any imports — stderr noise breaks MCP stdio
@@ -43,7 +44,15 @@ SERVER_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SERVER_DIR.parent.parent.parent  # tools/mcp-servers/knowledge-mcp -> root
 INDEX_PATH = PROJECT_ROOT / "tools" / "knowledge-index.json"
 DB_PATH = PROJECT_ROOT / "tools" / "knowledge.db"
-CONSTANTS_PATH = PROJECT_ROOT / "tier0-computation" / "canonical_constants.py"
+# Auto-detect a canonical-constants module across common compute-dir conventions.
+# Resolved at server start; restart/reload the MCP to pick up a module added later.
+# To use a different location, set this path explicitly.
+CONSTANTS_PATH = next(
+    (PROJECT_ROOT / d / "canonical_constants.py"
+     for d in ("tier0-computation", "computation", "tools")
+     if (PROJECT_ROOT / d / "canonical_constants.py").exists()),
+    PROJECT_ROOT / "tier0-computation" / "canonical_constants.py",
+)
 USAGE_COUNTER_PATH = SERVER_DIR / "usage_counter.json"
 
 # Logging — to file, not stderr
@@ -159,7 +168,7 @@ def _parse_constants_module() -> dict:
             pass
 
     # --- Pass 2: Alias assignments (name = other_name) ---
-    # Matches: E_cond = E_cond_ED_8mode, M_KK = M_KK_gravity, Delta_BCS = Delta_0_OES
+    # Matches: alpha = alpha_fit, c = c_light, beta = beta_0
     alias_re = re.compile(
         r'^([A-Za-z_]\w*)\s*=\s*([A-Za-z_]\w*)\s*(?:#.*)?$',
         re.MULTILINE
@@ -174,7 +183,7 @@ def _parse_constants_module() -> dict:
             continue
         aliases[alias_name] = target_name
 
-    # Resolve alias chains: E_cond -> E_cond_ED_8mode -> (numeric value)
+    # Resolve alias chains: alpha -> alpha_fit -> (numeric value)
     for alias_name, target in aliases.items():
         if target in constants and alias_name not in constants:
             constants[alias_name] = constants[target]
@@ -182,9 +191,9 @@ def _parse_constants_module() -> dict:
             constants[alias_name] = constants[aliases[target]]
 
     # --- Pass 3: Derived expressions where all operands are already parsed ---
-    # Catches: R_protected_fold = a0_fold * a4_fold / a2_fold**2
-    #          Omega_DM = Omega_m - Omega_b
-    #          T_CMB_GeV = T_CMB * k_B / 1e9
+    # Catches: ratio = a0 * a4 / a2**2
+    #          diff = total - baseline
+    #          scaled = raw * factor / 1e9
     import math
     expr_re = re.compile(
         r'^([A-Za-z_]\w*)\s*=\s*(.+?)\s*(?:#.*)?$',
@@ -345,7 +354,7 @@ async def handle_list_tools() -> list[types.Tool]:
                 "properties": {
                     "name": {
                         "type": "string",
-                        "description": "Entity name or concept to trace (e.g. 'BCS', 'monotonic', 'tau stabilization')"
+                        "description": "Entity name or concept to trace (e.g. a result, mechanism, or concept name)"
                     },
                     "limit": {
                         "type": "integer",
@@ -367,7 +376,7 @@ async def handle_list_tools() -> list[types.Tool]:
                 "properties": {
                     "name": {
                         "type": "string",
-                        "description": "Constant name (e.g. 'tau_fold', 'M_KK_gravity', 'Delta_BCS')"
+                        "description": "Constant name (e.g. 'alpha', 'c_light')"
                     }
                 },
                 "required": ["name"]
@@ -389,7 +398,7 @@ async def handle_list_tools() -> list[types.Tool]:
                     },
                     "section": {
                         "type": "string",
-                        "description": "Filter by section: PDG, geometric, BCS, spectral, transit, cosmological, acoustic, observation",
+                        "description": "Filter by category, e.g. the sections your constants module defines",
                         "default": ""
                     }
                 }
@@ -415,15 +424,15 @@ async def handle_list_tools() -> list[types.Tool]:
                     },
                     "session": {
                         "type": "string",
-                        "description": "Session where this was established (e.g. 'S77')"
+                        "description": "Session where this was established (e.g. 'S12')"
                     },
                     "source": {
                         "type": "string",
-                        "description": "Source file or derivation (e.g. 's77_equil_tau_bcs.npz')"
+                        "description": "Source file or derivation (e.g. 's12_run_outputs.npz')"
                     },
                     "gate": {
                         "type": "string",
-                        "description": "Gate ID if applicable (e.g. 'S77-A1-EQUIL-TAU'). Null if none.",
+                        "description": "Gate ID if applicable (e.g. 'S12-A1-CONVERGENCE'). Null if none.",
                         "default": ""
                     },
                     "comment": {
@@ -450,6 +459,74 @@ async def handle_list_tools() -> list[types.Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {},
+            }
+        ),
+        types.Tool(
+            name="emit_verdict",
+            description=(
+                "Append ONE gate-verdict record to a verdict file using a cross-process "
+                "lock so concurrent writers never interleave or drop lines (a raw "
+                "append loses lines under parallel writers on Windows). Records are "
+                "append-only (Option-A permanence): never overwrite a prior line -- to "
+                "correct one, emit a new record with 'supersedes' set to the prior "
+                "record's content_sha256. Consumers read the latest non-superseded "
+                "record per gate_id. Each record is written as one JSON object per line."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "gate_id": {
+                        "type": "string",
+                        "description": "Gate identifier (e.g. 'S12-A1-CONVERGENCE')."
+                    },
+                    "session": {
+                        "type": "string",
+                        "description": "Session or investigation label (e.g. 'S12', 'inv3')."
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The measured/computed value being gated."
+                    },
+                    "verdict": {
+                        "type": "string",
+                        "enum": ["PASS", "FAIL", "INFO", "INCONCLUSIVE"],
+                        "description": "Verdict outcome."
+                    },
+                    "threshold": {
+                        "type": "string",
+                        "description": "Pre-registered threshold/tolerance the value was tested against.",
+                        "default": ""
+                    },
+                    "content_sha256": {
+                        "type": "string",
+                        "description": "SHA-256 of the result content this verdict is derived from.",
+                        "default": ""
+                    },
+                    "script_sha256": {
+                        "type": "string",
+                        "description": "SHA-256 of the script that produced the value.",
+                        "default": ""
+                    },
+                    "source_file": {
+                        "type": "string",
+                        "description": "Verdict file to append to. Absolute, or relative to the project "
+                                       "root (e.g. 'tier0-computation/session-12/s12_gate_verdicts.txt')."
+                    },
+                    "track": {
+                        "type": "string",
+                        "description": "Verdict track: 'session' (default) or 'investigation'.",
+                        "default": "session"
+                    },
+                    "supersedes": {
+                        "type": "string",
+                        "description": "Optional 64-hex content_sha256 of a prior record this one corrects."
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "description": "Optional ISO-8601 timestamp; defaults to current UTC."
+                    }
+                },
+                "required": ["gate_id", "session", "value", "verdict", "source_file"]
             }
         ),
     ]
@@ -480,6 +557,8 @@ async def handle_call_tool(name: str, arguments: dict | None) -> list[types.Text
             return await _update_constant(args)
         elif name == "usage_stats":
             return await _usage_stats(args)
+        elif name == "emit_verdict":
+            return await _emit_verdict(args)
         else:
             return [types.TextContent(type="text", text=f"Unknown tool: {name}")]
     except Exception as e:
@@ -733,7 +812,7 @@ async def _get_constant(args: dict) -> list[types.TextContent]:
     # Has provenance but value not parsed (complex alias or expression)
     if name in provenance:
         prov = provenance[name]
-        # Try to resolve via source hint (e.g., "alias for E_cond_ED_8mode")
+        # Try to resolve via source hint (e.g., "alias for alpha_fit")
         alias_target = None
         src = prov.get("source", "")
         if "alias for " in src:
@@ -947,6 +1026,102 @@ async def _usage_stats(args: dict) -> list[types.TextContent]:
     lines.append("")
     lines.append("To reset: delete the counter file and restart the server.")
     return [types.TextContent(type="text", text="\n".join(lines))]
+
+
+async def _emit_verdict(args: dict) -> list[types.TextContent]:
+    """Append one gate-verdict record to a verdict file under a cross-process lock.
+
+    Race-safe: a single writer holds an O_EXCL lock on '<source_file>.lock' for the
+    append, so concurrent emitters never interleave or drop lines (a raw open(path,
+    'a') loses lines under parallel writers on Windows). Append-only: corrections add
+    a new record carrying 'supersedes' rather than rewriting history (Option-A
+    permanence). Each record is one JSON object per line (JSONL); ensure_ascii keeps
+    the written line ASCII-safe regardless of input.
+    """
+    import datetime as _dt
+    import time as _time
+
+    valid_verdicts = ("PASS", "FAIL", "INFO", "INCONCLUSIVE")
+    verdict = str(args.get("verdict", "")).strip()
+    if verdict not in valid_verdicts:
+        return [types.TextContent(type="text",
+                text=f"Error: verdict must be one of {', '.join(valid_verdicts)} (got '{verdict}')")]
+
+    source_file = str(args.get("source_file", "")).strip()
+    if not source_file:
+        return [types.TextContent(type="text", text="Error: source_file is required")]
+
+    # Resolve the verdict-file path: absolute as-is, else relative to project root.
+    p = Path(source_file)
+    if not p.is_absolute():
+        p = PROJECT_ROOT / p
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+    except OSError as e:
+        return [types.TextContent(type="text",
+                text=f"Error: cannot create directory for {p}: {e}")]
+
+    timestamp = str(args.get("timestamp", "")).strip()
+    if not timestamp:
+        timestamp = _dt.datetime.now(_dt.timezone.utc).isoformat().replace("+00:00", "Z")
+
+    record = {
+        "gate_id": str(args.get("gate_id", "")),
+        "session": str(args.get("session", "")),
+        "track": str(args.get("track", "") or "session"),
+        "verdict": verdict,
+        "value": str(args.get("value", "")),
+        "threshold": str(args.get("threshold", "")),
+        "content_sha256": str(args.get("content_sha256", "")),
+        "script_sha256": str(args.get("script_sha256", "")),
+        "timestamp": timestamp,
+    }
+    supersedes = str(args.get("supersedes", "")).strip()
+    if supersedes:
+        record["supersedes"] = supersedes
+
+    line = json.dumps(record, ensure_ascii=True, sort_keys=True)
+
+    # --- Cross-process lock: O_EXCL create-or-spin, with a stale-lock breaker. ---
+    lock_path = str(p) + ".lock"
+    timeout_s = 15.0
+    stale_s = 30.0
+    poll_s = 0.05
+    deadline = _time.time() + timeout_s
+    fd = None
+    while True:
+        try:
+            fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_RDWR)
+            break
+        except FileExistsError:
+            # Reclaim a wedged lock left behind by a crashed writer.
+            try:
+                if _time.time() - os.path.getmtime(lock_path) > stale_s:
+                    os.remove(lock_path)
+                    continue
+            except OSError:
+                pass
+            if _time.time() >= deadline:
+                return [types.TextContent(type="text",
+                        text=f"Error: timed out after {timeout_s:.0f}s acquiring lock {lock_path}")]
+            _time.sleep(poll_s)
+
+    try:
+        with open(p, "a", encoding="utf-8") as f:
+            f.write(line + "\n")
+    finally:
+        try:
+            os.close(fd)
+        except OSError:
+            pass
+        try:
+            os.remove(lock_path)
+        except OSError:
+            pass
+
+    note = f" (supersedes {supersedes})" if supersedes else ""
+    return [types.TextContent(type="text",
+            text=f"[OK] {verdict} verdict for '{record['gate_id']}' appended to {p}{note}")]
 
 
 # ---------------------------------------------------------------------------

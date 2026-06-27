@@ -51,12 +51,14 @@ Available:
 
   1. PAPER-SEARCH    Search & download academic papers
                      Sources: arXiv, PubMed, bioRxiv, medRxiv, Google Scholar
-                     Requires: Python 3.10+, pip install paper-search-mcp
+                     Requires: Python 3.13 (3.10+ minimum), pip install paper-search-mcp
 
   {future MCPs appear here automatically}
 
   0. NONE            Skip MCP installation (can add later manually)
 ```
+
+**Recommend pack-skill-dependent MCPs.** If the selected discipline pack installed a skill that hard-depends on one of the pack's MCPs — declared via the skill's `Requires:` note or by name convention (e.g. the `sage-compute` skill needs the `sage` MCP, `proof-check` benefits from the knowledge MCP's `get_constant`) — surface it in the menu: mark that MCP "(recommended — required by the installed `<skill>` skill)" and default it to selected. This prevents shipping an installed-but-inert skill whose backend the user skipped. (A skipped dependency is not fatal — these skills degrade with a clean "no backend available" message — but it surprises the user.)
 
 Print the menu as plain text, then ask ONE AskUserQuestion:
 
@@ -292,8 +294,11 @@ MCP setup complete:
     - download_arxiv, download_biorxiv, download_medrxiv
     - read_arxiv_paper, read_biorxiv_paper, read_medrxiv_paper
 
-  NOTE: MCP servers activate on next Claude Code session start.
-  If you are in an active session, restart to pick up the new tools.
+  NOTE: MCP servers are NOT live yet — Claude Code loads them at session start.
+  The skill's Phase 7d "MCP Reset Gate" handles this: after the Python deps are
+  installed (Phase 7c), it asks you to pass  \  to reload the servers before the
+  researcher phase. If you are running MCP install standalone, pass \ (or restart
+  the session) to pick up the new tools.
 ```
 
 ### If skipped:
